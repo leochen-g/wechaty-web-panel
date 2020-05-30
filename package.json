@@ -1,20 +1,30 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "verpub publish",
+    "release:dry": "verpub --dry-run"
   },
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "wechaty"
+  ],
+  "author": {
+    "name": "Leo_chen",
+    "url": "leo.gengchen@foxmail.com"
+  },
+  "license": "MIT",
   "devDependencies": {
+  },
+  "readme": "README.md",
+  "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "node-schedule": "^1.3.2",
     "qrcode-terminal": "^0.12.0",
     "superagent": "^5.2.2",
     "wechaty": "^0.39.40",
     "wechaty-puppet-padplus": "^0.7.16"
-  },
-  "dependencies": {}
+  }
 }
