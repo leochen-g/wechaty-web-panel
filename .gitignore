@@ -1,0 +1,27 @@
+*.vscode
+*/.settings
+*/target
+*target
+*/.settings
+*/target
+*.project
+*.classpath
+*.idea
+*.iml
+*.DS_Store
+*.log
+/build/
+/bin/
+*/output
+*node_modules
+*/log
+.env
+*.memory-card.json
+package-lock.json
+# Runtime data
+pids
+*.pid
+*.seed
+*/file
+npm-debug.log
+/yarn.lock
