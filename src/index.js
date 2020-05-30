@@ -10,7 +10,7 @@ const onHeartbeat = require("./handlers/on-heartbeat");
 const onError = require("./handlers/on-error");
 const onRoomtopic = require("./handlers/on-roomtopic");
 const onRoomleave = require("./handlers/on-roomleave");
-module.exports = function WechatyPanelPlugin(config = {}) {
+module.exports = function WechatyWebPanelPlugin(config = {}) {
   return function (bot) {
     bot.on("scan", onScan);
     bot.on("login", onLogin);
