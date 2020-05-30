@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "0.0.1",
+  "version": "0.0.2-beta.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,8 +16,7 @@
     "url": "leo.gengchen@foxmail.com"
   },
   "license": "MIT",
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "readme": "README.md",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
@@ -26,5 +25,7 @@
     "superagent": "^5.2.2",
     "wechaty": "^0.39.40",
     "wechaty-puppet-padplus": "^0.7.16"
-  }
+  },
+  "_id": "wechaty-web-panel@0.0.2-beta.0",
+  "_commitid": "a812df8"
 }
