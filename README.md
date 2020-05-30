@@ -106,6 +106,12 @@ bot
 $ node mybot.js
 ```
 
+### Step 5: 扫码进入
+
+进入面板`小助手配置->登录状态`扫码登录，或直接扫码控制台二维码登录
+
+![](./doc/img/qrcode-s.png)
+
 ## 面板预览
 
 ![](./doc/img/qrcode.png)

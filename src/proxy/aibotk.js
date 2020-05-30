@@ -1,47 +1,47 @@
-const {aiBotReq, req} = require('./superagent');
-const {parseBody} = require('../lib/index')
-const fs = require('fs')
-const path = require('path')
+const { aiBotReq, req } = require("./superagent");
+const { parseBody } = require("../lib/index");
+const fs = require("fs");
+const path = require("path");
 
 /**
  * 获取配置文件
  * @returns {Promise<*>}
  */
 async function getConfig() {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/wechat/config',
-            params: {}
-        };
-        let res = await aiBotReq(option)
-        let content = parseBody(res);
-        let data = `${JSON.stringify(JSON.parse(content.data.config), null, 2)}`
-        fs.writeFileSync(path.join('./wechat.config.json'), data)
-        return content.data
-    } catch (e) {
-        console.log('获取配置文件失败:' + e);
-    }
+  try {
+    let option = {
+      method: "GET",
+      url: "/wechat/config",
+      params: {},
+    };
+    let res = await aiBotReq(option);
+    let content = parseBody(res);
+    let data = `${JSON.stringify(JSON.parse(content.data.config), null, 2)}`;
+    fs.writeFileSync(path.join("./wechat.config.json"), data);
+    return content.data;
+  } catch (e) {
+    console.log("获取配置文件失败:" + e);
+  }
 }
 
 /**
  * 获取定时提醒任务列表
  */
 async function getScheduleList() {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/task',
-            params: {}
-        };
-        let res = await aiBotReq(option)
-        let text = parseBody(res);
-        let scheduleList = text.data;
-        console.log('获取定时任务成功:' + scheduleList)
-        return scheduleList;
-    } catch (error) {
-        console.log('获取定时任务失败:' + error);
-    }
+  try {
+    let option = {
+      method: "GET",
+      url: "/task",
+      params: {},
+    };
+    let res = await aiBotReq(option);
+    let text = parseBody(res);
+    let scheduleList = text.data;
+    console.log("获取定时任务成功:" + scheduleList);
+    return scheduleList;
+  } catch (error) {
+    console.log("获取定时任务失败:" + error);
+  }
 }
 
 /**
@@ -50,35 +50,35 @@ async function getScheduleList() {
  * @returns {*} 任务详情
  */
 async function setSchedule(obj) {
-    try {
-        let option = {
-            method: 'POST',
-            url: '/task',
-            params: obj
-        };
-        let res = await aiBotReq(option)
-        let content = parseBody(res);
-        return content.data;
-    } catch (error) {
-        console.log('添加定时任务失败', error);
-    }
+  try {
+    let option = {
+      method: "POST",
+      url: "/task",
+      params: obj,
+    };
+    let res = await aiBotReq(option);
+    let content = parseBody(res);
+    return content.data;
+  } catch (error) {
+    console.log("添加定时任务失败", error);
+  }
 }
 
 /**
  * 更新定时提醒任务
  */
 async function updateSchedule(id) {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/task/update',
-            params: {id: id}
-        };
-        let res = await aiBotReq(option)
-        console.log('更新定时任务成功');
-    } catch (error) {
-        console.log('更新定时任务失败', error);
-    }
+  try {
+    let option = {
+      method: "GET",
+      url: "/task/update",
+      params: { id: id },
+    };
+    let res = await aiBotReq(option);
+    console.log("更新定时任务成功");
+  } catch (error) {
+    console.log("更新定时任务失败", error);
+  }
 }
 
 /**
@@ -88,17 +88,21 @@ async function updateSchedule(id) {
  * @returns {Promise<void>}
  */
 async function setQrCode(url, status) {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/wechat/qrcode',
-            params: {qrUrl: url, qrStatus: status}
-        };
-        let res = await aiBotReq(option)
-        console.log('推送二维码成功');
-    } catch (error) {
-        console.log('推送登录二维码失败', error);
+  try {
+    let option = {
+      method: "GET",
+      url: "/wechat/qrcode",
+      params: { qrUrl: url, qrStatus: status },
+    };
+    let res = await aiBotReq(option);
+    if (res) {
+      console.log("推送二维码成功");
+    } else {
+      console.log("推送登录二维码失败");
     }
+  } catch (error) {
+    console.log("推送登录二维码失败", error);
+  }
 }
 
 /**
@@ -107,17 +111,17 @@ async function setQrCode(url, status) {
  * @returns {Promise<void>}
  */
 async function sendHeartBeat(heart) {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/wechat/heart',
-            params: {heartBeat: heart}
-        };
-        let res = await aiBotReq(option)
-        console.log('推送心跳成功');
-    } catch (error) {
-        console.log('推送心跳失败', error);
-    }
+  try {
+    let option = {
+      method: "GET",
+      url: "/wechat/heart",
+      params: { heartBeat: heart },
+    };
+    let res = await aiBotReq(option);
+    console.log("推送心跳成功");
+  } catch (error) {
+    console.log("推送心跳失败", error);
+  }
 }
 
 /**
@@ -126,17 +130,17 @@ async function sendHeartBeat(heart) {
  * @returns {Promise<void>}
  */
 async function sendError(error) {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/wechat/qrerror',
-            params: {qrError: error}
-        };
-        let res = await aiBotReq(option)
-        console.log('推送错误成功',error);
-    } catch (e) {
-        console.log('推送错误失败', e);
-    }
+  try {
+    let option = {
+      method: "GET",
+      url: "/wechat/qrerror",
+      params: { qrError: error },
+    };
+    let res = await aiBotReq(option);
+    console.log("推送错误成功", error);
+  } catch (e) {
+    console.log("推送错误失败", e);
+  }
 }
 
 /**
@@ -145,17 +149,17 @@ async function sendError(error) {
  * @param url
  */
 async function sendAvatar(url) {
-    try {
-        let option = {
-            method: 'POST',
-            url: '/wechat/avatar',
-            params: {avatar: url}
-        };
-        let res = await aiBotReq(option)
-        console.log('推送头像成功');
-    } catch (error) {
-        console.log('推送头像失败', error);
-    }
+  try {
+    let option = {
+      method: "POST",
+      url: "/wechat/avatar",
+      params: { avatar: url },
+    };
+    let res = await aiBotReq(option);
+    console.log("推送头像成功");
+  } catch (error) {
+    console.log("推送头像失败", error);
+  }
 }
 
 /**
@@ -163,18 +167,18 @@ async function sendAvatar(url) {
  * @returns {Promise<*>}
  */
 async function getQiToken() {
-    try {
-        let option = {
-            method: 'GET',
-            url: '/wechat/qitoken',
-            params: {}
-        }
-        let res = await aiBotReq(option)
-        let content = parseBody(res);
-        return content.data.token
-    } catch (e) {
-        console.log('token error', e)
-    }
+  try {
+    let option = {
+      method: "GET",
+      url: "/wechat/qitoken",
+      params: {},
+    };
+    let res = await aiBotReq(option);
+    let content = parseBody(res);
+    return content.data.token;
+  } catch (e) {
+    console.log("token error", e);
+  }
 }
 
 /**
@@ -184,37 +188,38 @@ async function getQiToken() {
  * @returns {Promise<void>}
  */
 async function putqn(base, name) {
-    try {
-        const token = await getQiToken()
-        const namebase = Buffer.from(name).toString('base64').replace('=', '');
-        let filename = 'wechat/avatar/' + namebase + '.jpeg'
-        let base_file_name = Buffer.from(filename).toString('base64').replace('+', '-').replace('/', '_')
-        let options = {
-            method: 'POST',
-            url: 'http://upload.qiniup.com/putb64/-1/key/' + base_file_name,
-            contentType: 'application/octet-stream',
-            authorization: 'UpToken ' + token,
-            params: base
-        }
-        let res = await req(options)
-        let content = parseBody(res);
-        console.log('上传结果', content.key)
-        return 'http://image.xkboke.com/' + content.key
-    } catch (e) {
-        console.log('上传失败', e.Error)
-    }
+  try {
+    const token = await getQiToken();
+    const namebase = Buffer.from(name).toString("base64").replace("=", "");
+    let filename = "wechat/avatar/" + namebase + ".jpeg";
+    let base_file_name = Buffer.from(filename)
+      .toString("base64")
+      .replace("+", "-")
+      .replace("/", "_");
+    let options = {
+      method: "POST",
+      url: "http://upload.qiniup.com/putb64/-1/key/" + base_file_name,
+      contentType: "application/octet-stream",
+      authorization: "UpToken " + token,
+      params: base,
+    };
+    let res = await req(options);
+    let content = parseBody(res);
+    console.log("上传结果", content.key);
+    return "http://image.xkboke.com/" + content.key;
+  } catch (e) {
+    console.log("上传失败", e.Error);
+  }
 }
 
 module.exports = {
-    getConfig,
-    getScheduleList,
-    setSchedule,
-    updateSchedule,
-    setQrCode,
-    sendHeartBeat,
-    sendError,
-    sendAvatar,
-    putqn
-}
-
-
+  getConfig,
+  getScheduleList,
+  setSchedule,
+  updateSchedule,
+  setQrCode,
+  sendHeartBeat,
+  sendError,
+  sendAvatar,
+  putqn,
+};
