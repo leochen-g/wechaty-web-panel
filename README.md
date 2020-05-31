@@ -41,6 +41,8 @@ Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
   - [ ] 更多待你发现
 - [x] 进群自动欢迎
 - [x] 加好友自动回复
+* 自动更新配置文件，无需重启
+- [x] 默认给机器人发送 ‘更新’ 触发拉取新配置文件操作，可在面板`小助手配置->关键词回复->关键词事件`进行修改关键词
 
 更多详情介绍：[传送门](https://www.xkboke.com/web-inn/secretary/client.html#%E5%B0%8F%E5%8A%A9%E6%89%8B%E5%8A%9F%E8%83%BD%E4%B8%80%E8%A7%88)
 
