@@ -3,7 +3,7 @@
 [![Wechaty Plugin Web Panel](https://img.shields.io/badge/Wechaty%20Plugin-WebPanel-brightgreen.svg)](https://github.com/gengchen528/wechaty-web-panel)
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://github.com/Wechaty/wechaty)
 
-Wechaty Web Panel让你使用插件，快速接入web控制面板
+Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
 
 ## 面板主要功能
 

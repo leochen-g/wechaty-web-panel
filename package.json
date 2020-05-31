@@ -13,7 +13,12 @@
   ],
   "author": {
     "name": "Leo_chen",
-    "url": "leo.gengchen@foxmail.com"
+    "url": "http://www.xkboke.com",
+    "email": "leo.gengchen@foxmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gengchen528/wechaty-web-panel"
   },
   "license": "MIT",
   "devDependencies": {},
