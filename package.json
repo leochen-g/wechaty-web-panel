@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -32,6 +32,6 @@
     "wechaty": "^0.47.24",
     "wechaty-puppet-padplus": "^0.7.40"
   },
-  "_id": "wechaty-web-panel@0.0.7",
-  "_commitid": "9f4fe0c"
+  "_id": "wechaty-web-panel@0.0.8",
+  "_commitid": "cc4ae31"
 }
