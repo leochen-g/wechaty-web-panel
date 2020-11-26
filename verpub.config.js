@@ -1,6 +1,6 @@
 module.exports = {
   publish: {
-    client: "npm",
+    client: 'npm',
   },
-  tag: "{name}@{version}",
-};
+  tag: '{name}@{version}',
+}

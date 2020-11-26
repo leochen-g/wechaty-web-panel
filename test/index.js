@@ -1,7 +1,11 @@
-const { Wechaty } = require("wechaty");
-const bot = Wechaty.instance({ profile: "WECHATY_PROFILE" });
-const WechatyWebPanelPlugin = require("../src/index");
+const { Wechaty } = require('wechaty')
+const WechatyWebPanelPlugin = require('../src/index')
+const token = ''
+const name = 'wechat-assistant'
+const bot = new Wechaty({
+  name, // generate xxxx.memory-card.json and save login data for the next login
+})
 bot
   .use(WechatyWebPanelPlugin())
   .start()
-  .catch((e) => console.error(e));
+  .catch((e) => console.error(e))

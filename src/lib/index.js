@@ -1,7 +1,7 @@
-const Crypto = require("crypto");
-const schedule = require("node-schedule");
-const fs = require("fs");
-const { FileBox } = require("wechaty");
+const Crypto = require('crypto')
+const schedule = require('node-schedule')
+const fs = require('fs')
+const { FileBox } = require('wechaty')
 
 /**
  * 设置定时器
@@ -31,16 +31,40 @@ const { FileBox } = require("wechaty");
 //
 // 每周1的1点1分30秒触发 ：'30 1 1 * * 1'
 
-function setLocalSchedule(date, callback) {
-  schedule.scheduleJob(date, callback);
+function setLocalSchedule(date, callback, name) {
+  if (name) {
+    schedule.scheduleJob(name, date, callback)
+  } else {
+    schedule.scheduleJob(date, callback)
+  }
 }
-
+// 取消任务
+function cancelLocalSchedule(name) {
+  schedule.cancelJob(name)
+}
+// 取消指定任务
+function cancelAllSchedule(type) {
+  for (let i in schedule.scheduledJobs) {
+    if (i.includes(type)) {
+      cancelLocalSchedule(i)
+    }
+  }
+}
+/**
+ * 获取所有定时任务的job名
+ *
+ */
+function getAllSchedule() {
+  for (let i in schedule.scheduledJobs) {
+    console.log(i)
+  }
+}
 /**
  * 延时函数
  * @param {*} ms 毫秒
  */
 async function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 /**
  * 读取文件
@@ -48,31 +72,29 @@ async function delay(ms) {
 const loadFile = {
   data: null,
   mtime: '',
-  fetch (file) {
+  fetch(file) {
     try {
-      let mtime = fs.statSync(file).mtime;
+      let mtime = fs.statSync(file).mtime
       if (!this.data || mtime - this.mtime !== 0) {
-        console.log('Reload task file: ' + mtime);
-        this.data = JSON.parse(fs.readFileSync(file));
-        this.mtime = +mtime;
+        console.log('Reload task file: ' + mtime)
+        this.data = JSON.parse(fs.readFileSync(file))
+        this.mtime = +mtime
       }
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
-    return this.data;
-  }
+    return this.data
+  },
 }
 /**
  * 获取周几
  * @param {*} date 日期
  */
 function getDay(date) {
-  var date2 = new Date();
-  var date1 = new Date(date);
-  var iDays = parseInt(
-    Math.abs(date2.getTime() - date1.getTime()) / 1000 / 60 / 60 / 24
-  );
-  return iDays;
+  var date2 = new Date()
+  var date1 = new Date(date)
+  var iDays = parseInt(Math.abs(date2.getTime() - date1.getTime()) / 1000 / 60 / 60 / 24)
+  return iDays
 }
 
 /**
@@ -81,40 +103,40 @@ function getDay(date) {
  * @returns 例：2019-9-10 13:13:04 星期一
  */
 function formatDate(date) {
-  var tempDate = new Date(date);
-  var year = tempDate.getFullYear();
-  var month = tempDate.getMonth() + 1;
-  var day = tempDate.getDate();
-  var hour = tempDate.getHours();
-  var min = tempDate.getMinutes();
-  var second = tempDate.getSeconds();
-  var week = tempDate.getDay();
-  var str = "";
+  var tempDate = new Date(date)
+  var year = tempDate.getFullYear()
+  var month = tempDate.getMonth() + 1
+  var day = tempDate.getDate()
+  var hour = tempDate.getHours()
+  var min = tempDate.getMinutes()
+  var second = tempDate.getSeconds()
+  var week = tempDate.getDay()
+  var str = ''
   if (week === 0) {
-    str = "星期日";
+    str = '星期日'
   } else if (week === 1) {
-    str = "星期一";
+    str = '星期一'
   } else if (week === 2) {
-    str = "星期二";
+    str = '星期二'
   } else if (week === 3) {
-    str = "星期三";
+    str = '星期三'
   } else if (week === 4) {
-    str = "星期四";
+    str = '星期四'
   } else if (week === 5) {
-    str = "星期五";
+    str = '星期五'
   } else if (week === 6) {
-    str = "星期六";
+    str = '星期六'
   }
   if (hour < 10) {
-    hour = "0" + hour;
+    hour = '0' + hour
   }
   if (min < 10) {
-    min = "0" + min;
+    min = '0' + min
   }
   if (second < 10) {
-    second = "0" + second;
+    second = '0' + second
   }
-  return year + "-" + month + "-" + day + " " + hour + ":" + min + " " + str;
+  return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ' ' + str
 }
 
 /**
@@ -122,11 +144,11 @@ function formatDate(date) {
  * @returns 2019-7-19
  */
 function getToday() {
-  const date = new Date();
-  let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
-  return year + "-" + month + "-" + day + " ";
+  const date = new Date()
+  let year = date.getFullYear()
+  let month = date.getMonth() + 1
+  let day = date.getDate()
+  return year + '-' + month + '-' + day + ' '
 }
 
 /**
@@ -135,8 +157,8 @@ function getToday() {
  * @returns 0 12 15 * * * 每天下午3点12分
  */
 function convertTime(time) {
-  let array = time.split(":");
-  return "0 " + array[1] + " " + array[0] + " * * *";
+  let array = time.split(':')
+  return '0 ' + array[1] + ' ' + array[0] + ' * * *'
 }
 
 //
@@ -146,17 +168,17 @@ function convertTime(time) {
  * @returns {boolean}
  */
 function isRealDate(str) {
-  var reg = /^(\d+)-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2})$/;
-  var r = str.match(reg);
-  if (r == null) return false;
-  r[2] = r[2] - 1;
-  var d = new Date(r[1], r[2], r[3], r[4], r[5]);
-  if (d.getFullYear() != r[1]) return false;
-  if (d.getMonth() != r[2]) return false;
-  if (d.getDate() != r[3]) return false;
-  if (d.getHours() != r[4]) return false;
-  if (d.getMinutes() != r[5]) return false;
-  return true;
+  var reg = /^(\d+)-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2})$/
+  var r = str.match(reg)
+  if (r == null) return false
+  r[2] = r[2] - 1
+  var d = new Date(r[1], r[2], r[3], r[4], r[5])
+  if (d.getFullYear() != r[1]) return false
+  if (d.getMonth() != r[2]) return false
+  if (d.getDate() != r[3]) return false
+  if (d.getHours() != r[4]) return false
+  if (d.getMinutes() != r[5]) return false
+  return true
 }
 
 /**
@@ -164,49 +186,44 @@ function isRealDate(str) {
  * @param {*} msg
  */
 function getConstellation(astro) {
-  if (astro.includes("白羊座")) {
-    return "aries";
+  if (astro.includes('白羊座')) {
+    return 'aries'
   }
-  if (astro.includes("金牛座")) {
-    return "taurus";
+  if (astro.includes('金牛座')) {
+    return 'taurus'
   }
-  if (astro.includes("双子座")) {
-    return "gemini";
+  if (astro.includes('双子座')) {
+    return 'gemini'
   }
-  if (astro.includes("巨蟹座") || astro.includes("钜蟹座")) {
-    return "cancer";
+  if (astro.includes('巨蟹座') || astro.includes('钜蟹座')) {
+    return 'cancer'
   }
-  if (astro.includes("狮子座")) {
-    return "leo";
+  if (astro.includes('狮子座')) {
+    return 'leo'
   }
-  if (astro.includes("处女座")) {
-    return "virgo";
+  if (astro.includes('处女座')) {
+    return 'virgo'
   }
-  if (
-    astro.includes("天平座") ||
-    astro.includes("天秤座") ||
-    astro.includes("天瓶座") ||
-    astro.includes("天枰座")
-  ) {
-    return "libra";
+  if (astro.includes('天平座') || astro.includes('天秤座') || astro.includes('天瓶座') || astro.includes('天枰座')) {
+    return 'libra'
   }
-  if (astro.includes("天蝎座")) {
-    return "scorpio";
+  if (astro.includes('天蝎座')) {
+    return 'scorpio'
   }
-  if (astro.includes("射手座")) {
-    return "sagittarius";
+  if (astro.includes('射手座')) {
+    return 'sagittarius'
   }
-  if (astro.includes("射手座")) {
-    return "sagittarius";
+  if (astro.includes('射手座')) {
+    return 'sagittarius'
   }
-  if (astro.includes("摩羯座")) {
-    return "capricorn";
+  if (astro.includes('摩羯座')) {
+    return 'capricorn'
   }
-  if (astro.includes("水瓶座")) {
-    return "aquarius";
+  if (astro.includes('水瓶座')) {
+    return 'aquarius'
   }
-  if (astro.includes("双鱼座")) {
-    return "pisces";
+  if (astro.includes('双鱼座')) {
+    return 'pisces'
   }
 }
 
@@ -217,7 +234,7 @@ function getConstellation(astro) {
  */
 function randomRange(min, max) {
   // min最小值，max最大值
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min)) + min
 }
 
 /**
@@ -230,12 +247,12 @@ async function writeFile(fpath, encoding) {
   return new Promise(function (resolve, reject) {
     fs.writeFile(fpath, encoding, function (err, content) {
       if (err) {
-        reject(err);
+        reject(err)
       } else {
-        resolve(content);
+        resolve(content)
       }
-    });
-  });
+    })
+  })
 }
 
 /**
@@ -243,8 +260,8 @@ async function writeFile(fpath, encoding) {
  * @param {*} content 内容
  */
 function parseBody(content) {
-  if (!content) return;
-  return JSON.parse(content.text);
+  if (!content) return
+  return JSON.parse(content.text)
 }
 
 /**
@@ -252,7 +269,7 @@ function parseBody(content) {
  * @return {string}
  */
 function MD5(str) {
-  return Crypto.createHash("md5").update(str).digest("hex");
+  return Crypto.createHash('md5').update(str).digest('hex')
 }
 
 /**
@@ -260,12 +277,12 @@ function MD5(str) {
  * @param obj
  */
 function objKeySort(obj) {
-  const newkey = Object.keys(obj).sort();
-  const newObj = {};
+  const newkey = Object.keys(obj).sort()
+  const newObj = {}
   for (let i = 0; i < newkey.length; i++) {
-    newObj[newkey[i]] = obj[newkey[i]];
+    newObj[newkey[i]] = obj[newkey[i]]
   }
-  return newObj;
+  return newObj
 }
 
 /**
@@ -274,15 +291,15 @@ function objKeySort(obj) {
  * @returns {string}
  */
 function getQueryString(datas) {
-  const data = objKeySort(datas);
-  let url = "";
-  if (typeof data === "undefined" || data == null || typeof data !== "object") {
-    return "";
+  const data = objKeySort(datas)
+  let url = ''
+  if (typeof data === 'undefined' || data == null || typeof data !== 'object') {
+    return ''
   }
   for (var k in data) {
-    url += (url.indexOf("=") !== -1 ? "&" : "") + k + "=" + data[k];
+    url += (url.indexOf('=') !== -1 ? '&' : '') + k + '=' + data[k]
   }
-  return url;
+  return url
 }
 
 /**
@@ -292,8 +309,8 @@ function getQueryString(datas) {
  * @returns {string}
  */
 function getSign(secret, query) {
-  const stringSignTemp = `${query}&ApiSecret=${secret}`;
-  return MD5(stringSignTemp).toUpperCase();
+  const stringSignTemp = `${query}&ApiSecret=${secret}`
+  return MD5(stringSignTemp).toUpperCase()
 }
 
 /**
@@ -302,11 +319,11 @@ function getSign(secret, query) {
  * @returns {string}
  */
 function rndNum(n) {
-  let rnd = "";
+  let rnd = ''
   for (let i = 0; i < n; i++) {
-    rnd += Math.floor(Math.random() * 10);
+    rnd += Math.floor(Math.random() * 10)
   }
-  return rnd;
+  return rnd
 }
 
 /**
@@ -322,10 +339,10 @@ function getFormatQuery(apiKey, apiSecret, params = {}) {
     timestamp: new Date().getTime(),
     nonce: rndNum(3),
     ...params,
-  };
-  const sign = getSign(getQueryString(query), apiSecret);
-  query.sign = sign;
-  return query;
+  }
+  const sign = getSign(getQueryString(query), apiSecret)
+  query.sign = sign
+  return query
 }
 
 /**
@@ -335,9 +352,9 @@ function getFormatQuery(apiKey, apiSecret, params = {}) {
  * @param url 链接
  * @returns {[{type: *, content: *, url: *}]}
  */
-function msgArr(type = 1, content = "", url = "") {
-  let obj = { type: type, content: content, url: url };
-  return [obj];
+function msgArr(type = 1, content = '', url = '') {
+  let obj = { type: type, content: content, url: url }
+  return [obj]
 }
 
 /**
@@ -348,17 +365,15 @@ function msgArr(type = 1, content = "", url = "") {
  * @param msg 消息
  */
 async function addRoomWelcomeSay(room, roomName, contactName, msg) {
-  if (msg.type === 1 && msg.content !== "") {
+  if (msg.type === 1 && msg.content !== '') {
     // 文字
-    console.log("回复内容", msg.content);
-    await room.say(
-      `${roomName}：欢迎新朋友 @${contactName}，<br>${msg.content}`
-    );
-  } else if (msg.type === 2 && msg.url !== "") {
+    console.log('回复内容', msg.content)
+    await room.say(`${roomName}：欢迎新朋友 @${contactName}，<br>${msg.content}`)
+  } else if (msg.type === 2 && msg.url !== '') {
     // url文件
-    let obj = FileBox.fromUrl(msg.url);
-    console.log("回复内容", obj);
-    await room.say(obj);
+    let obj = FileBox.fromUrl(msg.url)
+    console.log('回复内容', obj)
+    await room.say(obj)
   }
 }
 /**
@@ -368,17 +383,17 @@ async function addRoomWelcomeSay(room, roomName, contactName, msg) {
  * @param {*} isRoom
  */
 async function roomSay(room, contact, msg) {
-  if (msg.type === 1 && msg.content !== "") {
+  if (msg.type === 1 && msg.content !== '') {
     // 文字
-    console.log("回复内容", msg.content);
-    await room.say(msg.content, contact);
-  } else if (msg.type === 2 && msg.url !== "") {
+    console.log('回复内容', msg.content)
+    contact ? await room.say(msg.content, contact) : await room.say(msg.content)
+  } else if (msg.type === 2 && msg.url !== '') {
     // url文件
-    let obj = FileBox.fromUrl(msg.url);
-    console.log("回复内容", obj);
-    await room.say("", contact);
-    await delay(500);
-    await room.say(obj);
+    let obj = FileBox.fromUrl(msg.url)
+    console.log('回复内容', obj)
+    contact ? await room.say('', contact) : ''
+    await delay(500)
+    await room.say(obj)
   }
 }
 
@@ -389,19 +404,19 @@ async function roomSay(room, contact, msg) {
  * @param isRoom
  */
 async function contactSay(contact, msg, isRoom = false) {
-  if (msg.type === 1 && msg.content !== "") {
+  if (msg.type === 1 && msg.content !== '') {
     // 文字
-    console.log("回复内容", msg.content);
-    await contact.say(msg.content);
-  } else if (msg.type === 2 && msg.url !== "") {
+    console.log('回复内容', msg.content)
+    await contact.say(msg.content)
+  } else if (msg.type === 2 && msg.url !== '') {
     // url文件
-    let obj = FileBox.fromUrl(msg.url);
-    console.log("回复内容", obj);
+    let obj = FileBox.fromUrl(msg.url)
+    console.log('回复内容', obj)
     if (isRoom) {
-      await contact.say(`@${contact.name()}`);
-      await delay(500);
+      await contact.say(`@${contact.name()}`)
+      await delay(500)
     }
-    await contact.say(obj);
+    await contact.say(obj)
   }
 }
 
@@ -411,19 +426,19 @@ async function contactSay(contact, msg, isRoom = false) {
  * @param contact
  */
 async function addRoom(that, contact, roomName, replys) {
-  let room = await that.Room.find({ topic: roomName });
+  let room = await that.Room.find({ topic: roomName })
   if (room) {
     try {
       for (const item of replys) {
-        await delay(2000);
-        contactSay(contact, item);
+        await delay(2000)
+        contactSay(contact, item)
       }
-      await room.add(contact);
+      await room.add(contact)
     } catch (e) {
-      console.error("加群报错", e);
+      console.error('加群报错', e)
     }
   } else {
-    console.log(`不存在此群：${roomName}`);
+    console.log(`不存在此群：${roomName}`)
   }
 }
 
@@ -433,73 +448,48 @@ async function addRoom(that, contact, roomName, replys) {
  * @param name
  */
 function contentDistinguish(keywordArray, name) {
-  let scheduleObj = {};
-  let today = getToday();
-  scheduleObj.setter = name; // 设置定时任务的用户
-  scheduleObj.subscribe = keywordArray[1] === "我" ? name : keywordArray[1]; // 定时任务接收者
-  if (keywordArray[2] === "每天") {
+  let scheduleObj = {}
+  let today = getToday()
+  scheduleObj.setter = name // 设置定时任务的用户
+  scheduleObj.subscribe = keywordArray[1] === '我' ? name : keywordArray[1] // 定时任务接收者
+  if (keywordArray[2] === '每天') {
     // 判断是否属于循环任务
-    console.log("已设置每日定时任务");
-    scheduleObj.isLoop = true;
-    if (keywordArray[3].includes(":") || keywordArray[3].includes("：")) {
-      let time = keywordArray[3].replace("：", ":");
-      scheduleObj.time = convertTime(time);
+    console.log('已设置每日定时任务')
+    scheduleObj.isLoop = true
+    if (keywordArray[3].includes(':') || keywordArray[3].includes('：')) {
+      let time = keywordArray[3].replace('：', ':')
+      scheduleObj.time = convertTime(time)
     } else {
-      scheduleObj.time = "";
+      scheduleObj.time = ''
     }
-    scheduleObj.content =
-      scheduleObj.setter === scheduleObj.subscribe
-        ? `亲爱的${scheduleObj.subscribe}，温馨提醒：${keywordArray[4].replace(
-            "我",
-            "你"
-          )}`
-        : `亲爱的${scheduleObj.subscribe},${
-            scheduleObj.setter
-          }委托我提醒你，${keywordArray[4].replace("我", "你")}`;
-  } else if (keywordArray[2] && keywordArray[2].includes("-")) {
-    console.log("已设置指定日期时间任务");
-    scheduleObj.isLoop = false;
-    scheduleObj.time =
-      keywordArray[2] + " " + keywordArray[3].replace("：", ":");
-    scheduleObj.content =
-      scheduleObj.setter === scheduleObj.subscribe
-        ? `亲爱的${scheduleObj.subscribe}，温馨提醒：${keywordArray[4].replace(
-            "我",
-            "你"
-          )}`
-        : `亲爱的${scheduleObj.subscribe},${
-            scheduleObj.setter
-          }委托我提醒你，${keywordArray[4].replace("我", "你")}`;
+    scheduleObj.content = scheduleObj.setter === scheduleObj.subscribe ? `亲爱的${scheduleObj.subscribe}，温馨提醒：${keywordArray[4].replace('我', '你')}` : `亲爱的${scheduleObj.subscribe},${scheduleObj.setter}委托我提醒你，${keywordArray[4].replace('我', '你')}`
+  } else if (keywordArray[2] && keywordArray[2].includes('-')) {
+    console.log('已设置指定日期时间任务')
+    scheduleObj.isLoop = false
+    scheduleObj.time = keywordArray[2] + ' ' + keywordArray[3].replace('：', ':')
+    scheduleObj.content = scheduleObj.setter === scheduleObj.subscribe ? `亲爱的${scheduleObj.subscribe}，温馨提醒：${keywordArray[4].replace('我', '你')}` : `亲爱的${scheduleObj.subscribe},${scheduleObj.setter}委托我提醒你，${keywordArray[4].replace('我', '你')}`
   } else {
-    console.log("已设置当天任务");
-    scheduleObj.isLoop = false;
-    scheduleObj.time = today + keywordArray[2].replace("：", ":");
-    scheduleObj.content =
-      scheduleObj.setter === scheduleObj.subscribe
-        ? `亲爱的${scheduleObj.subscribe}，温馨提醒：${keywordArray[3].replace(
-            "我",
-            "你"
-          )}`
-        : `亲爱的${scheduleObj.subscribe},${
-            scheduleObj.setter
-          }委托我提醒你，${keywordArray[3].replace("我", "你")}`;
+    console.log('已设置当天任务')
+    scheduleObj.isLoop = false
+    scheduleObj.time = today + keywordArray[2].replace('：', ':')
+    scheduleObj.content = scheduleObj.setter === scheduleObj.subscribe ? `亲爱的${scheduleObj.subscribe}，温馨提醒：${keywordArray[3].replace('我', '你')}` : `亲爱的${scheduleObj.subscribe},${scheduleObj.setter}委托我提醒你，${keywordArray[3].replace('我', '你')}`
   }
-  return scheduleObj;
+  return scheduleObj
 }
 async function putb64(base64, size, token) {
-  var pic = base64;
-  var url = "http://upload.qiniup.com/putb64/-1/"; //非华东空间需要根据注意事项 1 修改上传域名
-  var xhr = new XMLHttpRequest();
+  var pic = base64
+  var url = 'http://upload.qiniup.com/putb64/-1/' //非华东空间需要根据注意事项 1 修改上传域名
+  var xhr = new XMLHttpRequest()
   xhr.onreadystatechange = function () {
     if (xhr.readyState === 4) {
-      console.log("xhr.responseText", xhr.responseText);
-      return xhr.responseText;
+      console.log('xhr.responseText', xhr.responseText)
+      return xhr.responseText
     }
-  };
-  xhr.open("POST", url, true);
-  xhr.setRequestHeader("Content-Type", "application/octet-stream");
-  xhr.setRequestHeader("Authorization", "UpToken " + token);
-  xhr.send(pic);
+  }
+  xhr.open('POST', url, true)
+  xhr.setRequestHeader('Content-Type', 'application/octet-stream')
+  xhr.setRequestHeader('Authorization', 'UpToken ' + token)
+  xhr.send(pic)
 }
 //过滤联系人
 /**
@@ -514,23 +504,23 @@ async function putb64(base64, size, token) {
  * address：地址
  */
 function filterContacts(contacts, query) {
-  let { name, alias, friend, type, gender, province, city, address } = query;
+  let { name, alias, friend, type, gender, province, city, address } = query
   return contacts.filter((item) => {
-    let arr = [];
-    let { payload } = item;
+    let arr = []
+    let { payload } = item
     if (friend) {
-      let bool = Number(friend) === 1 ? true : false;
-      arr.push(bool === payload.friend);
+      let bool = Number(friend) === 1 ? true : false
+      arr.push(bool === payload.friend)
     }
-    name && arr.push(payload.name.indexOf(name) >= 0);
-    alias && arr.push(payload.alias.indexOf(alias) >= 0);
-    type && arr.push(Number(type) === payload.type);
-    gender && arr.push(Number(gender) === payload.gender);
-    province && arr.push(payload.province.indexOf(province) >= 0);
-    city && arr.push(payload.city.indexOf(city) >= 0);
-    address && arr.push(payload.address.indexOf(address) >= 0);
-    return arr.indexOf(false) < 0;
-  });
+    name && arr.push(payload.name.indexOf(name) >= 0)
+    alias && arr.push(payload.alias.indexOf(alias) >= 0)
+    type && arr.push(Number(type) === payload.type)
+    gender && arr.push(Number(gender) === payload.gender)
+    province && arr.push(payload.province.indexOf(province) >= 0)
+    city && arr.push(payload.city.indexOf(city) >= 0)
+    address && arr.push(payload.address.indexOf(address) >= 0)
+    return arr.indexOf(false) < 0
+  })
 }
 /**
  * 格式化联系人
@@ -540,23 +530,22 @@ function formatContacts(data) {
   let arr = data.map(function (item) {
     // const file = await item.avatar()
     // let avatar = await file.toBase64(file.name, true);
-    let payload = item.payload;
+    let payload = item.payload
     return {
       id: payload.id,
       name: payload.name,
-      gender: payload.gender === 0 ? "无" : payload.gender === 1 ? "男" : "女",
+      gender: payload.gender === 0 ? '无' : payload.gender === 1 ? '男' : '女',
       alias: payload.alias,
-      friend: payload.friend ? "是" : "否",
-      star: payload.star ? "是" : "否",
-      type:
-        payload.type === 1 ? "个人" : payload.type === 2 ? "公众号" : "未知",
+      friend: payload.friend ? '是' : '否',
+      star: payload.star ? '是' : '否',
+      type: payload.type === 1 ? '个人' : payload.type === 2 ? '公众号' : '未知',
       signature: payload.signature,
       province: payload.province,
       city: payload.city,
       address: payload.address,
-    };
-  });
-  return arr;
+    }
+  })
+  return arr
 }
 
 /**
@@ -566,17 +555,17 @@ function formatContacts(data) {
  * @returns {Function}
  */
 function throttle(fn, wait) {
-  var timer = null;
+  var timer = null
   return function () {
-    var context = this;
-    var args = arguments;
+    var context = this
+    var args = arguments
     if (!timer) {
       timer = setTimeout(function () {
-        fn.apply(context, args);
-        timer = null;
-      }, wait);
+        fn.apply(context, args)
+        timer = null
+      }, wait)
     }
-  };
+  }
 }
 module.exports = {
   setLocalSchedule,
@@ -602,5 +591,7 @@ module.exports = {
   roomSay,
   formatContacts,
   filterContacts,
-  loadFile
-};
+  loadFile,
+  cancelAllSchedule,
+  getAllSchedule,
+}
