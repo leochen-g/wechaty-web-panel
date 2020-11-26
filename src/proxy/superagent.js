@@ -5,6 +5,7 @@ const path = require('path')
 const env = JSON.parse(fs.readFileSync(path.resolve('./env.json')))
 const { apiKey, apiSecret } = env
 const { AIBOTK, TXHOST } = require('./config')
+const { allConfig } = require('../common/configDb')
 
 /**
  * 封装get请求
@@ -56,8 +57,8 @@ function req(option) {
   }
 }
 
-function txReq(option) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+async function txReq(option) {
+  const config = await allConfig()
   if (!option) return
   const params = {
     key: config.txApiKey,

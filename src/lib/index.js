@@ -31,10 +31,34 @@ const { FileBox } = require('wechaty')
 //
 // 每周1的1点1分30秒触发 ：'30 1 1 * * 1'
 
-function setLocalSchedule(date, callback) {
-  schedule.scheduleJob(date, callback)
+function setLocalSchedule(date, callback, name) {
+  if (name) {
+    schedule.scheduleJob(name, date, callback)
+  } else {
+    schedule.scheduleJob(date, callback)
+  }
 }
-
+// 取消任务
+function cancelLocalSchedule(name) {
+  schedule.cancelJob(name)
+}
+// 取消指定任务
+function cancelAllSchedule(type) {
+  for (let i in schedule.scheduledJobs) {
+    if (i.includes(type)) {
+      cancelLocalSchedule(i)
+    }
+  }
+}
+/**
+ * 获取所有定时任务的job名
+ *
+ */
+function getAllSchedule() {
+  for (let i in schedule.scheduledJobs) {
+    console.log(i)
+  }
+}
 /**
  * 延时函数
  * @param {*} ms 毫秒
@@ -362,12 +386,12 @@ async function roomSay(room, contact, msg) {
   if (msg.type === 1 && msg.content !== '') {
     // 文字
     console.log('回复内容', msg.content)
-    await room.say(msg.content, contact)
+    contact ? await room.say(msg.content, contact) : await room.say(msg.content)
   } else if (msg.type === 2 && msg.url !== '') {
     // url文件
     let obj = FileBox.fromUrl(msg.url)
     console.log('回复内容', obj)
-    await room.say('', contact)
+    contact ? await room.say('', contact) : ''
     await delay(500)
     await room.say(obj)
   }
@@ -568,4 +592,6 @@ module.exports = {
   formatContacts,
   filterContacts,
   loadFile,
+  cancelAllSchedule,
+  getAllSchedule,
 }

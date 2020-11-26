@@ -1,4 +1,5 @@
 const common = require('../common')
+const { getContactTextReply, getRoomTextReply } = require('../common/reply')
 const { delay, contactSay, roomSay } = require('../lib/index')
 
 /**
@@ -9,7 +10,7 @@ const { delay, contactSay, roomSay } = require('../lib/index')
 async function dispatchFriendFilterByMsgType(that, msg) {
   try {
     const type = msg.type()
-    const contact = msg.from() // 发消息人
+    const contact = msg.talker() // 发消息人
     const isOfficial = contact.type() === that.Contact.Type.Official
     let content = ''
     let replys = []
@@ -19,7 +20,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         if (!isOfficial) {
           console.log(`发消息人${await contact.name()}:${content}`)
           if (content.trim()) {
-            replys = await common.getContactTextReply(that, contact, content)
+            replys = await getContactTextReply(that, contact, content)
             for (let reply of replys) {
               await delay(1000)
               await contactSay(contact, reply)
@@ -59,7 +60,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
  * @param {*} msg 消息主体
  */
 async function dispatchRoomFilterByMsgType(that, room, msg) {
-  const contact = msg.from() // 发消息人
+  const contact = msg.talker() // 发消息人
   const contactName = contact.name()
   const roomName = await room.topic()
   const type = msg.type()
@@ -76,7 +77,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
       console.log('是否提及', mentionSelf)
       if (mentionSelf) {
         content = content.replace(/@[^,，：:\s@]+/g, '').trim()
-        replys = await common.getRoomTextReply(content, contactName, contactId, contactAvatar)
+        replys = await getRoomTextReply(that, content, contactName, contactId, contactAvatar)
         for (let reply of replys) {
           await delay(1000)
           await roomSay(room, contact, reply)

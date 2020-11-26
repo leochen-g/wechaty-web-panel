@@ -1,5 +1,7 @@
 const path = require('path')
 const { addRoomWelcomeSay, loadFile } = require('../lib/index')
+const { allConfig } = require('../common/configDb')
+
 /**
  * 判断配置中是否存在此群
  * @param {*} arr 配置的群组
@@ -17,7 +19,7 @@ function roomHasConfig(arr, name) {
  * 群中有新人进入
  */
 async function onRoomjoin(room, inviteeList, inviter, date) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+  const config = await allConfig
   const nameList = inviteeList.map((c) => c.name()).join(',')
   const roomName = await room.topic()
   const roomIndex = roomHasConfig(config.roomJoinKeywords, roomName)

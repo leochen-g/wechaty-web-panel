@@ -1,5 +1,5 @@
 module.exports = {
-  AIBOTK: 'http://0.0.0.0:7001/open/v1/api', // 智能微秘书
+  AIBOTK: 'https://api-bot.aibotk.com/open/v1/api', // 智能微秘书
   ONE: 'http://wufazhuce.com/', // 每日一句网址
   TULING: 'http://openapi.tuling123.com/openapi/api/v2', // 图灵api
   MOJI: 'https://tianqi.moji.com/weather/china/', // 墨迹天气官网

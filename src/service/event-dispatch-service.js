@@ -1,10 +1,7 @@
 const api = require('../proxy/api')
 const { getConfig } = require('../proxy/aibotk')
-const { getConstellation, msgArr } = require('../lib')
-const fs = require('fs')
-const path = require('path')
-const basePath = path.join(__dirname, '../')
-
+const { getConstellation, msgArr, getAllSchedule } = require('../lib')
+const { initTaskLocalSchedule } = require('../task/index')
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -14,7 +11,7 @@ const basePath = path.join(__dirname, '../')
  * @param avatar
  * @returns {string} 内容
  */
-async function dispatchEventContent(eName, msg, name, id, avatar) {
+async function dispatchEventContent(that, eName, msg, name, id, avatar) {
   let content = '',
     type = 1,
     url = ''
@@ -73,6 +70,8 @@ async function dispatchEventContent(eName, msg, name, id, avatar) {
       break
     case 'updateConfig':
       await getConfig()
+      await initTaskLocalSchedule(that)
+      getAllSchedule()
       content = '更新成功，请稍等两分钟后生效'
       break
     default:

@@ -18,9 +18,6 @@ async function getConfig() {
     let res = await aiBotReq(option)
     let content = parseBody(res)
     let cres = await updateConfig(JSON.parse(content.data.config))
-
-    // let data = `${JSON.stringify(JSON.parse(content.data.config), null, 2)}`;
-    // fs.writeFileSync(path.join('./wechat.config.json'), data);
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)

@@ -2,7 +2,8 @@ const fs = require('fs')
 const path = require('path')
 const dispatch = require('./event-dispatch-service')
 const { setSchedule, updateSchedule } = require('../proxy/aibotk')
-const { getToday, convertTime, delay, contactSay, addRoom, contentDistinguish, setLocalSchedule, isRealDate, loadFile } = require('../lib')
+const { addRoom, contentDistinguish, setLocalSchedule, isRealDate } = require('../lib')
+const { allConfig } = require('../common/configDb')
 const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '微信团队'] // 微信官方账户，针对此账户不做任何回复
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
 const REMINDKEY = '提醒'
@@ -41,8 +42,8 @@ async function addSchedule(that, obj) {
  * 关键词回复
  * @returns {Promise<*>}
  */
-function keywordsReply(msg) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+async function keywordsReply(msg) {
+  const config = await allConfig() // 获取配置信息
   if (config.replyKeywords && config.replyKeywords.length > 0) {
     for (let item of config.replyKeywords) {
       if (item.reg === 2 && item.keywords.includes(msg)) {
@@ -71,8 +72,8 @@ function keywordsReply(msg) {
  * @param avatar 用户头像
  * @returns {String}
  */
-async function getEventReply(event, msg, name, id, avatar) {
-  let reply = await dispatch.dispatchEventContent(event, msg, name, id, avatar)
+async function getEventReply(that, event, msg, name, id, avatar) {
+  let reply = await dispatch.dispatchEventContent(that, event, msg, name, id, avatar)
   return reply
 }
 
@@ -85,7 +86,7 @@ async function getEventReply(event, msg, name, id, avatar) {
  * @returns {number} 返回回复内容
  */
 async function filterFriendMsg(that, contact, msg) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+  const config = await allConfig() // 获取配置信息
   const name = contact.name()
   const id = contact.id
   const avatar = await contact.avatar()
@@ -158,14 +159,14 @@ async function filterFriendMsg(that, contact, msg) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
           msg = msg.replace(key, '')
-          let res = await getEventReply(item.event, msg, name, id, avatar)
+          let res = await getEventReply(that, item.event, msg, name, id, avatar)
           return res
         }
       }
     }
   }
   // 关键词处理
-  msgArr = keywordsReply(msg) || []
+  msgArr = (await keywordsReply(msg)) || []
   if (msgArr.length > 0) {
     return msgArr
   }
@@ -195,8 +196,8 @@ async function filterFriendMsg(that, contact, msg) {
  * 1 开启了好友验证 || 朋友推荐消息 || 发送的文字消息过长,大于40个字符
  * 2 初次添加好友
  */
-async function filterRoomMsg(msg, name, id, avatar) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+async function filterRoomMsg(that, msg, name, id, avatar) {
+  const config = await allConfig() // 获取配置信息
   let msgArr = [] // 返回的消息列表
   let obj = { type: 1, content: '', url: '' }
   if (msg === '') {
@@ -210,7 +211,7 @@ async function filterRoomMsg(msg, name, id, avatar) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
           msg = msg.replace(key, '')
-          let res = await getEventReply(item.event, msg, name, id, avatar)
+          let res = await getEventReply(that, item.event, msg, name, id, avatar)
           return res
         }
       }

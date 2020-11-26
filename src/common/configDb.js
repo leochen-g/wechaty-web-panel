@@ -37,8 +37,6 @@ async function updateConfig(config) {
 async function allConfig() {
   try {
     let search = await cdb.find()
-    console.log(search)
-
     return search[0]
   } catch (error) {
     console.log('查询数据错误', error)

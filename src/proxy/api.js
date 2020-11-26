@@ -3,6 +3,8 @@ const path = require('path')
 const { req, txReq } = require('./superagent')
 const { EMOHOST, TULING, ONE } = require('./config')
 const { randomRange, parseBody, MD5, loadFile } = require('../lib/index')
+const { allConfig } = require('../common/configDb')
+
 
 /**
  * 获取每日一句
@@ -95,7 +97,7 @@ async function getResByTX(word, id) {
  * @param {*} id id
  */
 async function getResByTL(word, id) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+  const config = await allConfig()
   try {
     let uniqueId = MD5(id)
     let data = {

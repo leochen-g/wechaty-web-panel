@@ -1,12 +1,13 @@
 const { Friendship } = require('wechaty')
 const { delay, contactSay, loadFile } = require('../lib')
+const { allConfig } = require('../common/configDb')
 const path = require('path')
 
 /**
  * 好友添加
  */
 async function onFriend(friendship) {
-  const config = loadFile.fetch(path.resolve('./wechat.config.json'))
+  const config = await allConfig()
   let logMsg, hello
   try {
     let name = friendship.contact().name()
