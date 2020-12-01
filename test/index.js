@@ -6,6 +6,6 @@ const bot = new Wechaty({
   name, // generate xxxx.memory-card.json and save login data for the next login
 })
 bot
-  .use(WechatyWebPanelPlugin())
+  .use(WechatyWebPanelPlugin({apiKey:'', apiSecret: ''}))
   .start()
   .catch((e) => console.error(e))

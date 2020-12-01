@@ -1,42 +1,24 @@
 const db = require('../lib/nedb.js')()
-const cdb = require('../lib/nedb.js')()
 
 async function addUser(info) {
-  try {
-    let doc = await db.insert(info)
-    return doc
-  } catch (error) {
-    console.log('插入数据错误', error)
-  }
+    try {
+        let doc = await db.insert(info)
+        return doc
+    } catch (error) {
+        console.log('插入数据错误', error)
+    }
 }
 
 async function getUser() {
-  try {
-    let search = await db.find({})
-    return search[0]
-  } catch (error) {
-    console.log('查询数据错误', error)
-  }
+    try {
+        let search = await db.find({})
+        return search[0]
+    } catch (error) {
+        console.log('查询数据错误', error)
+    }
 }
-async function addConf(info) {
-  try {
-    let doc = await cdb.insert(info)
-    return doc
-  } catch (error) {
-    console.log('插入数据错误', error)
-  }
-}
-async function getConf() {
-  try {
-    let search = await cdb.find({})
-    return search[0]
-  } catch (error) {
-    console.log('查询数据错误', error)
-  }
-}
+
 module.exports = {
-  addUser,
-  getUser,
-  addConf,
-  getConf,
+    addUser,
+    getUser,
 }
