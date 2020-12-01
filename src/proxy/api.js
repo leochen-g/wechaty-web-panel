@@ -5,7 +5,6 @@ const { EMOHOST, TULING, ONE } = require('./config')
 const { randomRange, parseBody, MD5, loadFile } = require('../lib/index')
 const { allConfig } = require('../common/configDb')
 
-
 /**
  * 获取每日一句
  */

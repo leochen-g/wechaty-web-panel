@@ -78,7 +78,6 @@ function aiBotReq(option) {
     return
   }
   let params = getFormatQuery(apiKey, apiSecret, option.params)
-  console.log('sign', params.sign)
   if (option.method === 'POST') {
     return post(AIBOTK + option.url, params, option.contentType)
   } else {

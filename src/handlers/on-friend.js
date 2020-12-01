@@ -1,7 +1,6 @@
 const { Friendship } = require('wechaty')
-const { delay, contactSay, loadFile } = require('../lib')
+const { delay } = require('../lib')
 const { allConfig } = require('../common/configDb')
-const path = require('path')
 
 /**
  * 好友添加

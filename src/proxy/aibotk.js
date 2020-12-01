@@ -147,13 +147,14 @@ async function sendError(error) {
  * 更新头像
  * @returns {Promise<void>}
  * @param url
+ * @param info 用户基本信息
  */
-async function sendAvatar(url) {
+async function sendRobotInfo(url, name, id) {
   try {
     let option = {
       method: 'POST',
-      url: '/wechat/avatar',
-      params: { avatar: url },
+      url: '/wechat/info',
+      params: { avatar: url, robotName: name, robotId: id },
     }
     let res = await aiBotReq(option)
     console.log('推送头像成功')
@@ -174,9 +175,40 @@ async function sendFriend(friend) {
       params: { friend: friend },
     }
     let res = await aiBotReq(option)
-    console.log('推送好友列表成功')
   } catch (error) {
-    console.log('推送好友列表失败', error)
+    console.log('推送好友列表失败')
+  }
+}
+/**
+ * 更新群
+ * @returns {Promise<void>}
+ * @param url
+ */
+async function sendRoom(room) {
+  try {
+    let option = {
+      method: 'POST',
+      url: '/wechat/room',
+      params: { room: room },
+    }
+    let res = await aiBotReq(option)
+  } catch (error) {
+    console.log('推送群列表失败', error)
+  }
+}
+/**
+ * 同步群和好友列表
+ */
+async function asyncData(robotId, type) {
+  try {
+    let option = {
+      method: 'get',
+      url: '/wechat/asyncData',
+      params: { type, robotId },
+    }
+    let res = await aiBotReq(option)
+  } catch (error) {
+    console.log('同步好友列表失败', error)
   }
 }
 
@@ -235,7 +267,9 @@ module.exports = {
   setQrCode,
   sendHeartBeat,
   sendError,
-  sendAvatar,
+  sendRobotInfo,
   putqn,
   sendFriend,
+  sendRoom,
+  asyncData,
 }

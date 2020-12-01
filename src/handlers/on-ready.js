@@ -1,14 +1,18 @@
 const common = require('../common/index')
-const { setQrCode, sendHeartBeat } = require('../proxy/aibotk')
+const { delay } = require('../lib/index')
+const { setQrCode, sendHeartBeat, asyncData } = require('../proxy/aibotk')
+const { getUser } = require('../common/userDb')
 
 /**
  * 准备好的事件
  */
 async function onReady() {
+  const userInfo = await getUser()
   console.log(`所有数据准备完毕`)
-  await setQrCode('', '4')
   await sendHeartBeat('live')
-  // common.updateContactInfo(this)
+  await common.updateContactInfo(this)
+  await delay(5000)
+  await common.updateRoomInfo(this)
 }
 
 module.exports = onReady
