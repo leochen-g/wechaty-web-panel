@@ -64,51 +64,35 @@ Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
 ### Step 1: 安装
 
 ```
-$ npm install wechaty-web-panel --save
+$ npm install wechaty-web-panel wechaty@latest --save
 ```
 
-### Step 2: 创建配置文件
-项目根目录创建`env.json`,填入之前准备的`apiKey`和`apiSecret`
-
-```
-$ vim env.json
-
-{
-  "apiKey": "",
-  "apiSecret": ""
-}
-```
-
-再创建一个`wechat-config.json`，内容为一个空对象即可，后续会自动写入配置文件
-```
-$ vim wechat-config.json
-
-{}
-```
-
-### Step 3: 创建机器人
+### Step 2: 创建机器人并配置插件的`apiKey`和`apiSecret`
 
 ```
 $ vim mybot.js
 
 const { Wechaty } = require('wechaty');
 const WechatyWebPanelPlugin = require('wechaty-web-panel');
-const bot = Wechaty.instance({ profile: "WECHATY_PROFILE" });
+const name = 'wechat-assistant'
+const bot = new Wechaty({
+              name, // generate xxxx.memory-card.json and save login data for the next login
+            });
 
 bot
-  .use(WechatyPanelPlugin())
+  .use(WechatyPanelPlugin({apiKey:'', apiSecret: ''}))
   .start()
   .catch((e) => console.error(e));
 
 ```
 
-### Step 4: 运行
+### Step 3: 运行
 
 ```
 $ node mybot.js
 ```
 
-### Step 5: 扫码进入
+### Step 4: 扫码进入
 
 进入面板`小助手配置->登录状态`扫码登录，或直接扫码控制台二维码登录
 

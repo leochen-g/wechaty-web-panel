@@ -1,4 +1,4 @@
-const { WechatyPlugin, Wechaty, Message } = require('wechaty')
+const { addAibotConfig } = require('./common/aiDb')
 const onScan = require('./handlers/on-scan')
 const onLogin = require('./handlers/on-login')
 const onLogout = require('./handlers/on-logout')
@@ -10,7 +10,8 @@ const onHeartbeat = require('./handlers/on-heartbeat')
 const onError = require('./handlers/on-error')
 const onRoomtopic = require('./handlers/on-roomtopic')
 const onRoomleave = require('./handlers/on-roomleave')
-module.exports = function WechatyWebPanelPlugin(config = {}) {
+module.exports = function WechatyWebPanelPlugin(config = {apiKey, apiSecret}) {
+  addAibotConfig(config)
   return function (bot) {
     bot.on('scan', onScan)
     bot.on('login', onLogin)
