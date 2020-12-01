@@ -64,7 +64,7 @@ Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
 ### Step 1: 安装
 
 ```
-$ npm install wechaty-web-panel wechaty@latest --save
+$ npm install wechaty-web-panel@latest wechaty@latest --save
 ```
 
 ### Step 2: 创建机器人并配置插件的`apiKey`和`apiSecret`
