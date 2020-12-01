@@ -1,80 +1,23 @@
-const fs = require('fs')
-const path = require('path')
-const dispatch = require('./event-dispatch-service')
-const { setSchedule, updateSchedule } = require('../proxy/aibotk')
-const { addRoom, contentDistinguish, setLocalSchedule, isRealDate } = require('../lib')
-const { allConfig } = require('../common/configDb')
-const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '微信团队'] // 微信官方账户，针对此账户不做任何回复
+const {allConfig} = require('../common/configDb')
+const msgFilter = require('./msg-filters')
+const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '微信团队', 'recommendation message'] // 微信官方账户，针对此账户不做任何回复
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
 const REMINDKEY = '提醒'
 const NEWADDFRIEND = '你已添加'
 
-/**
- * 添加定时提醒
- * @param that wechaty实例
- * @param obj 定时对线
- * @returns {Promise<boolean>}
- */
-async function addSchedule(that, obj) {
-  try {
-    let scheduleObj = await setSchedule(obj)
-    let nickName = scheduleObj.subscribe
-    let time = scheduleObj.time
-    let Rule1 = scheduleObj.isLoop ? time : new Date(time)
-    let content = scheduleObj.content
-    let contact = await that.Contact.find({ name: nickName })
-    let id = scheduleObj.id
-    setLocalSchedule(Rule1, async () => {
-      console.log('你的专属提醒开启啦！')
-      await contact.say(content)
-      if (!scheduleObj.isLoop) {
-        updateSchedule(id)
-      }
-    })
-    return true
-  } catch (error) {
-    console.log('设置定时任务失败', error)
-    return false
-  }
-}
 
-/**
- * 关键词回复
- * @returns {Promise<*>}
- */
-async function keywordsReply(msg) {
-  const config = await allConfig() // 获取配置信息
-  if (config.replyKeywords && config.replyKeywords.length > 0) {
-    for (let item of config.replyKeywords) {
-      if (item.reg === 2 && item.keywords.includes(msg)) {
-        console.log(`精确匹配到关键词${msg},正在回复用户`)
-        return item.replys
-      } else if (item.reg === 1) {
-        for (let key of item.keywords) {
-          if (msg.includes(key)) {
-            console.log(`模糊匹配到关键词${msg},正在回复用户`)
-            return item.replys
-          }
+async function getMsgReply(resArray, {that, msg, name, contact, config, avatar, id}) {
+    let msgArr = []
+    for (let i = 0; i < resArray.length; i++) {
+        const item = resArray[i]
+        if (item.bool) {
+            msgArr = (await msgFilter[item.method]({that, msg, name, contact, config, avatar, id})) || []
         }
-      }
+        if (msgArr.length > 0) {
+            return msgArr
+        }
     }
-  } else {
     return []
-  }
-}
-
-/**
- * 获取事件处理返回的内容
- * @param {*} event 事件名
- * @param {*} msg 消息
- * @param {*} name 用户
- * @param {*} id 用户id
- * @param avatar 用户头像
- * @returns {String}
- */
-async function getEventReply(that, event, msg, name, id, avatar) {
-  let reply = await dispatch.dispatchEventContent(that, event, msg, name, id, avatar)
-  return reply
 }
 
 /**
@@ -86,102 +29,22 @@ async function getEventReply(that, event, msg, name, id, avatar) {
  * @returns {number} 返回回复内容
  */
 async function filterFriendMsg(that, contact, msg) {
-  const config = await allConfig() // 获取配置信息
-  const name = contact.name()
-  const id = contact.id
-  const avatar = await contact.avatar()
-  let msgArr = [] // 返回的消息列表
-  let obj = { type: 1, content: '', url: '' } // 消息主体
-  if (msg === '') {
-    obj.content = '我在呢'
-    msgArr.push(obj)
-    return msgArr
-  }
-  if (msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 200) {
-    console.log('字符超200字符，或无效及官方消息，不做回复')
-    obj.content = ''
-    msgArr.push(obj)
-    return msgArr
-  }
-  // 新增好友回复
-  if (msg.includes(NEWADDFRIEND)) {
-    console.log(`新添加好友：${name}，默认回复`)
-    msgArr = config.newFriendReplys || []
-    return msgArr
-  }
-  // 进群邀请
-  if (config.roomJoinKeywords && config.roomJoinKeywords.length > 0) {
-    for (const item of config.roomJoinKeywords) {
-      if (item.reg === 2 && item.keywords.includes(msg)) {
-        console.log(`精确匹配到加群关键词${msg},正在邀请用户进群`)
-        await addRoom(that, contact, item.roomName, item.replys)
-        return []
-      } else {
-        for (let key of item.keywords) {
-          if (msg.includes(key)) {
-            console.log(`模糊匹配到加群关键词${msg},正在邀请用户进群`)
-            await addRoom(that, contact, item.roomName, item.replys)
-            return []
-          }
-        }
-      }
-    }
-  }
-  // 定时任务
-  if (msg.startsWith(REMINDKEY)) {
-    let msgArr = msg.replace(/\s+/g, ' ').split(' ')
-    if (msgArr.length > 3) {
-      let schedule = contentDistinguish(msgArr, name)
-      let time = schedule.isLoop ? schedule.time : isRealDate(schedule.time)
-      if (time) {
-        let res = await addSchedule(that, schedule)
-        if (res) {
-          obj.content = '小助手已经把你的提醒牢记在小本本上了'
-        } else {
-          obj.content = '添加提醒失败，请稍后重试'
-        }
-        msgArr.push(obj)
-        return msgArr
-      } else {
-        obj.content = '提醒设置失败，请保证每个关键词之间使用空格分割开，并保证日期格式正确。正确格式为：“提醒(空格)我(空格)每天(空格)18:30(空格)下班回家'
-        msgArr.push(obj)
-        return msgArr
-      }
-    } else {
-      obj.content = '提醒设置失败，请保证每个关键词之间使用空格分割开，并保证日期格式正确。正确格式为：“提醒(空格)我(空格)18:30(空格)下班回家”'
-      msgArr.push(obj)
-      return msgArr
-    }
-  }
-  // 事件回复
-  if (config.eventKeywords && config.eventKeywords.length > 0) {
-    for (let item of config.eventKeywords) {
-      for (let key of item.keywords) {
-        if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
-          msg = msg.replace(key, '')
-          let res = await getEventReply(that, item.event, msg, name, id, avatar)
-          return res
-        }
-      }
-    }
-  }
-  // 关键词处理
-  msgArr = (await keywordsReply(msg)) || []
-  if (msgArr.length > 0) {
-    return msgArr
-  }
-
-  if (config.autoReply) {
-    console.log('开启了机器人自动回复功能')
-    obj.type = 1
-    obj.content = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
-  } else {
-    console.log('没有开启机器人自动回复功能')
-    obj.type = 1
-    obj.content = ''
-  }
-  msgArr.push(obj)
-  return msgArr
+    const config = await allConfig() // 获取配置信息
+    const name = contact.name()
+    const id = contact.id
+    const avatar = await contact.avatar()
+    const resArray = [
+        {bool: msg === '', method: 'emptyMsg'},
+        {bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 200, method: 'officialMsg'},
+        {bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg'},
+        {bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg'},
+        {bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg'},
+        {bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg'},
+        {bool: true, method: 'keywordsMsg'},
+        {bool: config.autoReply, method: 'robotMsg'},
+    ]
+    const msgArr = await getMsgReply(resArray, {that, msg, contact, name, config, avatar, id})
+    return msgArr.length > 0 ? msgArr : [{type: 1, content: '', url: ''}]
 }
 
 /**
@@ -197,45 +60,20 @@ async function filterFriendMsg(that, contact, msg) {
  * 2 初次添加好友
  */
 async function filterRoomMsg(that, msg, name, id, avatar) {
-  const config = await allConfig() // 获取配置信息
-  let msgArr = [] // 返回的消息列表
-  let obj = { type: 1, content: '', url: '' }
-  if (msg === '') {
-    obj.content = '我在呢'
-    msgArr.push(obj)
-    return msgArr
-  }
-  // 事件回复
-  if (config.eventKeywords && config.eventKeywords.length > 0) {
-    for (let item of config.eventKeywords) {
-      for (let key of item.keywords) {
-        if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
-          msg = msg.replace(key, '')
-          let res = await getEventReply(that, item.event, msg, name, id, avatar)
-          return res
-        }
-      }
-    }
-  }
-  // 关键词处理
-  msgArr = keywordsReply(msg) || []
-  if (msgArr.length > 0) {
-    return msgArr
-  }
-  if (config.autoReply) {
-    console.log('开启了机器人自动回复功能')
-    obj.type = 1
-    obj.content = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
-  } else {
-    console.log('没有开启机器人自动回复功能')
-    obj.type = 1
-    obj.content = ''
-  }
-  msgArr.push(obj)
-  return msgArr
+    const config = await allConfig() // 获取配置信息
+    const resArray = [
+        {bool: msg === '', method: 'emptyMsg'},
+        {bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg'},
+        {bool: true, method: 'keywordsMsg'},
+        {bool: config.autoReply, method: 'robotMsg'},
+    ]
+    const msgArr = await getMsgReply(resArray, {that, msg, name, config, avatar, id})
+    console.log('room', msgArr)
+    return msgArr.length > 0 ? msgArr : [{type: 1, content: '', url: ''}]
 }
 
+
 module.exports = {
-  filterFriendMsg,
-  filterRoomMsg,
+    filterFriendMsg,
+    filterRoomMsg,
 }

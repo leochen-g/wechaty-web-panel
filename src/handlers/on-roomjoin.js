@@ -1,5 +1,5 @@
 const path = require('path')
-const { addRoomWelcomeSay, loadFile } = require('../lib/index')
+const { addRoomWelcomeSay }  = require('../common/index')
 const { allConfig } = require('../common/configDb')
 
 /**
@@ -19,7 +19,7 @@ function roomHasConfig(arr, name) {
  * 群中有新人进入
  */
 async function onRoomjoin(room, inviteeList, inviter, date) {
-  const config = await allConfig
+  const config = await allConfig()
   const nameList = inviteeList.map((c) => c.name()).join(',')
   const roomName = await room.topic()
   const roomIndex = roomHasConfig(config.roomJoinKeywords, roomName)

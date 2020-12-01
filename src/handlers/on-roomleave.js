@@ -1,5 +1,6 @@
 async function onRoomleave(room, leaverList, remover, date) {
-  console.log('有人离开了群', room, leaverList, remover)
+  const nameList = leaverList.map((c) => c.name()).join(',')
+  console.log(`Room ${await room.topic()} lost member ${nameList}, the remover is: ${remover}`)
 }
 
 module.exports = onRoomleave
