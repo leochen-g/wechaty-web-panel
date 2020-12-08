@@ -3,7 +3,7 @@ const {getConfig, asyncData} = require('../proxy/aibotk')
 const {getConstellation, msgArr, getAllSchedule} = require('../lib')
 const {initTaskLocalSchedule} = require('../task/index')
 const {updateContactAndRoom} = require('../common/index')
-
+const {chatTencent} = require('../proxy/tencent')
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -88,7 +88,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar) {
 
 /**
  * 派发不同的机器人处理回复内容
- * @param {*} bot 机器人类别 0 天行机器人 1 天行的图灵机器人 2 图灵机器人
+ * @param {*} bot 机器人类别 0 天行机器人 1 天行的图灵机器人 2 图灵机器人 3 腾讯闲聊机器人
  * @param {*} msg 消息内容
  * @param {*} name 发消息人
  * @param {*} id 发消息人id
@@ -104,6 +104,9 @@ async function dispatchAiBot(bot, msg, name, id) {
             break
         case 2:
             res = await api.getResByTL(msg, id)
+            break
+        case 3:
+            res = await chatTencent(msg, id)
             break
         default:
             res = ''
