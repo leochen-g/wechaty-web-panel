@@ -5,7 +5,6 @@ let client = '';
 
 async function initClient() {
     const config = await allConfig()
-    console.log(config.tencentSecretId, config.tencentSecretKey)
     //初始化腾讯闲聊机器人，创建链接
     const clientConfig = {
         credential: {
