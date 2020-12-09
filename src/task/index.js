@@ -80,7 +80,7 @@ async function setEveryDayTask(that, item, name) {
       setLocalSchedule(
         time,
         async () => {
-          let content = await common.getEveryDayContent(item.memorialDay, item.city, item.endWord)
+          let content = await getEveryDayContent(item.memorialDay, item.city, item.endWord)
           console.log('每日说任务开始工作,发送内容：', content)
           await delay(10000)
           await contact.say(content)
