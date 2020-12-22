@@ -3,6 +3,7 @@ const { parseBody } = require('../lib/index')
 const { updateConfig } = require('../common/configDb')
 const fs = require('fs')
 const path = require('path')
+const pjson = require('../../package.json')
 
 /**
  * 获取配置文件
@@ -230,7 +231,26 @@ async function getQiToken() {
     console.log('token error', e)
   }
 }
-
+/**
+ * 生成群合影
+ * @param {*}} roomName 群名
+ * @param {*} list 群成员列表
+ * @param {*} contactName 触发用户
+ */
+async function drawRoomPhoto(roomName, list, contactName) {
+  try {
+    let option = {
+      method: 'POST',
+      url: '/roomPhoto',
+      params: { name: roomName, user: contactName, list: list },
+    }
+    let res = await aiBotReq(option)
+    let content = parseBody(res)
+    return content.data
+  } catch (e) {
+    console.log('群合影生成错误', e)
+  }
+}
 /**
  * 上传base64图片到七牛云
  * @param base
@@ -258,6 +278,24 @@ async function putqn(base, name) {
     console.log('上传失败', e.Error)
   }
 }
+/**
+ * 更新插件版本信息
+ * @param {*} version
+ */
+async function updatePanelVersion() {
+  try {
+    let option = {
+      method: 'POST',
+      url: '/webPanel/version',
+      params: { version: pjson.version },
+    }
+    let res = await aiBotReq(option)
+    let content = parseBody(res)
+    return content.data
+  } catch (error) {
+    console.log('error', error)
+  }
+}
 
 module.exports = {
   getConfig,
@@ -272,4 +310,6 @@ module.exports = {
   sendFriend,
   sendRoom,
   asyncData,
+  drawRoomPhoto,
+  updatePanelVersion,
 }

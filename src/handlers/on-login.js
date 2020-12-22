@@ -1,13 +1,15 @@
 const { delay, MD5 } = require('../lib')
-const { getConfig, sendRobotInfo, sendError, putqn, setQrCode } = require('../proxy/aibotk')
+const { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } = require('../proxy/aibotk')
 const { addUser } = require('../common/userDb')
 const { initAllSchedule } = require('../task')
+var pjson = require('../../package.json')
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户
  */
 async function onLogin(user) {
   console.log(`贴心助理${user}登录了`)
+  await updatePanelVersion()
   await setQrCode('', 4)
   await sendError('')
   await getConfig() // 获取配置文件

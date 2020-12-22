@@ -1,5 +1,5 @@
 const path = require('path')
-const { addRoomWelcomeSay }  = require('../common/index')
+const { addRoomWelcomeSay } = require('../common/index')
 const { allConfig } = require('../common/configDb')
 
 /**
@@ -23,7 +23,7 @@ async function onRoomjoin(room, inviteeList, inviter, date) {
   const nameList = inviteeList.map((c) => c.name()).join(',')
   const roomName = await room.topic()
   const roomIndex = roomHasConfig(config.roomJoinKeywords, roomName)
-  console.log('jinqun', roomName, roomIndex, nameList)
+  console.log('进群', roomName, roomIndex, nameList)
   if (roomIndex > -1) {
     const { welcomes } = config.roomJoinKeywords[roomIndex]
     console.log(`群名： ${roomName} ，加入新成员： ${nameList}, 邀请人： ${inviter}`)
