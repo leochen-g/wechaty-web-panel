@@ -1,6 +1,6 @@
 const api = require('../proxy/api')
 const { getConfig, asyncData, getRoomPhotoConfig, drawRoomPhoto } = require('../proxy/aibotk')
-const { getConstellation, msgArr, getAllSchedule, getRoomAvatarList } = require('../lib')
+const { getConstellation, msgArr, getAllSchedule, getRoomAvatarList, generateRoomImg } = require('../lib')
 const { initTaskLocalSchedule } = require('../task/index')
 const { updateContactAndRoom } = require('../common/index')
 const { chatTencent } = require('../proxy/tencent')
@@ -73,17 +73,26 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
     case 'roomAvatar':
       const roomName = await room.topic()
       const memberList = await getRoomAvatarList(room, name)
-      const res = await drawRoomPhoto(roomName, memberList, name)
-      if (res.type === 1) {
-        content = res.content
+      const config = await getRoomPhotoConfig(roomName)
+      if (!config) {
+        content = '本群暂未开通群合影功能，请联系群主或管理员开启'
+      } else if (config.authList.length) {
+        if (config.authList.includes(name)) {
+          const baseImg = await generateRoomImg(memberList, config)
+          type = 3
+          url = baseImg
+        } else {
+          content = '很抱歉，你没有生成群合影的权限，请联系管理员或群主开通'
+        }
       } else {
-        type = res.type
-        url = res.content
+        const baseImg = await generateRoomImg(memberList, config)
+        type = 3
+        url = baseImg
       }
       break
     case 'reloadFriend':
-      await updateContactAndRoom()
-      content = '更新成功，请稍等两分钟后生效'
+      await updateContactAndRoom(that)
+      content = '更新好友群消息成功，请稍等两分钟后生效'
       break
     case 'updateConfig':
       await getConfig()

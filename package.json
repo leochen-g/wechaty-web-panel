@@ -36,6 +36,7 @@
   "readme": "README.md",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
+    "mcanvas": "^2.0.8",
     "nedb": "^1.8.0",
     "node-schedule": "^1.3.2",
     "qrcode-terminal": "^0.12.0",

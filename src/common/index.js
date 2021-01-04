@@ -98,7 +98,7 @@ async function updateRoomInfo(that) {
         topic: room.topic,
         avatar: room.avatar || '',
         ownerId: room.ownerId || '',
-        adminIds: room.adminIdList,
+        adminIds: room.adminIdList.toString(),
         memberCount: room.memberIdList.length,
       }
       res.push(obj)

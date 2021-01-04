@@ -176,6 +176,10 @@ async function sendFriend(friend) {
       params: { friend: friend },
     }
     let res = await aiBotReq(option)
+    let content = parseBody(res)
+    if (!content.code === 200) {
+      console.log('推送失败', content.msg)
+    }
   } catch (error) {
     console.log('推送好友列表失败')
   }
@@ -193,6 +197,10 @@ async function sendRoom(room) {
       params: { room: room },
     }
     let res = await aiBotReq(option)
+    let content = parseBody(res)
+    if (!content.code === 200) {
+      console.log('推送失败', content.msg)
+    }
   } catch (error) {
     console.log('推送群列表失败', error)
   }
@@ -229,6 +237,23 @@ async function getQiToken() {
     return content.data.token
   } catch (e) {
     console.log('token error', e)
+  }
+}
+/**
+ * 获取群合影配置
+ */
+async function getRoomPhotoConfig(roomName) {
+  try {
+    let option = {
+      method: 'get',
+      url: '/roomPhoto',
+      params: { name: roomName },
+    }
+    let res = await aiBotReq(option)
+    let content = parseBody(res)
+    return content.data
+  } catch (e) {
+    console.log('群合影生成错误', e)
   }
 }
 /**
@@ -312,4 +337,5 @@ module.exports = {
   asyncData,
   drawRoomPhoto,
   updatePanelVersion,
+  getRoomPhotoConfig,
 }

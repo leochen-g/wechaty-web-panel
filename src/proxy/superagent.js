@@ -78,7 +78,7 @@ async function aiBotReq(option) {
   }
   let params = getFormatQuery(apiKey, apiSecret, option.params)
   if (option.method === 'POST') {
-    return post(AIBOTK + option.url, params, option.contentType)
+    return post(AIBOTK + option.url, params, 'application/json;charset=utf-8')
   } else {
     return get(AIBOTK + option.url, params, option.contentType)
   }

@@ -19,5 +19,5 @@ async function getAibotConfig() {
 }
 module.exports = {
   addAibotConfig,
-  getAibotConfig
+  getAibotConfig,
 }
