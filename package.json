@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -44,6 +44,6 @@
     "tencentcloud-sdk-nodejs": "^4.0.30",
     "wechaty": "^0.53.1"
   },
-  "_id": "wechaty-web-panel@0.1.6",
-  "_commitid": "ed0e605"
+  "_id": "wechaty-web-panel@0.1.7",
+  "_commitid": "56ea6f5"
 }
