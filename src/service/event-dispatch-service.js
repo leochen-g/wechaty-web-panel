@@ -1,9 +1,10 @@
 const api = require('../proxy/api')
 const { getConfig, asyncData, getRoomPhotoConfig, drawRoomPhoto } = require('../proxy/aibotk')
-const { getConstellation, msgArr, getAllSchedule, getRoomAvatarList, generateRoomImg } = require('../lib')
+const { getConstellation, msgArr, getAllSchedule, generateRoomImg, getRoomAvatar, generateAvatar } = require('../lib')
 const { initTaskLocalSchedule } = require('../task/index')
 const { updateContactAndRoom } = require('../common/index')
 const { chatTencent } = require('../proxy/tencent')
+const { log } = require('wechaty')
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -46,15 +47,10 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
     case 'rkl':
       content = await api.getRkl(msg)
       break
-    case 'avatarGuo':
-      let base64Text = await avatar.toBase64()
-      url = await api.getAvatar(base64Text, 1)
-      type = 2
-      break
-    case 'avatarShengDan':
-      let base64 = await avatar.toBase64()
-      url = await api.getAvatar(base64, 2)
-      type = 2
+    case 'avatar':
+      let base64Text = await avatar.toDataURL()
+      url = await generateAvatar(base64Text)
+      type = 3
       break
     case 'emo':
       url = await api.getEmo(msg)
@@ -71,13 +67,14 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       content = await api.getCname()
       break
     case 'roomAvatar':
-      const roomName = await room.topic()
-      const memberList = await getRoomAvatarList(room, name)
+      let memberList = []
+      const roomName = await room.topic() // 获取群名
       const config = await getRoomPhotoConfig(roomName)
-      if (!config) {
+      if (!config.authList) {
         content = '本群暂未开通群合影功能，请联系群主或管理员开启'
       } else if (config.authList.length) {
         if (config.authList.includes(name)) {
+          memberList = await getRoomAvatar(room, roomName, name)
           const baseImg = await generateRoomImg(memberList, config)
           type = 3
           url = baseImg
@@ -85,6 +82,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
           content = '很抱歉，你没有生成群合影的权限，请联系管理员或群主开通'
         }
       } else {
+        memberList = await getRoomAvatar(room, roomName, name)
         const baseImg = await generateRoomImg(memberList, config)
         type = 3
         url = baseImg

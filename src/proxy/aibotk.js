@@ -251,7 +251,7 @@ async function getRoomPhotoConfig(roomName) {
     }
     let res = await aiBotReq(option)
     let content = parseBody(res)
-    return content.data
+    return content.data || ''
   } catch (e) {
     console.log('群合影生成错误', e)
   }

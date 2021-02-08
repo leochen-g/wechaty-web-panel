@@ -42,7 +42,7 @@
     "qrcode-terminal": "^0.12.0",
     "superagent": "^5.2.2",
     "tencentcloud-sdk-nodejs": "^4.0.30",
-    "wechaty": "^0.53.1"
+    "wechaty": "^0.57.3"
   },
   "_id": "wechaty-web-panel@0.1.8",
   "_commitid": "b275afa"

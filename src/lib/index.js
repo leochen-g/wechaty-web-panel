@@ -2,6 +2,8 @@ const Crypto = require('crypto')
 const schedule = require('node-schedule')
 const fs = require('fs')
 const { MCanvas, MImage } = require('mcanvas')
+const { log } = require('wechaty')
+const { addRoom, getRoom } = require('../common/roomAvatarDb')
 
 /**
  * 设置定时器
@@ -515,13 +517,20 @@ async function getRoomAvatarList(room, name) {
   let res = []
   for (let i of members) {
     let member = i.payload
-    const avatar = await i.avatar()
-    const base64 = member.weixin ? member.avatar : await avatar.toDataURL()
-    let obj = {
-      img: base64,
-      name: member.name,
+    try {
+      const avatar = await i.avatar()
+      if (avatar.mimeType) {
+        const base64 = member.weixin ? member.avatar : await avatar.toDataURL()
+        let obj = {
+          img: base64,
+          name: member.name,
+        }
+        res.push(obj)
+      }
+    } catch (error) {
+      console.log('获取头像失败', error)
+      continue
     }
-    res.push(obj)
   }
   const say = res.splice(
     res.findIndex((e) => e.name === name),
@@ -532,25 +541,70 @@ async function getRoomAvatarList(room, name) {
 }
 
 /**
+ * 设置中心位置
+ */
+function setFirstAvatr(list, name) {
+  const temp = list
+  const say = temp.splice(
+    temp.findIndex((e) => e.name === name),
+    1
+  )
+  temp.unshift(say[0])
+  return temp
+}
+
+/**
+ * 获取群头像列表
+ * @param {*} roomObj
+ * @param {*} roomName
+ * @param {*} name
+ */
+async function getRoomAvatar(roomObj, roomName, name) {
+  let memberList = []
+  const room = await getRoom(roomName) // 先获取缓存中是否存在已经获取的头像
+  if (room && room.list) {
+    memberList = room.list
+  } else {
+    const list = await getRoomAvatarList(roomObj, name)
+    const obj = { name: roomName, list }
+    await addRoom(obj)
+    memberList = list
+  }
+  const list = setFirstAvatr(memberList, name)
+  return list
+}
+
+/**
  * 头像处理
  * @param {*}} list
  * @param {*} size
  */
 async function cropImg(list, size = 74) {
-  const arr = []
-  for (const i of list) {
-    const im = new MImage(i.img)
-    im.compress({
-      quality: 1,
-      width: size,
-      height: size,
-    }).crop({
-      radius: size,
-    })
-    const bas64 = await im.draw({ type: 'png' })
-    arr.push({ img: bas64 })
+  try {
+    const arr = []
+    for (const i of list) {
+      try {
+        if (i.img) {
+          const im = new MImage(i.img)
+          im.compress({
+            quality: 1,
+            width: size,
+            height: size,
+          }).crop({
+            radius: size,
+          })
+          const bas64 = await im.draw({ type: 'png' })
+          arr.push({ img: bas64 })
+        }
+      } catch (error) {
+        console.log('处理头像失败', error)
+        continue
+      }
+    }
+    return arr
+  } catch (error) {
+    console.log('处理头像错误error', error)
   }
-  return arr
 }
 
 /**
@@ -615,7 +669,7 @@ function patternCircle(mc, t, info, i) {
       (n = S - y),
       w > 0 && b === _ - 1 ? (v++, (b = 0)) : b++),
       (j = i.size),
-      w === 0 && ((j = o), (r = u - o / 2), (n = g - o / 2)),
+      parseInt(w) === 0 && ((j = o), (r = u - o / 2), (n = g - o / 2)),
       (q = t[w].img)
     mc.add(q, {
       width: j,
@@ -692,6 +746,41 @@ async function generateRoomImg(list, options) {
   return base64
 }
 
+async function generateAvatar(avatar) {
+  let mc = new MCanvas({
+    width: 880,
+    height: 880,
+    backgroundColor: '#ffffff',
+  })
+  mc.add(avatar, {
+    width: 740,
+    pos: {
+      x: 70,
+      y: 70,
+      scale: 1,
+    },
+  })
+  mc.add('http://image.xkboke.com/guajian', {
+    width: 700,
+    pos: {
+      x: 90,
+      y: -10,
+      scale: 0.7,
+    },
+  })
+  const base64 = await mc.draw({ type: 'jpg', quality: 1 })
+  // var base64Data = base64.replace(/^data:image\/\w+;base64,/, '')
+  // var dataBuffer = Buffer.from(base64Data, 'base64')
+  // fs.writeFile('avatar.jpg', dataBuffer, function (err) {
+  //   if (err) {
+  //     console.log(err)
+  //   } else {
+  //     console.log('保存成功！')
+  //   }
+  // })
+  return base64
+}
+
 module.exports = {
   Base64Encode,
   Base64Decode,
@@ -718,4 +807,6 @@ module.exports = {
   groupArray,
   getRoomAvatarList,
   generateRoomImg,
+  getRoomAvatar,
+  generateAvatar,
 }

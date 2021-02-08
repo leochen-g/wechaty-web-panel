@@ -189,6 +189,10 @@ async function contactSay(contact, msg, isRoom = false) {
       await delay(500)
     }
     await contact.say(obj)
+  } else if (msg.type === 3 && msg.url !== '') {
+    // bse64文件
+    let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
+    await contact.say(obj)
   }
 }
 

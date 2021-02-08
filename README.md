@@ -3,7 +3,7 @@
 [![Wechaty Plugin Web Panel](https://img.shields.io/badge/Wechaty%20Plugin-WebPanel-brightgreen.svg)](https://github.com/gengchen528/wechaty-web-panel)
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://github.com/Wechaty/wechaty)
 
-Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
+Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面板
 
 ## 面板主要功能
 
@@ -11,21 +11,25 @@ Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
 
 * 定时提醒
 
-- [x] 当天定时提醒  例："提醒 我 18:00 下班了，记得带好随身物品"
-- [x] 每天定时提醒  例："提醒 我 每天 18:00 下班了，记得带好随身物品"
-- [x] 指定日期提醒  例："提醒 我 2019-05-10 8:00 还有7天是女朋友生日了，准备一下"
+- [x] 当天定时提醒 例："提醒 我 18:00 下班了，记得带好随身物品"
+- [x] 每天定时提醒 例："提醒 我 每天 18:00 下班了，记得带好随身物品"
+- [x] 指定日期提醒 例："提醒 我 2019-05-10 8:00 还有 7 天是女朋友生日了，准备一下"
+
 * 智能机器人
+
 - [x] 天行机器人
 - [x] 图灵机器人
 - [x] 腾讯闲聊机器人
 - [ ] 更多
 
 * 群定时任务
+
 - [x] 群新闻定时发送
 - [x] 群消息定时发送
-- [ ] 更多功能等你来pr
+- [ ] 更多功能等你来 pr
 
 * 关键词
+
 - [x] 关键词加好友
 - [x] 关键词加群
 - [x] 关键词回复
@@ -33,21 +37,23 @@ Wechaty Web Panel插件，让你的wechaty机器人快速接入web控制面板
   - [x] 天气查询 例："上海天气"
   - [x] 垃圾分类 例："?香蕉皮"
   - [x] 名人名言 例： "名人名言"
-  - [x] 老黄历查询 例： "黄历2019-6-13"
+  - [x] 老黄历查询 例： "黄历 2019-6-13"
   - [x] 姓氏起源 例： "姓陈"
-  - [x] 星座运势 例： "*双子座"
+  - [x] 星座运势 例： "\*双子座"
   - [x] 神回复 例： "神回复"
   - [x] 获取表情包 例： "表情包你好坏"
   - [x] 获取美女图 例： "美女图"
   - [x] 群合影 例： "群合影"
+  - [x] 牛年头像 例： "牛气冲天"
   - [ ] 更多待你发现
 - [x] 进群自动欢迎
 - [x] 加好友自动回复
+
 * 自动更新配置文件，无需重启
+
 - [x] 默认给机器人发送 ‘更新’ 触发拉取新配置文件操作，可在面板`小助手配置->关键词回复->关键词事件`进行修改关键词
 
 更多详情介绍：[传送门](https://www.xkboke.com/web-inn/secretary/client.html#%E5%B0%8F%E5%8A%A9%E6%89%8B%E5%8A%9F%E8%83%BD%E4%B8%80%E8%A7%88)
-
 
 ## 提前准备
 
@@ -84,8 +90,9 @@ const { Wechaty } = require('wechaty');
 const WechatyWebPanelPlugin = require('wechaty-web-panel');
 const name = 'wechat-assistant'
 const bot = new Wechaty({
-              name, // generate xxxx.memory-card.json and save login data for the next login
-            });
+  name, // generate xxxx.memory-card.json and save login data for the next login
+  puppet: 'wechaty-puppet-puppeteer',
+});
 
 bot
   .use(WechatyPanelPlugin({apiKey:'', apiSecret: ''}))
