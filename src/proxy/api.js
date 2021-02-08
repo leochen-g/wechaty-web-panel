@@ -1,9 +1,10 @@
 const cheerio = require('cheerio')
 const path = require('path')
 const { req, txReq } = require('./superagent')
-const { EMOHOST, TULING, ONE } = require('./config')
+const { EMOHOST, TULING, ONE, MEINV } = require('./config')
 const { randomRange, parseBody, MD5, loadFile } = require('../lib/index')
 const { allConfig } = require('../common/configDb')
+const { log, FileBox } = require('wechaty')
 
 /**
  * 获取每日一句
@@ -474,33 +475,32 @@ async function getAvatar(base, type) {
  * @param {*} msg
  */
 async function getEmo(msg) {
+  console.log('msg', msg)
   try {
     let option = {
-      method: 'POST',
-      url: EMOHOST,
+      method: 'get',
+      url: `${EMOHOST}keyword=${encodeURIComponent(msg)}`,
       contentType: 'application/json;charset=UTF-8',
-      params: {
-        name: msg,
-      },
+      params: {},
     }
     let res = await req(option)
     let content = parseBody(res)
-    if (content.code === 1) {
-      if (content.data && content.data.length > 0) {
+    if (content.totalSize > 0) {
+      if (content.items && content.items.length > 0) {
         let arr = []
-        for (let i of content.data) {
-          if (i.path.includes('.jpg')) {
+        for (let i of content.items) {
+          if (i.url.includes('.jpg') || i.url.includes('.gif')) {
             arr.push(i)
           }
         }
         let item = arr[randomRange(0, arr.length)]
-        if (item.path) {
-          return 'http://image.bqber.com/' + item.path
+        if (item.url) {
+          return item.url
         } else {
-          return 'http://dl.weshineapp.com/gif/20190902/401ed8e703984d504ca1e49ffd4ed8ac.jpg'
+          return 'http://img.doutula.com/production/uploads/image/2017/11/30/20171130047004_PiJlhx.gif'
         }
       } else {
-        return 'http://dl.weshineapp.com/gif/20190902/401ed8e703984d504ca1e49ffd4ed8ac.jpg'
+        return 'http://img.doutula.com/production/uploads/image/2017/11/30/20171130047004_PiJlhx.gif'
       }
     }
   } catch (e) {
@@ -514,33 +514,20 @@ async function getEmo(msg) {
 async function getMeiNv() {
   try {
     let option = {
-      method: 'GET',
-      url: '/meinv/',
-      params: {
-        num: 10,
-        page: randomRange(1, 99),
-      },
+      method: 'get',
+      url: MEINV,
+      contentType: 'application/json;charset=UTF-8',
+      params: {},
     }
-    let res = await txReq(option)
+    let res = await req(option)
     let content = parseBody(res)
-    if (content.code === 200) {
-      let arr = []
-      for (let i of content.newslist) {
-        if (i.picUrl.includes('.jpg')) {
-          arr.push(i)
-        }
-      }
-      let item = arr[randomRange(0, arr.length)]
-      let url = ''
-      if (item.picUrl) {
-        url = item.picUrl
-      } else {
-        url = 'http://dl.weshineapp.com/gif/20190902/401ed8e703984d504ca1e49ffd4ed8ac.jpg'
-      }
-      return url
+    if (content.imgurl) {
+      let url = content.imgurl
+      return url.includes('.jpg') ? url : 'https://tva2.sinaimg.cn/large/0072Vf1pgy1foxkcsx9rmj31hc0u0h9k.jpg'
     }
   } catch (e) {
     console.log('获取美女图片失败', e)
+    return 'https://tva2.sinaimg.cn/large/0072Vf1pgy1foxkcsx9rmj31hc0u0h9k.jpg'
   }
 }
 /**
