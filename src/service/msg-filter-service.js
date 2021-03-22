@@ -34,7 +34,7 @@ async function filterFriendMsg(that, contact, msg) {
   const avatar = await contact.avatar()
   const resArray = [
     { bool: msg === '', method: 'emptyMsg' },
-    { bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 200, method: 'officialMsg' },
+    { bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 1000, method: 'officialMsg' },
     { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
     { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
     { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
