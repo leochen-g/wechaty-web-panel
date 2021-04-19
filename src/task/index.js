@@ -1,7 +1,7 @@
-const { setLocalSchedule, delay, cancelAllSchedule, roomSay } = require('../lib')
+const { setLocalSchedule, delay, cancelAllSchedule } = require('../lib')
 const { allConfig } = require('../common/configDb')
 const { getScheduleList, updateSchedule } = require('../proxy/aibotk')
-const { getEveryDayRoomContent, getEveryDayContent } = require('../common')
+const { getEveryDayRoomContent, getEveryDayContent, roomSay } = require('../common')
 /**
  * 群定时任务，针对群
  * @param {*} that bot对象
