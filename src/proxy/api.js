@@ -12,12 +12,13 @@ const { log, FileBox } = require('wechaty')
 async function getOne() {
   try {
     let option = {
+      spider: true,
       method: 'GET',
       url: ONE,
       params: '',
     }
     let res = await req(option)
-    let $ = cheerio.load(res.text)
+    let $ = cheerio.load(res)
     let todayOneList = $('#carousel-one .carousel-inner .item')
     let todayOne = $(todayOneList[0])
       .find('.fp-one-cita')
@@ -42,8 +43,7 @@ async function getResByTXTL(word, id) {
       url: '/txapi/tuling/',
       params: { question: word, user: uniqueId },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let response = content.newslist[0].reply
       console.log('天行图灵机器人回复：', response)
@@ -70,14 +70,14 @@ async function getResByTX(word, id) {
       params: { question: word, userid: uniqueId },
     }
     let res = await txReq(option)
-    let content = parseBody(res)
-    if (content.code === 200) {
+    if (res.code === 200) {
       let response = ''
+      let content = res.newslist[0]
       if (content.datatype === 'text') {
-        response = content.newslist[0].reply
+        response = content.reply
       } else if (content.datatype === 'view') {
         response = `虽然我不太懂你说的是什么，但是感觉很高级的样子，因此我也查找了类似的文章去学习，你觉得有用吗<br> 
-        《${content.newslist[0].title}》${content.newslist[0].url}`
+        《${content.title}》${content.url}`
       } else {
         response = '你太厉害了，说的话把我难倒了，我要去学习了，不然没法回答你的问题'
       }
@@ -118,8 +118,7 @@ async function getResByTL(word, id) {
       params: data,
       contentType: 'application/json;charset=UTF-8',
     }
-    let res = await req(option)
-    let content = parseBody(res)
+    let content = await req(option)
     let reply = content.results[0].values.text
     return reply
   } catch (error) {
@@ -138,8 +137,7 @@ async function getRubbishType(word) {
       url: '/txapi/lajifenlei/',
       params: { word: word },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let type
       if (content.newslist[0].type == 0) {
@@ -172,8 +170,7 @@ async function getSweetWord() {
       url: '/txapi/saylove/',
       params: {},
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let sweet = content.newslist[0].content
       let str = sweet.replace('\r\n', '<br>')
@@ -196,8 +193,7 @@ async function getTXweather(city) {
       url: '/txapi/tianqi/',
       params: { city: city },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let todayInfo = content.newslist[0]
       let obj = {
@@ -224,8 +220,7 @@ async function getNews(id) {
       url: '/allnews/',
       params: { num: 10, col: id },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
       let news = ''
@@ -251,8 +246,7 @@ async function getMingYan() {
       url: '/txapi/mingyan/',
       params: { num: 1 },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
       let news = `${newList[0].content}<br>——————————${newList[0].author}`
@@ -274,8 +268,7 @@ async function getStar(astro) {
       url: '/txapi/star/',
       params: { astro: astro },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
       let news = ''
@@ -300,8 +293,7 @@ async function getXing(name) {
       url: '/txapi/surname/',
       params: { xing: name },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
       let news = `${newList[0].content}`
@@ -322,8 +314,7 @@ async function getSkl() {
       url: '/txapi/skl/',
       params: {},
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
       let news = `${newList[0].content}`
@@ -344,8 +335,7 @@ async function getLunar(date) {
       url: '/txapi/lunar/',
       params: { date: date },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       let news = `<br>阳历：${item.gregoriandate}<br>阴历：${item.lunardate}<br>节日：${item.lunar_festival}<br>适宜：${item.fitness}<br>不宜：${item.taboo}<br>神位：${item.shenwei}<br>胎神：${item.taishen}<br>冲煞：${item.chongsha}<br>岁煞：${item.suisha}`
@@ -366,8 +356,7 @@ async function getGoldReply() {
       url: '/txapi/godreply/',
       params: { num: 1 },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       let news = `标题："${item.title}"<br>回复：${item.content}`
@@ -388,8 +377,7 @@ async function getXhy() {
       url: '/txapi/xiehou/',
       params: { num: 1 },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       let news = `${item.quest}————${item.result}`
@@ -410,8 +398,7 @@ async function getRkl() {
       url: '/txapi/rkl/',
       params: { num: 1 },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       let news = `${item.content}`
@@ -432,8 +419,7 @@ async function getShortUrl(url) {
       url: '/txapi/turl/',
       params: { url: url },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       let shorturl = item.shorturl
@@ -459,8 +445,7 @@ async function getAvatar(base, type) {
         img: 'data:image/jpeg;base64,' + base,
       },
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       return item.picurl
@@ -483,8 +468,7 @@ async function getEmo(msg) {
       contentType: 'application/json;charset=UTF-8',
       params: {},
     }
-    let res = await req(option)
-    let content = parseBody(res)
+    let content = await req(option)
     if (content.totalSize > 0) {
       if (content.items && content.items.length > 0) {
         let arr = []
@@ -519,8 +503,7 @@ async function getMeiNv() {
       contentType: 'application/json;charset=UTF-8',
       params: {},
     }
-    let res = await req(option)
-    let content = parseBody(res)
+    let content = await req(option)
     if (content.imgurl) {
       let url = content.imgurl
       return url.includes('.jpg') ? url : 'https://tva2.sinaimg.cn/large/0072Vf1pgy1foxkcsx9rmj31hc0u0h9k.jpg'
@@ -540,8 +523,7 @@ async function getNcov() {
       method: 'GET',
       url: '/txapi/ncov/index',
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist[0].news
       let desc = content.newslist.desc
@@ -565,8 +547,7 @@ async function getCname() {
       method: 'GET',
       url: '/txapi/cname/index',
     }
-    let res = await txReq(option)
-    let content = parseBody(res)
+    let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
       let cname = item.name

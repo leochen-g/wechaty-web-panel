@@ -10,7 +10,7 @@ const { allConfig } = require('../common/configDb')
  * @param {*} params 参数
  * @param {*} contentType 发送请求数据类型
  */
-function get(url, params, contentType = 'application/x-www-form-urlencoded', authorization = '') {
+function get({url, params, contentType = 'application/x-www-form-urlencoded', platform='tx', authorization = '', spider= false}) {
   return new Promise((resolve, reject) => {
     superagent
       .get(url)
@@ -18,8 +18,21 @@ function get(url, params, contentType = 'application/x-www-form-urlencoded', aut
       .set('Content-Type', contentType)
       .set('Authorization', authorization)
       .end((err, res) => {
-        if (err) reject(err)
-        resolve(res)
+        if (err) {
+          console.log('请求出错', err)
+          reject(err)
+        }
+        if (spider) { // 如果是爬取内容，直接返回页面html
+          resolve(res.text)
+        }else { // 如果是非爬虫，返回格式化后的内容
+          res = JSON.parse(res.text);
+          if(platform!=='chuan') {
+              if (res.code !== 200 && platform === 'tx' || res.code !== 200 && platform === 'aibot' || res.code !== 0 && platform === 'qi' || res.code !== 100000 && platform === 'tl') {
+                  console.error(`接口请求失败`, res.msg || res.text)
+              }
+          }
+          resolve(res)
+        }
       })
   })
 }
@@ -31,7 +44,7 @@ function get(url, params, contentType = 'application/x-www-form-urlencoded', aut
  * @param {*} contentType 发送请求数据类型
  * @param authorization
  */
-function post(url, params, contentType = 'application/x-www-form-urlencoded', authorization = '') {
+function post({ url, params, contentType = 'application/x-www-form-urlencoded', authorization = '', platform='tx', spider= false, skipCheck = false}) {
   return new Promise((resolve, reject) => {
     superagent
       .post(url)
@@ -39,18 +52,31 @@ function post(url, params, contentType = 'application/x-www-form-urlencoded', au
       .set('Content-Type', contentType)
       .set('Authorization', authorization)
       .end((err, res) => {
-        if (err) reject(err)
-        resolve(res)
+          if (err) {
+              console.log('请求出错', err)
+              reject(err)
+          }
+          if (spider) { // 如果是爬取内容，直接返回页面html
+              resolve(res.text)
+          }else { // 如果是非爬虫，返回格式化后的内容
+              res = JSON.parse(res.text);
+              if(platform!=='chuan') {
+                  if (res.code !== 200 && platform === 'tx' || res.code !== 200 && platform === 'aibot' || res.code !== 100000 && platform === 'tl') {
+                      console.error(`接口请求失败`, res.msg || res.text)
+                  }
+              }
+              resolve(res)
+          }
       })
   })
 }
 
 function req(option) {
   if (!option) return
-  if (option.method == 'POST') {
-    return post(option.url, option.params, option.contentType, option.authorization)
+  if (option.method === 'POST') {
+    return post(option)
   } else {
-    return get(option.url, option.params, option.contentType, option.authorization)
+    return get(option)
   }
 }
 
@@ -62,9 +88,9 @@ async function txReq(option) {
     ...option.params,
   }
   if (option.method === 'POST') {
-    return post(TXHOST + option.url, params, option.contentType)
+    return post({ url: TXHOST + option.url, params, contentType: option.contentType})
   } else {
-    return get(TXHOST + option.url, params, option.contentType)
+    return get({ url: TXHOST + option.url, params, contentType: option.contentType})
   }
 }
 
@@ -78,9 +104,9 @@ async function aiBotReq(option) {
   }
   let params = getFormatQuery(apiKey, apiSecret, option.params)
   if (option.method === 'POST') {
-    return post(AIBOTK + option.url, params, 'application/json;charset=utf-8')
+    return post({url: AIBOTK + option.url, params, contentType: 'application/json;charset=utf-8', platform: option.platform || 'aibot'})
   } else {
-    return get(AIBOTK + option.url, params, option.contentType)
+    return get({ url: AIBOTK + option.url, params, contentType: option.contentType, platform: option.platform || 'aibot' })
   }
 }
 

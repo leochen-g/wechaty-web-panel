@@ -1,8 +1,5 @@
 const { aiBotReq, req } = require('./superagent')
-const { parseBody } = require('../lib/index')
 const { updateConfig } = require('../common/configDb')
-const fs = require('fs')
-const path = require('path')
 const pjson = require('../../package.json')
 
 /**
@@ -16,8 +13,7 @@ async function getConfig() {
       url: '/wechat/config',
       params: {},
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     let cres = await updateConfig(JSON.parse(content.data.config))
     return cres
   } catch (e) {
@@ -35,9 +31,8 @@ async function getScheduleList() {
       url: '/task',
       params: {},
     }
-    let res = await aiBotReq(option)
-    let text = parseBody(res)
-    let scheduleList = text.data
+    let content = await aiBotReq(option)
+    let scheduleList = content.data
     console.log('获取定时任务成功:' + scheduleList)
     return scheduleList
   } catch (error) {
@@ -57,8 +52,7 @@ async function setSchedule(obj) {
       url: '/task',
       params: obj,
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     return content.data
   } catch (error) {
     console.log('添加定时任务失败', error)
@@ -75,7 +69,7 @@ async function updateSchedule(id) {
       url: '/task/update',
       params: { id: id },
     }
-    let res = await aiBotReq(option)
+    let content = await aiBotReq(option)
     console.log('更新定时任务成功')
   } catch (error) {
     console.log('更新定时任务失败', error)
@@ -95,8 +89,8 @@ async function setQrCode(url, status) {
       url: '/wechat/qrcode',
       params: { qrUrl: url, qrStatus: status },
     }
-    let res = await aiBotReq(option)
-    if (res) {
+    let content = await aiBotReq(option)
+    if (content) {
       console.log('推送二维码成功')
     } else {
       console.log('推送登录二维码失败')
@@ -118,7 +112,7 @@ async function sendHeartBeat(heart) {
       url: '/wechat/heart',
       params: { heartBeat: heart },
     }
-    let res = await aiBotReq(option)
+    let content = await aiBotReq(option)
     console.log('推送心跳成功')
   } catch (error) {
     console.log('推送心跳失败', error)
@@ -137,7 +131,7 @@ async function sendError(error) {
       url: '/wechat/qrerror',
       params: { qrError: error },
     }
-    let res = await aiBotReq(option)
+    let content = await aiBotReq(option)
     console.log('推送错误成功', error)
   } catch (e) {
     console.log('推送错误失败', e)
@@ -157,7 +151,7 @@ async function sendRobotInfo(url, name, id) {
       url: '/wechat/info',
       params: { avatar: url, robotName: name, robotId: id },
     }
-    let res = await aiBotReq(option)
+    let content = await aiBotReq(option)
     console.log('推送头像成功')
   } catch (error) {
     console.log('推送头像失败', error)
@@ -175,8 +169,7 @@ async function sendFriend(friend) {
       url: '/wechat/friend',
       params: { friend: friend },
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     if (!content.code === 200) {
       console.log('推送失败', content.msg)
     }
@@ -196,8 +189,7 @@ async function sendRoom(room) {
       url: '/wechat/room',
       params: { room: room },
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     if (!content.code === 200) {
       console.log('推送失败', content.msg)
     }
@@ -215,7 +207,7 @@ async function asyncData(robotId, type) {
       url: '/wechat/asyncData',
       params: { type, robotId },
     }
-    let res = await aiBotReq(option)
+    let content = await aiBotReq(option)
   } catch (error) {
     console.log('同步好友列表失败', error)
   }
@@ -231,9 +223,9 @@ async function getQiToken() {
       method: 'GET',
       url: '/wechat/qitoken',
       params: {},
+      platform: 'qi'
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     return content.data.token
   } catch (e) {
     console.log('token error', e)
@@ -247,10 +239,9 @@ async function getRoomPhotoConfig(roomName) {
     let option = {
       method: 'get',
       url: '/roomPhoto',
-      params: { name: roomName },
+      params: { name: roomName }
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     return content.data || ''
   } catch (e) {
     console.log('群合影生成错误', e)
@@ -269,8 +260,7 @@ async function drawRoomPhoto(roomName, list, contactName) {
       url: '/roomPhoto',
       params: { name: roomName, user: contactName, list: list },
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     return content.data
   } catch (e) {
     console.log('群合影生成错误', e)
@@ -294,9 +284,9 @@ async function putqn(base, name) {
       contentType: 'application/octet-stream',
       authorization: 'UpToken ' + token,
       params: base,
+      platform: 'chuan'
     }
-    let res = await req(options)
-    let content = parseBody(res)
+    let content = await req(options)
     console.log('上传结果', content.key)
     return 'http://image.xkboke.com/' + content.key
   } catch (e) {
@@ -314,11 +304,29 @@ async function updatePanelVersion() {
       url: '/webPanel/version',
       params: { version: pjson.version },
     }
-    let res = await aiBotReq(option)
-    let content = parseBody(res)
+    let content = await aiBotReq(option)
     return content.data
   } catch (error) {
     console.log('error', error)
+  }
+}
+
+/**
+ * 更新插件版本信息
+ * @param {*} version
+ */
+async function getMqttConfig() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/ws/mqtt/config',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    console.log(content)
+    return content.data
+  } catch (error) {
+    console.log('获取mqtt配置错误', error)
   }
 }
 
@@ -338,4 +346,5 @@ module.exports = {
   drawRoomPhoto,
   updatePanelVersion,
   getRoomPhotoConfig,
+  getMqttConfig
 }

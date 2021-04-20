@@ -3,6 +3,7 @@ const { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersio
 const { addUser } = require('../common/userDb')
 const { initAllSchedule } = require('../task')
 var pjson = require('../../package.json')
+const { initMqtt } = require('../proxy/mqtt')
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户
@@ -24,6 +25,7 @@ async function onLogin(user) {
   await sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
   await delay(6000)
   await initAllSchedule(this) // 初始化任务
+  await initMqtt(this) // 初始化mqtt任务
 }
 
 module.exports = onLogin
