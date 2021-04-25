@@ -53,6 +53,10 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 
 - [x] 默认给机器人发送 ‘更新’ 触发拉取新配置文件操作，可在面板`小助手配置->关键词回复->关键词事件`进行修改关键词
 
+* 特色功能
+
+- [x] 群合影
+
 更多详情介绍：[传送门](https://www.xkboke.com/web-inn/secretary/client.html#%E5%B0%8F%E5%8A%A9%E6%89%8B%E5%8A%9F%E8%83%BD%E4%B8%80%E8%A7%88)
 
 ## 提前准备
@@ -66,6 +70,34 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 3. 个人中心获取`APIKEY`和`APISECRET`，后续配置用到
 
 ![](./doc/img/user-center.png)
+
+### 注册天行数据账号
+
+由于本项目大部分定时资讯和一些天气接口来自于天行数据，所以需要提前准备好天行数据的账号，同时申请好相关接口的权限
+
+1、注册: [天行数据](https://www.tianapi.com/source/865c0f3bfa)
+
+2、申请接口权限
+
+必选接口
+* [天行机器人](https://www.tianapi.com/apiview/47)
+* [天气](https://www.tianapi.com/apiview/72)
+* [新闻](https://www.tianapi.com/apiview/51)
+* [垃圾分类](https://www.tianapi.com/apiview/97)
+  
+可选接口（如果想使用相应的功能还是必须申请的），但是如果默认使用了天行机器人，以下功能接口无需申请也可以，机器人会直接返回对应信息
+
+* [土味情话](https://www.tianapi.com/apiview/80)
+* [名人名言](https://www.tianapi.com/apiview/92)
+* [星座运势](https://www.tianapi.com/apiview/78)
+* [姓氏起源](https://www.tianapi.com/apiview/94)
+* [顺口溜](https://www.tianapi.com/apiview/54)
+* [老黄历](https://www.tianapi.com/apiview/45)
+* [神回复](https://www.tianapi.com/apiview/39)
+* [歇后语](https://www.tianapi.com/apiview/38)
+* [绕口令](https://www.tianapi.com/apiview/37)
+* [疫情](https://www.tianapi.com/apiview/169)
+* [网络取名](https://www.tianapi.com/apiview/36)
 
 ## 开始
 
@@ -91,7 +123,7 @@ const WechatyWebPanelPlugin = require('wechaty-web-panel');
 const name = 'wechat-assistant'
 const bot = new Wechaty({
   name, // generate xxxx.memory-card.json and save login data for the next login
-  puppet: 'wechaty-puppet-puppeteer',
+  puppet: 'wechaty-puppet-wechat',
 });
 
 bot
@@ -129,4 +161,6 @@ $ node mybot.js
 
 ![](./doc/img/func.jpeg)
 
-功能一览
+群合影
+
+![](./doc/img/group.jpeg)
