@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -51,6 +51,6 @@
   "peerDependencies": {
     "wechaty": "^0.57.13"
   },
-  "_id": "wechaty-web-panel@0.1.14",
-  "_commitid": "5c041a9"
+  "_id": "wechaty-web-panel@0.1.15",
+  "_commitid": "dcce6b0"
 }
