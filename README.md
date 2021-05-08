@@ -127,7 +127,7 @@ const bot = new Wechaty({
 });
 
 bot
-  .use(WechatyPanelPlugin({apiKey:'', apiSecret: ''}))
+  .use(WechatyWebPanelPlugin({apiKey:'', apiSecret: ''}))
   .start()
   .catch((e) => console.error(e));
 
