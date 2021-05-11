@@ -2,7 +2,7 @@ const { getNews, getOne, getTXweather, getSweetWord } = require('../proxy/api')
 const { sendFriend, sendRoom, asyncData } = require('../proxy/aibotk')
 const { getUser } = require('../common/userDb')
 const { formatDate, getDay, MD5, groupArray, delay } = require('../lib')
-const { FileBox } = require('wechaty')
+const { FileBox, UrlLink, MiniProgram } = require('wechaty')
 
 /**
  * 获取每日新闻内容
@@ -166,6 +166,26 @@ async function roomSay(room, contact, msg) {
     contact ? await room.say('', contact) : ''
     await delay(500)
     await room.say(obj)
+  } else if(msg.type === 4 && msg.url !== '' && msg.title && msg.description ) {
+    console.log('in url')
+    let url = new UrlLink({
+      description : msg.description,
+      thumbnailUrl: msg.thumbUrl,
+      title: msg.title,
+      url: msg.url,
+    })
+    console.log(url)
+    await room.say(url)
+  } else if(msg.type === 5 && msg.appid !== '' && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey ) {
+    let miniProgram = new MiniProgram({
+      appid: msg.appid,
+      title: msg.title,
+      pagePath: msg.pagePath,
+      description: msg.description,
+      thumbUrl: msg.thumbUrl,
+      thumbKey: msg.thumbKey,
+    });
+    await room.say(miniProgram)
   }
 }
 
@@ -174,6 +194,7 @@ async function roomSay(room, contact, msg) {
  * @param contact
  * @param msg
  * @param isRoom
+ *  type 1 文字 2 图片url 3 图片base64 4 url链接 5 小程序  6 名片
  */
 async function contactSay(contact, msg, isRoom = false) {
   if (msg.type === 1 && msg.content !== '') {
@@ -193,6 +214,24 @@ async function contactSay(contact, msg, isRoom = false) {
     // bse64文件
     let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
     await contact.say(obj)
+  } else if(msg.type === 4 && msg.url !== '' && msg.title && msg.description && msg.thumbUrl ) {
+    let url = new UrlLink({
+      description : msg.description,
+      thumbnailUrl: msg.thumbUrl,
+      title: msg.title,
+      url: msg.url,
+    })
+    await contact.say(url)
+  } else if(msg.type === 5 && msg.appid !== '' && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey ) {
+    let miniProgram = new MiniProgram({
+      appid: msg.appid,
+      title: msg.title,
+      pagePath: msg.pagePath,
+      description: msg.description,
+      thumbUrl: msg.thumbUrl,
+      thumbKey: msg.thumbKey,
+    });
+    await contact.say(miniProgram)
   }
 }
 
@@ -226,15 +265,39 @@ async function addRoom(that, contact, roomName, replys) {
 async function updateContactAndRoom(that) {
   const contactSelf = await getUser()
   await asyncData(1, contactSelf.robotId)
-  delay(5000)
+  delay(3000)
   await asyncData(2, contactSelf.robotId)
-  delay(5000)
+  delay(3000)
   await updateRoomInfo(that)
-  delay(5000)
+  delay(3000)
   await updateContactInfo(that)
+}
+/**
+ * 重新同步好友
+ * @param that
+ * @returns {Promise<void>}
+ */
+async function updateContactOnly(that) {
+  const contactSelf = await getUser()
+  await asyncData(1, contactSelf.robotId)
+  delay(3000)
+  await updateContactInfo(that)
+}
+/**
+ * 重新同步群
+ * @param that
+ * @returns {Promise<void>}
+ */
+async function updateRoomOnly(that) {
+  const contactSelf = await getUser()
+  await asyncData(2, contactSelf.robotId)
+  delay(3000)
+  await updateRoomInfo(that)
 }
 
 module.exports = {
+  updateRoomOnly,
+  updateContactOnly,
   getEveryDayContent,
   getEveryDayRoomContent,
   updateContactInfo,

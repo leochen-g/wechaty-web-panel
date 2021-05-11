@@ -1,7 +1,9 @@
 const mqtt = require('mqtt')
 const {allConfig} = require('../common/configDb')
 const {contactSay, roomSay,} = require('../common/index')
-const { getConfig, getMqttConfig } = require('../proxy/aibotk')
+const {getConfig, getMqttConfig} = require('../proxy/aibotk')
+const {dispatchEventContent} = require('../service/event-dispatch-service')
+const {sendRoomTaskMessage, sendContactTaskMessage} = require('../task/index')
 
 async function initMqtt(that) {
     try {
@@ -10,19 +12,13 @@ async function initMqtt(that) {
         const {userId, name, role} = config.userInfo
         if (role === 'vip') {
             const config = await getMqttConfig()
-            const {host, port,username, password} = config
+            const {host, port, username, password, clientId} = config
             let mqttclient = host ? mqtt.connect(`${host}:${port}`, {
                 username: username,
                 password: password,
-                clientId: `aibotk_client_${userId}`,
-                will: {
-                    topic: 'devicewill',
-                    payload: `${userId} device disconnect`,
-                    qos: 0,
-                    retain: false
-                }
-            }): null
-            if(mqttclient) {
+                clientId: clientId
+            }) : null
+            if (mqttclient) {
                 mqttclient.on('connect', function () {
                     console.debug('connect to Wechaty mqtt----------')
                     mqttclient.subscribe(`aibotk/${userId}/+`, function (err) {
@@ -30,6 +26,12 @@ async function initMqtt(that) {
                             console.log(err)
                         }
                     })
+                })
+                mqttclient.on('reconnect', function(e) {
+                    console.log('subscriber on reconnect')
+                })
+                mqttclient.on('disconnect', function(e) {
+                    console.log('disconnect--------', e)
                 })
                 mqttclient.on('error', function (e) {
                     console.debug('error----------', e)
@@ -57,7 +59,19 @@ async function initMqtt(that) {
                             }
                         }
                     } else if (topic === `aibotk/${userId}/event`) {
-                        console.log('触发了事件')
+                        if(content.target === 'system') {
+                            console.log('触发了内置事件')
+                            const eventName = content.event
+                            const res = await dispatchEventContent(that, eventName)
+                            console.log('事件处理结果', res[0].content)
+                        } else if(content.target ==='Room') {
+                            console.log('触发了群事件')
+                            await sendRoomTaskMessage(that, content)
+                        }else if(content.target ==='Contact') {
+                            console.log('触发了好友事件')
+                            await sendContactTaskMessage(that, content)
+                        }
+
                     }
                 })
             }
@@ -65,8 +79,8 @@ async function initMqtt(that) {
         } else {
             return false
         }
-    } catch(e) {
-      console.log('mqtt 创建链接失败', e)
+    } catch (e) {
+        console.log('mqtt 创建链接失败', e)
     }
 }
 

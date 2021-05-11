@@ -4,6 +4,8 @@ const { addUser } = require('../common/userDb')
 const { initAllSchedule } = require('../task')
 var pjson = require('../../package.json')
 const { initMqtt } = require('../proxy/mqtt')
+const {allConfig} = require('../common/configDb')
+
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户
@@ -14,6 +16,8 @@ async function onLogin(user) {
   await setQrCode('', 4)
   await sendError('')
   await getConfig() // 获取配置文件
+  const config = await allConfig()
+  const {userId} = config.userInfo
   const userInfo = {
     ...user.payload,
     robotId: user.payload.weixin || MD5(user.name()),
@@ -21,9 +25,9 @@ async function onLogin(user) {
   await addUser(userInfo) // 全局存储登录用户信息
   const file = await user.avatar()
   const base = await file.toBase64()
-  const avatarUrl = await putqn(base, user.name())
+  const avatarUrl = await putqn(base, userId)
   await sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
-  await delay(6000)
+  await delay(3000)
   await initAllSchedule(this) // 初始化任务
   await initMqtt(this) // 初始化mqtt任务
 }

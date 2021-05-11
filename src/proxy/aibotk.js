@@ -199,6 +199,7 @@ async function sendRoom(room) {
 }
 /**
  * 同步群和好友列表
+ * type： 1 好友 2 群组
  */
 async function asyncData(robotId, type) {
   try {
@@ -312,7 +313,7 @@ async function updatePanelVersion() {
 }
 
 /**
- * 更新插件版本信息
+ * 获取mqtt信息
  * @param {*} version
  */
 async function getMqttConfig() {
@@ -323,7 +324,6 @@ async function getMqttConfig() {
       params: {},
     }
     let content = await aiBotReq(option)
-    console.log(content)
     return content.data
   } catch (error) {
     console.log('获取mqtt配置错误', error)

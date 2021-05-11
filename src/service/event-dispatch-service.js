@@ -2,7 +2,7 @@ const api = require('../proxy/api')
 const { getConfig, asyncData, getRoomPhotoConfig, drawRoomPhoto } = require('../proxy/aibotk')
 const { getConstellation, msgArr, getAllSchedule, generateRoomImg, getRoomAvatar, generateAvatar } = require('../lib')
 const { initTaskLocalSchedule } = require('../task/index')
-const { updateContactAndRoom } = require('../common/index')
+const { updateContactAndRoom, updateContactOnly, updateRoomOnly } = require('../common/index')
 const { chatTencent } = require('../proxy/tencent')
 const { log } = require('wechaty')
 /**
@@ -88,6 +88,14 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         url = baseImg
       }
       break
+    case 'reloadFriendOnly':
+      await updateContactOnly(that)
+      content = '更新好友列表成功，请稍等两分钟后生效'
+      break
+    case 'reloadRoomOnly':
+      await updateRoomOnly(that)
+      content = '更新好友列表成功，请稍等两分钟后生效'
+      break
     case 'reloadFriend':
       await updateContactAndRoom(that)
       content = '更新好友群消息成功，请稍等两分钟后生效'
@@ -96,7 +104,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       await getConfig()
       await initTaskLocalSchedule(that)
       getAllSchedule()
-      content = '更新成功，请稍等两分钟后生效'
+      content = '更新配置成功，请稍等一分钟后生效'
       break
     default:
       break
