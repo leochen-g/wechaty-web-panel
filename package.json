@@ -55,6 +55,9 @@
   "peerDependencies": {
     "wechaty": "^0.60.9"
   },
+  "publishConfig": {
+    "registry": " https://registry.npmjs.org/"
+  },
   "engines": {
     "node": ">=14.0",
     "npm": ">=6.14"
