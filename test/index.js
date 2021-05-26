@@ -1,5 +1,4 @@
 const {Wechaty} = require('wechaty')
-const {PuppetPadlocal} = require('wechaty-puppet-padlocal')
 const WechatyWebPanelPlugin = require('../src/index')
 // const token = 'padtoken'
 const name = 'wechat-assistant'
@@ -13,8 +12,8 @@ const bot = new Wechaty({
 })
 bot
     .use(WechatyWebPanelPlugin({
-        apiKey: 'apiKey',
-        apiSecret: 'apiSecret'
+        apiKey: 'ak',
+        apiSecret: 'ac'
     }))
     .start()
     .catch((e) => console.error(e))

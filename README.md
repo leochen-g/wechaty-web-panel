@@ -59,7 +59,7 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 - [x] 主动发送消息
 - [x] 主动更新配置
 - [x] 主动同步好友和群列表
-- [ ] 多群消息同步
+- [x] 多群消息同步
 
 更多详情介绍：[传送门](https://www.xkboke.com/web-inn/secretary/client.html#%E5%B0%8F%E5%8A%A9%E6%89%8B%E5%8A%9F%E8%83%BD%E4%B8%80%E8%A7%88)
 
@@ -151,7 +151,8 @@ $ node mybot.js
 
 ## 面板预览
 
-![](./doc/img/qrcode.png)
+![](./doc/img/index.png)
+![](./doc/img/roomasync.png)
 ![](./doc/img/everyday.png)
 ![](./doc/img/schedule.png)
 ![](./doc/img/event.png)
@@ -164,6 +165,10 @@ $ node mybot.js
 个人定时与群定时任务
 
 ![](./doc/img/func.jpeg)
+
+群消息同步
+
+![](./doc/img/async.png)
 
 群合影
 

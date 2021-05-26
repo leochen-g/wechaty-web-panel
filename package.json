@@ -9,9 +9,13 @@
     "release:dry": "verpub --dry-run"
   },
   "keywords": [
-    "微信",
+    "定时发送",
+    "微秘书",
+    "智能机器人",
     "微信每日说",
     "每日说",
+    "群消息同步",
+    "Wechaty",
     "wechatEveryDay",
     "wechaty",
     "wechaty-plugin"
@@ -45,7 +49,7 @@
     "superagent": "^5.2.2",
     "tencentcloud-sdk-nodejs": "^4.0.30",
     "wechaty": "^0.60.9",
-    "wechaty-puppet-padlocal": "^0.2.46",
+    "wechaty-plugin-contrib": "^0.14.17",
     "wechaty-puppet-wechat": "^0.28.1"
   },
   "peerDependencies": {
