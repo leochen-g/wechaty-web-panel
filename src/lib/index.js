@@ -37,7 +37,7 @@ function setLocalSchedule(date, callback, name) {
     if (name) {
         schedule.scheduleJob(name, {tz: 'Asia/Shanghai'}, date, callback)
     } else {
-        schedule.scheduleJob(date, callback)
+        schedule.scheduleJob({tz: 'Asia/Shanghai'}, date, callback)
     }
 }
 
