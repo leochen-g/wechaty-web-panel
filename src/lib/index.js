@@ -35,7 +35,7 @@ const {addRoom, getRoom} = require('../common/roomAvatarDb')
 
 function setLocalSchedule(date, callback, name) {
     if (name) {
-        schedule.scheduleJob({name, tz: 'Asia/Shanghai'}, date, callback)
+        schedule.scheduleJob(name, {tz: 'Asia/Shanghai'}, date, callback)
     } else {
         schedule.scheduleJob(date, callback)
     }
