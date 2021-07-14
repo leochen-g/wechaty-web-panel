@@ -48,12 +48,13 @@
     "qrcode-terminal": "^0.12.0",
     "superagent": "^5.2.2",
     "tencentcloud-sdk-nodejs": "^4.0.30",
-    "wechaty": "^0.60.9",
+    "wechaty": "^0.63.3",
     "wechaty-plugin-contrib": "^0.14.17",
-    "wechaty-puppet-wechat": "^0.28.1"
+    "wechaty-puppet": "^0.41.4",
+    "wechaty-puppet-wechat": "^0.27.1"
   },
   "peerDependencies": {
-    "wechaty": "^0.60.9"
+    "wechaty": "^0.63.3"
   },
   "publishConfig": {
     "registry": " https://registry.npmjs.org/"
