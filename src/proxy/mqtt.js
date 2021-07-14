@@ -4,6 +4,7 @@ const {contactSay, roomSay,} = require('../common/index')
 const {getConfig, getMqttConfig} = require('../proxy/aibotk')
 const {dispatchEventContent} = require('../service/event-dispatch-service')
 const {sendRoomTaskMessage, sendContactTaskMessage} = require('../task/index')
+const {randomRange} = require('../lib/index')
 
 async function initMqtt(that) {
     try {
@@ -16,7 +17,7 @@ async function initMqtt(that) {
             let mqttclient = host ? mqtt.connect(`${host}:${port}`, {
                 username: username,
                 password: password,
-                clientId: clientId
+                clientId: clientId + randomRange(1, 100)
             }) : null
             if (mqttclient) {
                 mqttclient.on('connect', function () {
@@ -27,10 +28,10 @@ async function initMqtt(that) {
                         }
                     })
                 })
-                mqttclient.on('reconnect', function(e) {
+                mqttclient.on('reconnect', function (e) {
                     console.log('subscriber on reconnect')
                 })
-                mqttclient.on('disconnect', function(e) {
+                mqttclient.on('disconnect', function (e) {
                     console.log('disconnect--------', e)
                 })
                 mqttclient.on('error', function (e) {
@@ -59,15 +60,15 @@ async function initMqtt(that) {
                             }
                         }
                     } else if (topic === `aibotk/${userId}/event`) {
-                        if(content.target === 'system') {
+                        if (content.target === 'system') {
                             console.log('触发了内置事件')
                             const eventName = content.event
                             const res = await dispatchEventContent(that, eventName)
                             console.log('事件处理结果', res[0].content)
-                        } else if(content.target ==='Room') {
+                        } else if (content.target === 'Room') {
                             console.log('触发了群事件')
                             await sendRoomTaskMessage(that, content)
-                        }else if(content.target ==='Contact') {
+                        } else if (content.target === 'Contact') {
                             console.log('触发了好友事件')
                             await sendContactTaskMessage(that, content)
                         }
