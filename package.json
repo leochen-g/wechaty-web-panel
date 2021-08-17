@@ -39,7 +39,6 @@
   },
   "readme": "README.md",
   "dependencies": {
-    "canvas": "2.6.1",
     "cheerio": "^1.0.0-rc.3",
     "mcanvas": "^2.0.8",
     "mqtt": "^4.2.6",
@@ -51,7 +50,7 @@
     "wechaty": "^0.63.3",
     "wechaty-plugin-contrib": "^0.14.17",
     "wechaty-puppet": "^0.41.4",
-    "wechaty-puppet-wechat": "^0.27.1"
+    "wechaty-puppet-wechat": "^0.28.4"
   },
   "peerDependencies": {
     "wechaty": "^0.63.3"

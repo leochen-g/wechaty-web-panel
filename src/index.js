@@ -10,8 +10,25 @@ const onHeartbeat = require('./handlers/on-heartbeat')
 const onError = require('./handlers/on-error')
 const onRoomtopic = require('./handlers/on-roomtopic')
 const onRoomleave = require('./handlers/on-roomleave')
+console.log('获取环境变量中的 aibotkKey：', process.env['AIBOTK_KEY'])
+console.log('获取环境变量中的 aibotkSecret：', process.env['AIBOTK_SECRET'])
+let envKey = ''
+let envSecret = ''
+if( process.env['AIBOTK_KEY']) {
+  console.log('使用环境变量中的 aibotkKey')
+  envKey = process.env['AIBOTK_KEY']
+}
+if(process.env['AIBOTK_SECRET']) {
+  console.log('使用环境变量中的 aibotkSecret')
+  envSecret = process.env['AIBOTK_SECRET']
+}
+
 module.exports = function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
-  addAibotConfig(config)
+  const initConfig = {
+    apiKey: envKey || config.apiKey,
+    apiSecret: envSecret || config.apiSecret,
+  }
+  addAibotConfig(initConfig)
   return function (bot) {
     bot.on('scan', onScan)
     bot.on('login', onLogin)

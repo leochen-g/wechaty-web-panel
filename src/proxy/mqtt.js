@@ -17,7 +17,7 @@ async function initMqtt(that) {
             let mqttclient = host ? mqtt.connect(`${host}:${port}`, {
                 username: username,
                 password: password,
-                clientId: clientId + randomRange(1, 100)
+                clientId: clientId + randomRange(1, 10000)
             }) : null
             if (mqttclient) {
                 mqttclient.on('connect', function () {

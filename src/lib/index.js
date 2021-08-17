@@ -515,6 +515,7 @@ function groupArray(array, subGroupLength) {
 async function getRoomAvatarList(room, name) {
     const members = await room.memberAll()
     let res = []
+    console.log('正在努力获取群成员信息...')
     for (let i of members) {
         let member = i.payload
         try {
@@ -528,7 +529,7 @@ async function getRoomAvatarList(room, name) {
                 res.push(obj)
             }
         } catch (error) {
-            console.log('获取头像失败', error)
+            console.log(`获取${member.name}头像失败， 头像文件格式错误，不影响群合影生成`)
             continue
         }
     }
@@ -537,6 +538,7 @@ async function getRoomAvatarList(room, name) {
         1
     )
     res.unshift(say[0])
+    console.log('获取群成员信息完成...')
     return res
 }
 
@@ -570,6 +572,7 @@ async function getRoomAvatar(roomObj, roomName, name) {
         await addRoom(obj)
         memberList = list
     }
+    console.log('准备绘制...')
     const list = setFirstAvatr(memberList, name)
     return list
 }
@@ -708,6 +711,7 @@ function drawTitle(mc, title, titleInfo) {
 
 async function generateRoomImg(list, options) {
     const {sizeInfo, titleInfo, background, roomName} = options
+    console.log('群合影生成中...')
     list = await cropImg(list, sizeInfo.size)
     const initOptions = {
         title: titleInfo.title || roomName,
@@ -733,7 +737,7 @@ async function generateRoomImg(list, options) {
     patternCircle(mc, list, info, initOptions)
     drawTitle(mc, initOptions.title, titleInfo)
     const base64 = await mc.draw({type: 'jpg', quality: 1})
-    console.log('生成成功！')
+    console.log('群合影生成成功！')
     // var base64Data = base64.replace(/^data:image\/\w+;base64,/, '')
     // var dataBuffer = Buffer.from(base64Data, 'base64')
     // fs.writeFile('image.jpg', dataBuffer, function (err) {

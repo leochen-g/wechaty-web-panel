@@ -303,8 +303,9 @@ async function updatePanelVersion() {
     let option = {
       method: 'POST',
       url: '/webPanel/version',
-      params: { version: pjson.version },
+      params: { version: pjson.version || '0.2.11' },
     }
+    console.log('更新插件版本号', pjson.version)
     let content = await aiBotReq(option)
     return content.data
   } catch (error) {
