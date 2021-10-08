@@ -333,7 +333,7 @@ async function oneToMany(that, config, msg) {
  * @returns {Promise<void>}
  */
 async function dispatchAsync(that, msg, list) {
-  const userSelfName = this.userSelf().name()
+  const userSelfName = that.userSelf().name()
   const type = msg.type()
   const content = msg.text()
   const mentionSelf = content.includes(`@${userSelfName}`)
