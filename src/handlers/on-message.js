@@ -2,7 +2,7 @@ const { contactSay, roomSay } = require('../common')
 const { getContactTextReply, getRoomTextReply } = require('../common/reply')
 const { delay } = require('../lib/index')
 const { dispatchAsync } = require('../service/room-async-service')
-const {allConfig} = require('../common/configDb')
+const { allConfig } = require('../common/configDb')
 
 /**
  * 根据消息类型过滤私聊消息事件
@@ -107,15 +107,15 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
 
 async function onMessage(msg) {
   const config = await allConfig()
-  const {role} = config.userInfo
+  const { role } = config.userInfo
   const room = msg.room() // 是否为群消息
   const msgSelf = msg.self() // 是否自己发给自己的消息
   if (msgSelf) return
   if (room) {
     dispatchRoomFilterByMsgType(this, room, msg)
-    if(role === 'vip') {
+    if (role === 'vip') {
       const roomAsyncList = config.roomAsyncList || []
-      if(roomAsyncList.length) {
+      if (roomAsyncList.length) {
         dispatchAsync(this, msg, roomAsyncList)
       }
     }

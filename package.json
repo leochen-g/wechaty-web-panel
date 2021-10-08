@@ -47,10 +47,9 @@
     "qrcode-terminal": "^0.12.0",
     "superagent": "^5.2.2",
     "tencentcloud-sdk-nodejs": "^4.0.30",
-    "wechaty": "^0.63.3",
+    "wechaty": "^0.68.1",
     "wechaty-plugin-contrib": "^0.14.17",
-    "wechaty-puppet": "^0.41.4",
-    "wechaty-puppet-wechat": "^0.28.4"
+    "wechaty-puppet-wechat": "^0.30.2"
   },
   "peerDependencies": {
     "wechaty": "^0.63.3"

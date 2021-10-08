@@ -48,9 +48,14 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       content = await api.getRkl(msg)
       break
     case 'avatar':
-      let base64Text = await avatar.toDataURL()
-      url = await generateAvatar(base64Text)
-      type = 3
+      if (avatar.mimeType) {
+        // 如果图片类型正确再进行头像处理
+        let base64Text = await avatar.toDataURL()
+        url = await generateAvatar(base64Text)
+        type = 3
+      } else {
+        content = '你的头像属于高维世界产物，小助手能力不足，无法解析，待我修炼后为你提供服务'
+      }
       break
     case 'emo':
       url = await api.getEmo(msg)

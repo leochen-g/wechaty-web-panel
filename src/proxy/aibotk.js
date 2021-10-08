@@ -224,7 +224,7 @@ async function getQiToken() {
       method: 'GET',
       url: '/wechat/qitoken',
       params: {},
-      platform: 'qi'
+      platform: 'qi',
     }
     let content = await aiBotReq(option)
     return content.data.token
@@ -240,7 +240,7 @@ async function getRoomPhotoConfig(roomName) {
     let option = {
       method: 'get',
       url: '/roomPhoto',
-      params: { name: roomName }
+      params: { name: roomName },
     }
     let content = await aiBotReq(option)
     return content.data || ''
@@ -285,7 +285,7 @@ async function putqn(base, name) {
       contentType: 'application/octet-stream',
       authorization: 'UpToken ' + token,
       params: base,
-      platform: 'chuan'
+      platform: 'chuan',
     }
     let content = await req(options)
     console.log('上传结果', content.key)
@@ -347,5 +347,5 @@ module.exports = {
   drawRoomPhoto,
   updatePanelVersion,
   getRoomPhotoConfig,
-  getMqttConfig
+  getMqttConfig,
 }
