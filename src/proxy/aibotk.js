@@ -3,6 +3,46 @@ const { updateConfig } = require('../common/configDb')
 const pjson = require('../../package.json')
 
 /**
+ * 获取美女图片
+ */
+async function getMeiNv() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/meinv',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    let pics = content.data.pics || []
+    if (pics.length) {
+      let url = pics[0]
+      return url.includes('.jpg') ? url : 'https://tva2.sinaimg.cn/large/0072Vf1pgy1foxkcsx9rmj31hc0u0h9k.jpg'
+    }
+  } catch (e) {
+    console.log('获取美女图片失败', e)
+    return 'https://tva2.sinaimg.cn/large/0072Vf1pgy1foxkcsx9rmj31hc0u0h9k.jpg'
+  }
+}
+/**
+ * 获取每日一句
+ */
+async function getOne() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/one',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    let word = content.data.word || '今日一句似乎已经消失'
+    return word
+  } catch (e) {
+    console.log('获取每日一句失败', e)
+    return '今日一句似乎已经消失'
+  }
+}
+
+/**
  * 获取配置文件
  * @returns {Promise<*>}
  */
@@ -14,7 +54,8 @@ async function getConfig() {
       params: {},
     }
     let content = await aiBotReq(option)
-    let cres = await updateConfig(JSON.parse(content.data.config))
+    const config = JSON.parse(content.data.config)
+    let cres = await updateConfig(config)
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)
@@ -348,4 +389,6 @@ module.exports = {
   updatePanelVersion,
   getRoomPhotoConfig,
   getMqttConfig,
+  getMeiNv,
+  getOne,
 }

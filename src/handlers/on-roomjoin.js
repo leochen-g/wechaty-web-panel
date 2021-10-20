@@ -19,17 +19,21 @@ function roomHasConfig(arr, name) {
  * 群中有新人进入
  */
 async function onRoomjoin(room, inviteeList, inviter, date) {
-  const config = await allConfig()
-  const nameList = inviteeList.map((c) => c.name()).join(',')
-  const roomName = await room.topic()
-  const roomIndex = roomHasConfig(config.roomJoinKeywords, roomName)
-  console.log('进群', roomName, roomIndex, nameList)
-  if (roomIndex > -1) {
-    const { welcomes } = config.roomJoinKeywords[roomIndex]
-    console.log(`群名： ${roomName} ，加入新成员： ${nameList}, 邀请人： ${inviter}`)
-    for (const item of welcomes) {
-      await addRoomWelcomeSay(room, roomName, nameList, item)
+  try {
+    const config = await allConfig()
+    const nameList = inviteeList.map((c) => c.name()).join(',')
+    const roomName = await room.topic()
+    const roomIndex = roomHasConfig(config.roomJoinKeywords, roomName)
+    console.log('进群', roomName, roomIndex, nameList)
+    if (roomIndex > -1) {
+      const { welcomes } = config.roomJoinKeywords[roomIndex]
+      console.log(`群名： ${roomName} ，加入新成员： ${nameList}, 邀请人： ${inviter}`)
+      for (const item of welcomes) {
+        await addRoomWelcomeSay(room, roomName, nameList, item)
+      }
     }
+  } catch (e) {
+    console.log('on room join error: ', e)
   }
 }
 

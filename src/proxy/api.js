@@ -1,13 +1,11 @@
 const cheerio = require('cheerio')
-const path = require('path')
 const { req, txReq } = require('./superagent')
 const { EMOHOST, TULING, ONE, MEINV } = require('./config')
-const { randomRange, parseBody, MD5, loadFile } = require('../lib/index')
+const { randomRange, MD5 } = require('../lib/index')
 const { allConfig } = require('../common/configDb')
-const { log, FileBox } = require('wechaty')
 
 /**
- * 获取每日一句
+ * 获取每日一句，暂时弃用，已改为api调用
  */
 async function getOne() {
   try {
@@ -76,8 +74,11 @@ async function getResByTX(word, id) {
       if (content.datatype === 'text') {
         response = content.reply
       } else if (content.datatype === 'view') {
-        response = `虽然我不太懂你说的是什么，但是感觉很高级的样子，因此我也查找了类似的文章去学习，你觉得有用吗<br> 
-        《${content.title}》${content.url}`
+        let reply = ''
+        content.reply.forEach((item) => {
+          reply = reply + `《${item.title}》:${item.url}\n`
+        })
+        response = `虽然我不太懂你说的是什么，但是感觉很高级的样子，因此我也查找了类似的文章去学习，你觉得有用吗:\n${reply}`
       } else {
         response = '你太厉害了，说的话把我难倒了，我要去学习了，不然没法回答你的问题'
       }

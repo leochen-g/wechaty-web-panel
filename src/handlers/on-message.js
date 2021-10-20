@@ -62,65 +62,77 @@ async function dispatchFriendFilterByMsgType(that, msg) {
  * @param {*} msg 消息主体
  */
 async function dispatchRoomFilterByMsgType(that, room, msg) {
-  const contact = msg.talker() // 发消息人
-  const contactName = contact.name()
-  const roomName = await room.topic()
-  const type = msg.type()
-  const userSelfName = that.userSelf().name()
-  let content = ''
-  let replys = ''
-  let contactId = contact.id || '111'
-  let contactAvatar = await contact.avatar()
-  switch (type) {
-    case that.Message.Type.Text:
-      content = msg.text()
-      console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`)
-      const mentionSelf = content.includes(`@${userSelfName}`)
-      if (mentionSelf) {
-        content = content.replace(/@[^,，：:\s@]+/g, '').trim()
-        replys = await getRoomTextReply(that, content, contactName, contactId, contactAvatar, room)
-        for (let reply of replys) {
-          await delay(1000)
-          await roomSay(room, contact, reply)
+  try {
+    const contact = msg.talker() // 发消息人
+    const contactName = contact.name()
+    const roomName = await room.topic()
+    const type = msg.type()
+    const userSelfName = that.userSelf().name()
+    let content = ''
+    let replys = ''
+    let contactId = contact.id || '111'
+    let contactAvatar = await contact.avatar()
+    switch (type) {
+      case that.Message.Type.Text:
+        content = msg.text()
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`)
+        const mentionSelf = content.includes(`@${userSelfName}`)
+        if (mentionSelf) {
+          content = content.replace(/@[^,，：:\s@]+/g, '').trim()
+          replys = await getRoomTextReply(that, content, contactName, contactId, contactAvatar, room)
+          for (let reply of replys) {
+            await delay(1000)
+            await roomSay(room, contact, reply)
+          }
         }
-      }
-      break
-    case that.Message.Type.Emoticon:
-      console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个表情`)
-      break
-    case that.Message.Type.Image:
-      console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一张图片`)
-      break
-    case that.Message.Type.Url:
-      console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个链接`)
-      break
-    case that.Message.Type.Video:
-      console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个视频`)
-      break
-    case that.Message.Type.Audio:
-      console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个语音`)
-      break
-    default:
-      break
+        break
+      case that.Message.Type.Emoticon:
+        content = msg.text()
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个表情 ${content}`)
+        break
+      case that.Message.Type.Image:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一张图片`)
+        break
+      case that.Message.Type.Url:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个链接`)
+        break
+      case that.Message.Type.Video:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个视频`)
+        break
+      case that.Message.Type.Audio:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个语音`)
+        break
+      default:
+        break
+    }
+  } catch (e) {
+    console.log('error', e)
   }
 }
 
 async function onMessage(msg) {
-  const config = await allConfig()
-  const { role } = config.userInfo
-  const room = msg.room() // 是否为群消息
-  const msgSelf = msg.self() // 是否自己发给自己的消息
-  if (msgSelf) return
-  if (room) {
-    dispatchRoomFilterByMsgType(this, room, msg)
-    if (role === 'vip') {
-      const roomAsyncList = config.roomAsyncList || []
-      if (roomAsyncList.length) {
-        dispatchAsync(this, msg, roomAsyncList)
+  try {
+    const config = await allConfig()
+    const { role } = config.userInfo
+    const room = msg.room() // 是否为群消息
+    const msgSelf = msg.self() // 是否自己发给自己的消息
+    if (msgSelf) return
+    if (room) {
+      const roomName = await room.topic()
+      const contact = msg.talker() // 发消息人
+      const contactName = contact.name()
+      await dispatchRoomFilterByMsgType(this, room, msg)
+      if (role === 'vip' && roomName !== contactName) {
+        const roomAsyncList = config.roomAsyncList || []
+        if (roomAsyncList.length) {
+          await dispatchAsync(this, msg, roomAsyncList)
+        }
       }
+    } else {
+      await dispatchFriendFilterByMsgType(this, msg)
     }
-  } else {
-    dispatchFriendFilterByMsgType(this, msg)
+  } catch (e) {
+    console.log('监听消息失败', e)
   }
 }
 

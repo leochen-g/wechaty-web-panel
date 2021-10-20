@@ -10,7 +10,7 @@ const { allConfig } = require('../common/configDb')
  * @param {*} params 参数
  * @param {*} contentType 发送请求数据类型
  */
-function get({url, params, contentType = 'application/x-www-form-urlencoded', platform='tx', authorization = '', spider= false}) {
+function get({ url, params, contentType = 'application/x-www-form-urlencoded', platform = 'tx', authorization = '', spider = false }) {
   return new Promise((resolve, reject) => {
     superagent
       .get(url)
@@ -22,14 +22,16 @@ function get({url, params, contentType = 'application/x-www-form-urlencoded', pl
           console.log('请求出错', err)
           reject(err)
         }
-        if (spider) { // 如果是爬取内容，直接返回页面html
+        if (spider) {
+          // 如果是爬取内容，直接返回页面html
           resolve(res.text)
-        }else { // 如果是非爬虫，返回格式化后的内容
-          res = JSON.parse(res.text);
-          if(platform!=='chuan') {
-              if (res.code !== 200 && platform === 'tx' || res.code !== 200 && platform === 'aibot' || res.code !== 0 && platform === 'qi' || res.code !== 100000 && platform === 'tl') {
-                  console.error(`接口请求失败`, res.msg || res.text)
-              }
+        } else {
+          // 如果是非爬虫，返回格式化后的内容
+          res = JSON.parse(res.text)
+          if (platform !== 'chuan') {
+            if ((res.code !== 200 && platform === 'tx') || (res.code !== 200 && platform === 'aibot') || (res.code !== 0 && platform === 'qi') || (res.code !== 100000 && platform === 'tl')) {
+              console.error(`接口${url}请求失败`, res.msg || res.text)
+            }
           }
           resolve(res)
         }
@@ -44,7 +46,7 @@ function get({url, params, contentType = 'application/x-www-form-urlencoded', pl
  * @param {*} contentType 发送请求数据类型
  * @param authorization
  */
-function post({ url, params, contentType = 'application/x-www-form-urlencoded', authorization = '', platform='tx', spider= false, skipCheck = false}) {
+function post({ url, params, contentType = 'application/x-www-form-urlencoded', authorization = '', platform = 'tx', spider = false, skipCheck = false }) {
   return new Promise((resolve, reject) => {
     superagent
       .post(url)
@@ -52,21 +54,23 @@ function post({ url, params, contentType = 'application/x-www-form-urlencoded', 
       .set('Content-Type', contentType)
       .set('Authorization', authorization)
       .end((err, res) => {
-          if (err) {
-              console.log('请求出错', err)
-              reject(err)
+        if (err) {
+          console.log('请求出错', err)
+          reject(err)
+        }
+        if (spider) {
+          // 如果是爬取内容，直接返回页面html
+          resolve(res.text)
+        } else {
+          // 如果是非爬虫，返回格式化后的内容
+          res = JSON.parse(res.text)
+          if (platform !== 'chuan') {
+            if ((res.code !== 200 && platform === 'tx') || (res.code !== 200 && platform === 'aibot') || (res.code !== 100000 && platform === 'tl')) {
+              console.error(`接口请求失败${url}`, res.msg || res.text || res.error)
+            }
           }
-          if (spider) { // 如果是爬取内容，直接返回页面html
-              resolve(res.text)
-          }else { // 如果是非爬虫，返回格式化后的内容
-              res = JSON.parse(res.text);
-              if(platform!=='chuan') {
-                  if (res.code !== 200 && platform === 'tx' || res.code !== 200 && platform === 'aibot' || res.code !== 100000 && platform === 'tl') {
-                      console.error(`接口请求失败`, res.msg || res.text)
-                  }
-              }
-              resolve(res)
-          }
+          resolve(res)
+        }
       })
   })
 }
@@ -88,9 +92,9 @@ async function txReq(option) {
     ...option.params,
   }
   if (option.method === 'POST') {
-    return post({ url: TXHOST + option.url, params, contentType: option.contentType})
+    return post({ url: TXHOST + option.url, params, contentType: option.contentType })
   } else {
-    return get({ url: TXHOST + option.url, params, contentType: option.contentType})
+    return get({ url: TXHOST + option.url, params, contentType: option.contentType })
   }
 }
 
@@ -104,7 +108,7 @@ async function aiBotReq(option) {
   }
   let params = getFormatQuery(apiKey, apiSecret, option.params)
   if (option.method === 'POST') {
-    return post({url: AIBOTK + option.url, params, contentType: 'application/json;charset=utf-8', platform: option.platform || 'aibot'})
+    return post({ url: AIBOTK + option.url, params, contentType: 'application/json;charset=utf-8', platform: option.platform || 'aibot' })
   } else {
     return get({ url: AIBOTK + option.url, params, contentType: option.contentType, platform: option.platform || 'aibot' })
   }

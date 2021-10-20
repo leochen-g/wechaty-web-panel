@@ -6,9 +6,9 @@ const { allConfig } = require('../common/configDb')
  * 好友添加
  */
 async function onFriend(friendship) {
-  const config = await allConfig()
-  let logMsg, hello
   try {
+    const config = await allConfig()
+    let logMsg, hello
     let name = friendship.contact().name()
     hello = friendship.hello()
     logMsg = name + '，发送了好友请求'
@@ -37,8 +37,7 @@ async function onFriend(friendship) {
       console.log('未开启自动添加好友功能，忽略好友添加')
     }
   } catch (e) {
-    logMsg = e
-    console.log('添加好友出错：', logMsg)
+    console.log('添加好友出错：', e)
   }
 }
 

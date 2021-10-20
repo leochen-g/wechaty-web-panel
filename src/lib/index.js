@@ -2,7 +2,6 @@ const Crypto = require('crypto')
 const schedule = require('node-schedule')
 const fs = require('fs')
 const { MCanvas, MImage } = require('mcanvas')
-const { log } = require('wechaty')
 const { addRoom, getRoom } = require('../common/roomAvatarDb')
 
 /**
@@ -513,33 +512,37 @@ function groupArray(array, subGroupLength) {
  * @param {*} name
  */
 async function getRoomAvatarList(room, name) {
-  const members = await room.memberAll()
-  let res = []
-  console.log('正在努力获取群成员信息...')
-  for (let i of members) {
-    let member = i.payload
-    try {
-      const avatar = await i.avatar()
-      if (avatar.mimeType) {
-        const base64 = member.weixin ? member.avatar : await avatar.toDataURL()
-        let obj = {
-          img: base64,
-          name: member.name,
+  try {
+    const members = await room.memberAll()
+    let res = []
+    console.log('正在努力获取群成员信息...')
+    for (let i of members) {
+      let member = i.payload
+      try {
+        const avatar = await i.avatar()
+        if (avatar.mimeType && member.name) {
+          const base64 = member.weixin ? member.avatar : await avatar.toDataURL()
+          let obj = {
+            img: base64,
+            name: member.name,
+          }
+          res.push(obj)
         }
-        res.push(obj)
+      } catch (error) {
+        console.log(`获取${member.name}头像失败， 头像文件格式错误，不影响群合影生成`)
+        continue
       }
-    } catch (error) {
-      console.log(`获取${member.name}头像失败， 头像文件格式错误，不影响群合影生成`)
-      continue
     }
+    const say = res.splice(
+      res.findIndex((e) => e.name === name),
+      1
+    )
+    res.unshift(say[0])
+    console.log('获取群成员信息完成...')
+    return res
+  } catch (e) {
+    console.log('getRoomAvatarList error', e)
   }
-  const say = res.splice(
-    res.findIndex((e) => e.name === name),
-    1
-  )
-  res.unshift(say[0])
-  console.log('获取群成员信息完成...')
-  return res
 }
 
 /**
@@ -562,19 +565,23 @@ function setFirstAvatr(list, name) {
  * @param {*} name
  */
 async function getRoomAvatar(roomObj, roomName, name) {
-  let memberList = []
-  const room = await getRoom(roomName) // 先获取缓存中是否存在已经获取的头像
-  if (room && room.list) {
-    memberList = room.list
-  } else {
-    const list = await getRoomAvatarList(roomObj, name)
-    const obj = { name: roomName, list }
-    await addRoom(obj)
-    memberList = list
+  try {
+    let memberList = []
+    const room = await getRoom(roomName) // 先获取缓存中是否存在已经获取的头像
+    if (room && room.list) {
+      memberList = room.list
+    } else {
+      const list = await getRoomAvatarList(roomObj, name)
+      const obj = { name: roomName, list }
+      await addRoom(obj)
+      memberList = list
+    }
+    console.log('准备绘制...')
+    const list = setFirstAvatr(memberList, name)
+    return list
+  } catch (e) {
+    console.log('getRoomAvatar error', e)
   }
-  console.log('准备绘制...')
-  const list = setFirstAvatr(memberList, name)
-  return list
 }
 
 /**
@@ -606,7 +613,7 @@ async function cropImg(list, size = 74) {
     }
     return arr
   } catch (error) {
-    console.log('处理头像错误error', error)
+    console.log('cropImg error', error)
   }
 }
 
@@ -699,8 +706,8 @@ function drawTitle(mc, title, titleInfo) {
     width: '100%',
     normalStyle: {
       color: titleInfo.color,
-      lineheight: titleInfo.fontSize + 10,
-      font: `${titleInfo.fontSize}px`,
+      lineHeight: titleInfo.fontSize,
+      font: `${titleInfo.fontSize}px Microsoft YaHei,sans-serif`,
     },
     pos: {
       x: 0,
@@ -710,79 +717,87 @@ function drawTitle(mc, title, titleInfo) {
 }
 
 async function generateRoomImg(list, options) {
-  const { sizeInfo, titleInfo, background, roomName } = options
-  console.log('群合影生成中...')
-  list = await cropImg(list, sizeInfo.size)
-  const initOptions = {
-    title: titleInfo.title || roomName,
-    centerSize: sizeInfo.centerSize,
-    space: sizeInfo.space,
-    circleSpace: sizeInfo.space,
-    size: sizeInfo.size,
-    x: 0,
-    y: 0,
-    backWid: sizeInfo.width,
-    backHei: sizeInfo.height,
-    marginBottom: sizeInfo.bottom, // 距离底部高度
-  }
-  const mc = new MCanvas({
-    width: initOptions.backWid,
-    height: initOptions.backHei,
-    backgroundColor: '#ffffff',
-  })
-  mc.background(background, {
-    type: 'contain',
-  })
-  const info = __beforePatternCircle(list, initOptions)
-  patternCircle(mc, list, info, initOptions)
-  drawTitle(mc, initOptions.title, titleInfo)
-  const base64 = await mc.draw({ type: 'jpg', quality: 1 })
-  console.log('群合影生成成功！')
-  // var base64Data = base64.replace(/^data:image\/\w+;base64,/, '')
-  // var dataBuffer = Buffer.from(base64Data, 'base64')
-  // fs.writeFile('image.jpg', dataBuffer, function (err) {
-  //   if (err) {
-  //     console.log(err)
-  //   } else {
-  //     console.log('保存成功！')
-  //   }
-  // })
-  return base64
-}
-
-async function generateAvatar(avatar) {
-  let mc = new MCanvas({
-    width: 880,
-    height: 880,
-    backgroundColor: '#ffffff',
-  })
-  mc.add(avatar, {
-    width: 810,
-    pos: {
-      x: 35,
-      y: 35,
-      scale: 1,
-    },
-  })
-  mc.add('http://image.xkboke.com/hat.png', {
-    width: 880,
-    pos: {
+  try {
+    const { sizeInfo, titleInfo, background, roomName } = options
+    console.log('群合影生成中...')
+    list = await cropImg(list, sizeInfo.size)
+    const initOptions = {
+      title: titleInfo.title || roomName,
+      centerSize: sizeInfo.centerSize,
+      space: sizeInfo.space,
+      circleSpace: sizeInfo.space,
+      size: sizeInfo.size,
       x: 0,
       y: 0,
-      scale: 1,
-    },
-  })
-  const base64 = await mc.draw({ type: 'jpg', quality: 1 })
-  // var base64Data = base64.replace(/^data:image\/\w+;base64,/, '')
-  // var dataBuffer = Buffer.from(base64Data, 'base64')
-  // fs.writeFile('avatar.jpg', dataBuffer, function (err) {
-  //   if (err) {
-  //     console.log(err)
-  //   } else {
-  //     console.log('保存成功！')
-  //   }
-  // })
-  return base64
+      backWid: sizeInfo.width,
+      backHei: sizeInfo.height,
+      marginBottom: sizeInfo.bottom, // 距离底部高度
+    }
+    const mc = new MCanvas({
+      width: initOptions.backWid,
+      height: initOptions.backHei,
+      backgroundColor: '#ffffff',
+    })
+    mc.background(background, {
+      type: 'contain',
+    })
+    const info = __beforePatternCircle(list, initOptions)
+    patternCircle(mc, list, info, initOptions)
+    drawTitle(mc, initOptions.title, titleInfo)
+    const base64 = await mc.draw({ type: 'jpg', quality: 1 })
+    console.log('群合影生成成功！')
+    // var base64Data = base64.replace(/^data:image\/\w+;base64,/, '')
+    // var dataBuffer = Buffer.from(base64Data, 'base64')
+    // fs.writeFile('image.jpg', dataBuffer, function (err) {
+    //   if (err) {
+    //     console.log(err)
+    //   } else {
+    //     console.log('保存成功！')
+    //   }
+    // })
+    return base64
+  } catch (e) {
+    console.log('群合影生成失败', e)
+  }
+}
+
+async function generateAvatar(avatar, coverImg = 'http://image.xkboke.com/hat.png') {
+  try {
+    let mc = new MCanvas({
+      width: 880,
+      height: 880,
+      backgroundColor: '#ffffff',
+    })
+    mc.add(avatar, {
+      width: 860,
+      pos: {
+        x: 10,
+        y: 10,
+        scale: 1,
+      },
+    })
+    mc.add(coverImg, {
+      width: 880,
+      pos: {
+        x: 0,
+        y: 0,
+        scale: 1,
+      },
+    })
+    const base64 = await mc.draw({ type: 'jpg', quality: 1 })
+    // var base64Data = base64.replace(/^data:image\/\w+;base64,/, '')
+    // var dataBuffer = Buffer.from(base64Data, 'base64')
+    // fs.writeFile('avatar.jpg', dataBuffer, function (err) {
+    //   if (err) {
+    //     console.log(err)
+    //   } else {
+    //     console.log('保存成功！')
+    //   }
+    // })
+    return base64
+  } catch (e) {
+    console.log('头像生成失败', e)
+  }
 }
 
 module.exports = {

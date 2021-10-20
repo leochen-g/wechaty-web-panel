@@ -6,17 +6,22 @@ const REMINDKEY = '提醒'
 const NEWADDFRIEND = '你已添加'
 
 async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, id, room }) {
-  let msgArr = []
-  for (let i = 0; i < resArray.length; i++) {
-    const item = resArray[i]
-    if (item.bool) {
-      msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room })) || []
+  try {
+    let msgArr = []
+    for (let i = 0; i < resArray.length; i++) {
+      const item = resArray[i]
+      if (item.bool) {
+        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room })) || []
+      }
+      if (msgArr.length > 0) {
+        return msgArr
+      }
     }
-    if (msgArr.length > 0) {
-      return msgArr
-    }
+    return []
+  } catch (e) {
+    console.log('getMsgReply error', e)
+    return []
   }
-  return []
 }
 
 /**
@@ -28,22 +33,27 @@ async function getMsgReply(resArray, { that, msg, name, contact, config, avatar,
  * @returns {number} 返回回复内容
  */
 async function filterFriendMsg(that, contact, msg) {
-  const config = await allConfig() // 获取配置信息
-  const name = contact.name()
-  const id = contact.id
-  const avatar = await contact.avatar()
-  const resArray = [
-    { bool: msg === '', method: 'emptyMsg' },
-    { bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 1000, method: 'officialMsg' },
-    { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
-    { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
-    { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
-    { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
-    { bool: true, method: 'keywordsMsg' },
-    { bool: config.autoReply, method: 'robotMsg' },
-  ]
-  const msgArr = await getMsgReply(resArray, { that, msg, contact, name, config, avatar, id })
-  return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
+  try {
+    const config = await allConfig() // 获取配置信息
+    const name = contact.name()
+    const id = contact.id
+    const avatar = await contact.avatar()
+    const resArray = [
+      { bool: msg === '', method: 'emptyMsg' },
+      { bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 1000, method: 'officialMsg' },
+      { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
+      { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
+      { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
+      { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
+      { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
+      { bool: true, method: 'keywordsMsg' },
+      { bool: config.autoReply, method: 'robotMsg' },
+    ]
+    const msgArr = await getMsgReply(resArray, { that, msg, contact, name, config, avatar, id })
+    return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
+  } catch (e) {
+    console.log('filterFriendMsg error', e)
+  }
 }
 
 /**
@@ -59,15 +69,20 @@ async function filterFriendMsg(that, contact, msg) {
  * 2 初次添加好友
  */
 async function filterRoomMsg(that, msg, name, id, avatar, room) {
-  const config = await allConfig() // 获取配置信息
-  const resArray = [
-    { bool: msg === '', method: 'emptyMsg' },
-    { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
-    { bool: true, method: 'keywordsMsg' },
-    { bool: config.autoReply, method: 'robotMsg' },
-  ]
-  const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room })
-  return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
+  try {
+    const config = await allConfig() // 获取配置信息
+    const resArray = [
+      { bool: msg === '', method: 'emptyMsg' },
+      { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
+      { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
+      { bool: true, method: 'keywordsMsg' },
+      { bool: config.autoReply, method: 'robotMsg' },
+    ]
+    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room })
+    return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
+  } catch (e) {
+    console.log('filterRoomMsg error', e)
+  }
 }
 
 module.exports = {

@@ -2,10 +2,10 @@ const { sendHeartBeat } = require('../proxy/aibotk')
 
 async function onHeartBeat(str) {
   if (!str) {
-    sendHeartBeat('dead')
+    await sendHeartBeat('dead')
   }
   if (str.type === 'scan') {
-    sendHeartBeat('scan')
+    await sendHeartBeat('scan')
   }
 }
 
