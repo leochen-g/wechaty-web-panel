@@ -527,13 +527,14 @@ async function getNcov() {
     let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist[0].news
-      let desc = content.newslist.desc
-      let news = ''
-      for (let i in newList) {
-        let num = parseInt(i) + 1
-        news = `${news}<br>>>${newList[i].pubDateStr}: ${newList[i].title}<br><br>${newList[i].summary}----------------${newList[i].infoSource}<br><br>`
-      }
-      return `${news}<br>`
+      const riskarea = content.newslist[0].riskarea
+      const reply = `【疫情新闻暂时下线，目前只返回风险地区】\n\n全国风险地区\n\n【高风险地区】:\n${(riskarea.high && riskarea.high.length && riskarea.high.join('\n')) || '暂无'}\n【中风险地区】:\n${(riskarea.mid && riskarea.mid.length && riskarea.mid.join('\n')) || '暂无'}\n\n——————————数据来源：天行数据`
+      // let news = ''
+      // for (let i in newList) {
+      //   let num = parseInt(i) + 1
+      //   news = `${news}<br>>>${newList[i].pubDateStr}: ${newList[i].title}<br><br>${newList[i].summary}----------------${newList[i].infoSource}<br><br>`
+      // }
+      return reply
     }
   } catch (e) {
     console.log('获取疫情数据失败', e)
