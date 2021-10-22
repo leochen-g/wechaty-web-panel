@@ -75,7 +75,7 @@ async function updateContactInfo(that) {
  */
 async function updateFriendInfo(list, num) {
   const arr = groupArray(list, num)
-  for (let i = 1; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     const item = arr[i]
     await sendFriend(item)
     await delay(500)
@@ -117,7 +117,7 @@ async function updateRoomInfo(that) {
  */
 async function updateRoomsInfo(list, num) {
   const arr = groupArray(list, num)
-  for (let i = 1; i < arr.length; i++) {
+  for (let i = 0; i < arr.length; i++) {
     const item = arr[i]
     await sendRoom(item)
     await delay(500)
