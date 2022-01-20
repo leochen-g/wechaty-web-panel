@@ -1,6 +1,50 @@
-const { Message, log } = require('wechaty')
+const { log } = require('wechaty')
+const { Message } = require('wechaty').types
+const Mustache = require('mustache')
 
-const { roomTalker } = require('wechaty-plugin-contrib/dist/src/talkers/mod')
+function roomTalker(options) {
+  log.verbose('WechatyPluginContrib', 'roomTalker(%s)', JSON.stringify(options))
+  if (!options) {
+    return () => undefined
+  }
+  if (!Array.isArray(options)) {
+    options = [options]
+  }
+  const optionList = options
+  return async function talkRoom(room, contact, mustacheView) {
+    log.verbose('WechatyPluginContrib', 'roomTalker() talkRoom(%s, %s, %s)', room, contact || '', mustacheView ? JSON.stringify(mustacheView) : '')
+    for (const option of optionList) {
+      let msg
+      if (option instanceof Function) {
+        msg = await option(room, contact)
+      } else {
+        msg = option
+      }
+
+      if (!msg) {
+        continue
+      }
+
+      if (typeof msg === 'string') {
+        if (mustacheView) {
+          msg = Mustache.render(msg, mustacheView)
+        }
+        if (contact) {
+          await room.say(msg, contact)
+        } else {
+          await room.say(msg)
+        }
+      } else {
+        /**
+         *  FIXME(huan): https://github.com/microsoft/TypeScript/issues/14107
+         */
+        await room.say(msg)
+      }
+
+      await room.wechaty.sleep(1000)
+    }
+  }
+}
 
 function messageMapper(mapperOptions, one) {
   log.verbose('WechatyPluginContrib', 'messageMapper(%s)', typeof mapperOptions === 'function' ? 'function' : JSON.stringify(mapperOptions))
@@ -141,7 +185,7 @@ const bidirectionalMapper = async (message) => {
   try {
     const abbrRoomTopicForDevelopersHome = abbrRoomTopicByRegex(/\s*([^\s]*\s*[^\s]+)$/)
     // Drop all messages if not Text
-    if (message.type() !== Message.Type.Text) {
+    if (message.type() !== Message.Text) {
       return
     }
 
@@ -175,7 +219,7 @@ const unidirectionalMapper = async (message, one) => {
     const room = message.room()
     const topic = await room.topic()
     switch (message.type()) {
-      case Message.Type.Text:
+      case Message.Text:
         messageList.push(`${prefix}: ${message.text()}`)
         break
 
@@ -187,7 +231,7 @@ const unidirectionalMapper = async (message, one) => {
          * then we add a sender information for the destination rooms.
          */
         if (topic === one) {
-          const type = Message.Type[message.type()]
+          const type = Message[message.type()]
           messageList.unshift(`${prefix}: ${type}`)
         }
         break
@@ -374,11 +418,11 @@ async function oneToMany(that, config, msg) {
  */
 async function dispatchAsync(that, msg, list) {
   try {
-    const userSelfName = that.userSelf().name()
+    const userSelfName = that.currentUser.name()
     const type = msg.type()
     const content = msg.text()
     const mentionSelf = content.includes(`@${userSelfName}`)
-    if (that.Message.Type.Text === type && mentionSelf) {
+    if (that.Message.Text === type && mentionSelf) {
       // 如果内容中有提及机器人的内容，不进行转发
       return
     }
@@ -387,7 +431,7 @@ async function dispatchAsync(that, msg, list) {
       config.blacklist = [async () => true]
       if (config.forward === 1) {
         config.map = bidirectionalMapper
-        config.whitelist = [async (message) => message.type() === Message.Type.Text]
+        config.whitelist = [async (message) => message.type() === Message.Text]
       } else if (config.forward === 2) {
         config.blacklist = []
         config.map = unidirectionalMapper

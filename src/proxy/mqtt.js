@@ -53,7 +53,7 @@ async function initMqtt(that) {
               }
             } else if (content.target === 'Contact') {
               console.log(`收到联系人：${content.alias || content.name}发送消息请求： ${content.message.content || content.message.url}`)
-              let contact = (await that.Contact.find({ alias: content.alias })) || (await that.Contact.find({ name: content.name })) || (await that.Contact.find({ weixin: content.weixin })) // 获取你要发送的联系人
+              let contact = (await that.Contact.find({ name: content.name })) || (await that.Contact.find({ alias: content.alias })) || (await that.Contact.find({ weixin: content.weixin })) // 获取你要发送的联系人
               if (!contact) {
                 console.log(`查找不到联系人：${content.name || content.alias}，请检查联系人名称是否正确`)
                 return

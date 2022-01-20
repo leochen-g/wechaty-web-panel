@@ -107,6 +107,8 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 
 ## 开始
 
+> 环境node > 16
+
 ### Step 1: 安装
 
 ```
@@ -124,18 +126,23 @@ npm install wechaty-web-panel@latest wechaty@latest --save --canvas_binary_host_
 ```
 $ vim mybot.js
 
-const { Wechaty } = require('wechaty');
-const WechatyWebPanelPlugin = require('wechaty-web-panel');
-const name = 'wechat-assistant'
-const bot = new Wechaty({
-  name, // generate xxxx.memory-card.json and save login data for the next login
-  puppet: 'wechaty-puppet-wechat',
-});
+const {WechatyBuilder} = require('wechaty')
+const WechatyWebPanelPlugin = require('../src/index')
 
+const name = 'wechat-assistant'
+
+const bot = WechatyBuilder.build({
+    name, // generate xxxx.memory-card.json and save login data for the next login
+    puppet: 'wechaty-puppet-wechat',
+})
 bot
-  .use(WechatyWebPanelPlugin({apiKey:'', apiSecret: ''}))
-  .start()
-  .catch((e) => console.error(e));
+    .use(WechatyWebPanelPlugin({
+        apiKey: '',
+        apiSecret: ''
+    }))
+    .start()
+    .catch((e) => console.error(e))
+
 
 ```
 

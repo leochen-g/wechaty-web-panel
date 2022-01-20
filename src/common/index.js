@@ -2,8 +2,8 @@ const { getNews, getTXweather, getSweetWord } = require('../proxy/api')
 const { sendFriend, sendRoom, asyncData, getOne } = require('../proxy/aibotk')
 const { getUser } = require('../common/userDb')
 const { formatDate, getDay, MD5, groupArray, delay } = require('../lib')
-const { FileBox, UrlLink, MiniProgram } = require('wechaty')
-
+const { UrlLink, MiniProgram } = require('wechaty')
+const { FileBox } = require('file-box')
 /**
  * 获取每日新闻内容
  * @param {*} sortId 新闻资讯分类Id
@@ -12,7 +12,7 @@ const { FileBox, UrlLink, MiniProgram } = require('wechaty')
 async function getEveryDayRoomContent(sortId, endWord = '微信小助手') {
   let today = formatDate(new Date()) //获取今天的日期
   let news = await getNews(sortId)
-  let content = `${today}<br>${news}<br>————————${endWord}`
+  let content = `${today}\n${news}\n————————${endWord}`
   return content
 }
 
@@ -28,7 +28,7 @@ async function getEveryDayContent(date, city, endWord) {
   let today = formatDate(new Date()) //获取今天的日期
   let memorialDay = getDay(date) //获取纪念日天数
   let sweetWord = await getSweetWord() // 土味情话
-  let str = `${today}<br>我们在一起的第${memorialDay}天<br><br>元气满满的一天开始啦,要开心噢^_^<br><br>今日天气<br>${weather.weatherTips}<br>${weather.todayWeather}<br>每日一句:<br>${one}<br><br>情话对你说:<br>${sweetWord}<br><br>————————${endWord}`
+  let str = `${today}\n我们在一起的第${memorialDay}天\n\n元气满满的一天开始啦,要开心噢^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n情话对你说:\n${sweetWord}\n\n————————${endWord}`
   return str
 }
 
@@ -42,9 +42,9 @@ async function updateContactInfo(that) {
     const contactList = await that.Contact.findAll()
     let res = []
     const notids = ['filehelper', 'fmessage']
-    let realContact = hasWeixin ? contactList.filter((item) => item.payload.type == 1 && item.payload.friend && !notids.includes(item.payload.id)) : contactList
+    let realContact = hasWeixin ? contactList.filter((item) => item._payload.type == 1 && item._payload.friend && !notids.includes(item._payload.id)) : contactList
     for (let i of realContact) {
-      let contact = i.payload
+      let contact = i._payload
       let obj = {
         robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
         contactId: hasWeixin ? contact.id : MD5(contactSelf.name + contact.name + contact.alias + contact.province + contact.city + contact.gender),
@@ -92,7 +92,7 @@ async function updateRoomInfo(that) {
     const roomList = await that.Room.findAll()
     let res = []
     for (let i of roomList) {
-      let room = i.payload
+      let room = i._payload
       let obj = {
         robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
         roomId: MD5(room.topic),
@@ -135,7 +135,7 @@ async function addRoomWelcomeSay(room, roomName, contactName, msg) {
   if (msg.type === 1 && msg.content !== '') {
     // 文字
     console.log('回复内容', msg.content)
-    await room.say(`${roomName}：欢迎新朋友 @${contactName}，<br>${msg.content}`)
+    await room.say(`${roomName}：欢迎新朋友 @${contactName}，\n${msg.content}`)
   } else if (msg.type === 2 && msg.url !== '') {
     // url文件
     let obj = FileBox.fromUrl(msg.url)

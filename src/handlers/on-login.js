@@ -20,8 +20,8 @@ async function onLogin(user) {
     const config = await allConfig()
     const { userId } = config.userInfo
     const userInfo = {
-      ...user.payload,
-      robotId: user.payload.weixin || MD5(user.name()),
+      ...user._payload,
+      robotId: user._payload.weixin || MD5(user.name()),
     }
     await addUser(userInfo) // 全局存储登录用户信息
     const file = await user.avatar()

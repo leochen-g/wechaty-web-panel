@@ -416,7 +416,7 @@ function filterContacts(contacts, query) {
   let { name, alias, friend, type, gender, province, city, address } = query
   return contacts.filter((item) => {
     let arr = []
-    let { payload } = item
+    let { _payload: payload } = item
     if (friend) {
       let bool = Number(friend) === 1 ? true : false
       arr.push(bool === payload.friend)
@@ -440,7 +440,7 @@ function formatContacts(data) {
   let arr = data.map(function (item) {
     // const file = await item.avatar()
     // let avatar = await file.toBase64(file.name, true);
-    let payload = item.payload
+    let payload = item._payload
     return {
       id: payload.id,
       name: payload.name,
@@ -517,10 +517,11 @@ async function getRoomAvatarList(room, name) {
     let res = []
     console.log('正在努力获取群成员信息...')
     for (let i of members) {
-      let member = i.payload
+      let member = i._payload
       try {
         const avatar = await i.avatar()
-        if (avatar.mimeType && member.name) {
+        if (avatar._mediaType && avatar._name) {
+          console.log(avatar)
           const base64 = member.weixin ? member.avatar : await avatar.toDataURL()
           let obj = {
             img: base64,
@@ -541,7 +542,7 @@ async function getRoomAvatarList(room, name) {
     console.log('获取群成员信息完成...')
     return res
   } catch (e) {
-    console.log('getRoomAvatarList error', e)
+    console.log('获取群成员头像列表失败', e)
   }
 }
 
@@ -592,6 +593,9 @@ async function getRoomAvatar(roomObj, roomName, name) {
 async function cropImg(list, size = 74) {
   try {
     const arr = []
+    if (list.length >= 100) {
+      console.log('群成员数量超过100，生成群合影速度可能比较慢，请耐心等待')
+    }
     for (const i of list) {
       try {
         if (i.img) {

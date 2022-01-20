@@ -4,7 +4,6 @@ const { getConstellation, msgArr, getAllSchedule, generateRoomImg, getRoomAvatar
 const { initTaskLocalSchedule } = require('../task/index')
 const { updateContactAndRoom, updateContactOnly, updateRoomOnly } = require('../common/index')
 const { chatTencent } = require('../proxy/tencent')
-const { log } = require('wechaty')
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称

@@ -1,32 +1,7 @@
-const cheerio = require('cheerio')
 const { req, txReq } = require('./superagent')
 const { EMOHOST, TULING, ONE, MEINV } = require('./config')
 const { randomRange, MD5 } = require('../lib/index')
 const { allConfig } = require('../common/configDb')
-
-/**
- * 获取每日一句，暂时弃用，已改为api调用
- */
-async function getOne() {
-  try {
-    let option = {
-      spider: true,
-      method: 'GET',
-      url: ONE,
-      params: '',
-    }
-    let res = await req(option)
-    let $ = cheerio.load(res)
-    let todayOneList = $('#carousel-one .carousel-inner .item')
-    let todayOne = $(todayOneList[0])
-      .find('.fp-one-cita')
-      .text()
-      .replace(/(^\s*)|(\s*$)/g, '')
-    return todayOne
-  } catch (error) {
-    console.log('获取每日一句失败：', error)
-  }
-}
 
 /**
  * 天行图灵聊天机器人
@@ -150,7 +125,7 @@ async function getRubbishType(word) {
       } else if (content.newslist[0].type == 3) {
         type = '是其他(干)垃圾'
       }
-      let response = `${content.newslist[0].name}${type}<br>解释：${content.newslist[0].explain}<br>主要包括：${content.newslist[0].contain}<br>投放提示：${content.newslist[0].tip}`
+      let response = `${content.newslist[0].name}${type}\n解释：${content.newslist[0].explain}\n主要包括：${content.newslist[0].contain}\n投放提示：${content.newslist[0].tip}`
       return response
     } else {
       console.log('查询失败提示：', content.msg)
@@ -174,7 +149,7 @@ async function getSweetWord() {
     let content = await txReq(option)
     if (content.code === 200) {
       let sweet = content.newslist[0].content
-      let str = sweet.replace('\r\n', '<br>')
+      let str = sweet.replace('\r\n', '\n')
       return str
     } else {
       console.log('获取土情话接口失败', content.msg)
@@ -199,7 +174,7 @@ async function getTXweather(city) {
       let todayInfo = content.newslist[0]
       let obj = {
         weatherTips: todayInfo.tips,
-        todayWeather: `今天:${todayInfo.weather}<br>温度:${todayInfo.lowest}/${todayInfo.highest}<br>${todayInfo.wind} ${todayInfo.windspeed}<br><br>`,
+        todayWeather: `今天:${todayInfo.weather}\n温度:${todayInfo.lowest}/${todayInfo.highest}\n${todayInfo.wind} ${todayInfo.windspeed}\n\n`,
       }
       return obj
     } else {
@@ -225,12 +200,12 @@ async function getNews(id) {
     if (content.code === 200) {
       let newList = content.newslist
       let news = ''
-      let shortUrl = 'https://www.tianapi.com/weixin/news/?col=' + id
+      // let shortUrl = 'https://www.tianapi.com/weixin/news/?col=' + id
       for (let i in newList) {
         let num = parseInt(i) + 1
-        news = `${news}<br>${num}.${newList[i].title}`
+        news = `${news}\n${num}.${newList[i].title}`
       }
-      return `${news}<br>新闻详情查看：${shortUrl}<br>`
+      return `${news}\n`
     }
   } catch (error) {
     console.log('获取天行新闻失败', error)
@@ -250,7 +225,7 @@ async function getMingYan() {
     let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
-      let news = `${newList[0].content}<br>——————————${newList[0].author}`
+      let news = `${newList[0].content}\n——————————${newList[0].author}`
       return news
     }
   } catch (error) {
@@ -274,7 +249,7 @@ async function getStar(astro) {
       let newList = content.newslist
       let news = ''
       for (let item of newList) {
-        news = `${news}${item.type}:${item.content}<br>`
+        news = `${news}${item.type}:${item.content}\n`
       }
       return news
     }
@@ -339,7 +314,7 @@ async function getLunar(date) {
     let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
-      let news = `<br>阳历：${item.gregoriandate}<br>阴历：${item.lunardate}<br>节日：${item.lunar_festival}<br>适宜：${item.fitness}<br>不宜：${item.taboo}<br>神位：${item.shenwei}<br>胎神：${item.taishen}<br>冲煞：${item.chongsha}<br>岁煞：${item.suisha}`
+      let news = `\n阳历：${item.gregoriandate}\n阴历：${item.lunardate}\n节日：${item.lunar_festival}\n适宜：${item.fitness}\n不宜：${item.taboo}\n神位：${item.shenwei}\n胎神：${item.taishen}\n冲煞：${item.chongsha}\n岁煞：${item.suisha}`
       return news
     }
   } catch (error) {
@@ -360,7 +335,7 @@ async function getGoldReply() {
     let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
-      let news = `标题："${item.title}"<br>回复：${item.content}`
+      let news = `标题："${item.title}"\n回复：${item.content}`
       return news
     }
   } catch (error) {
@@ -528,7 +503,9 @@ async function getNcov() {
     if (content.code === 200) {
       let newList = content.newslist[0].news
       const riskarea = content.newslist[0].riskarea
-      const reply = `【疫情新闻暂时下线，目前只返回风险地区】\n\n全国风险地区\n\n【高风险地区】:\n${(riskarea.high && riskarea.high.length && riskarea.high.join('\n')) || '暂无'}\n【中风险地区】:\n${(riskarea.mid && riskarea.mid.length && riskarea.mid.join('\n')) || '暂无'}\n\n——————————数据来源：天行数据`
+      const reply = `【疫情新闻暂时下线，目前只返回风险地区】\n\n全国风险地区\n\n【高风险地区】:\n${(riskarea.high && riskarea.high.length && riskarea.high.join('\n')) || '暂无'}\n【中风险地区】:\n${
+        (riskarea.mid && riskarea.mid.length && riskarea.mid.join('\n')) || '暂无'
+      }\n\n——————————数据来源：天行数据`
       // let news = ''
       // for (let i in newList) {
       //   let num = parseInt(i) + 1
@@ -560,7 +537,6 @@ async function getCname() {
   }
 }
 module.exports = {
-  getOne,
   getResByTXTL,
   getResByTX,
   getResByTL,
