@@ -1,6 +1,7 @@
 const dispatch = require('./event-dispatch-service')
 const { setSchedule, updateSchedule } = require('../proxy/aibotk')
-const { contentDistinguish, setLocalSchedule, isRealDate, generateAvatar } = require('../lib')
+const { contentDistinguish, setLocalSchedule, isRealDate } = require('../lib')
+const { generateAvatar } = require('../puppeteer-paint/lanuch')
 const { addRoom } = require('../common/index')
 
 function emptyMsg() {

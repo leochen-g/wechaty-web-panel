@@ -2,7 +2,6 @@ const { delay, MD5 } = require('../lib')
 const { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } = require('../proxy/aibotk')
 const { addUser } = require('../common/userDb')
 const { initAllSchedule } = require('../task')
-var pjson = require('../../package.json')
 const { initMqtt } = require('../proxy/mqtt')
 const { allConfig } = require('../common/configDb')
 
@@ -19,9 +18,10 @@ async function onLogin(user) {
     await getConfig() // 获取配置文件
     const config = await allConfig()
     const { userId } = config.userInfo
+    const payload = user.payload || user._payload
     const userInfo = {
-      ...user._payload,
-      robotId: user._payload.weixin || MD5(user.name()),
+      ...payload,
+      robotId: payload.weixin || MD5(user.name()),
     }
     await addUser(userInfo) // 全局存储登录用户信息
     const file = await user.avatar()

@@ -1,6 +1,7 @@
 const api = require('../proxy/api')
-const { getConfig, asyncData, getRoomPhotoConfig, drawRoomPhoto, getMeiNv } = require('../proxy/aibotk')
-const { getConstellation, msgArr, getAllSchedule, generateRoomImg, getRoomAvatar, generateAvatar } = require('../lib')
+const { getConfig, getRoomPhotoConfig, getMeiNv } = require('../proxy/aibotk')
+const { getConstellation, msgArr, getAllSchedule, getRoomAvatar } = require('../lib')
+const { generateAvatar, generateRoomImg } = require('../puppeteer-paint/lanuch')
 const { initTaskLocalSchedule } = require('../task/index')
 const { updateContactAndRoom, updateContactOnly, updateRoomOnly } = require('../common/index')
 const { chatTencent } = require('../proxy/tencent')
@@ -51,7 +52,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         if (avatar.mimeType) {
           // 如果图片类型正确再进行头像处理
           let base64Text = await avatar.toDataURL()
-          url = await generateAvatar(base64Text)
+          url = await generateAvatar({ avatar: base64Text })
           type = 3
         } else {
           content = '你的头像属于高维世界产物，小助手能力不足，无法解析，待我修炼后为你提供服务'
@@ -80,7 +81,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         } else if (config.authList.length) {
           if (config.authList.includes(name)) {
             memberList = await getRoomAvatar(room, roomName, name)
-            const baseImg = await generateRoomImg(memberList, config)
+            const baseImg = await generateRoomImg({ list: memberList, options: config })
             type = 3
             url = baseImg
           } else {
@@ -88,7 +89,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
           }
         } else {
           memberList = await getRoomAvatar(room, roomName, name)
-          const baseImg = await generateRoomImg(memberList, config)
+          const baseImg = await generateRoomImg({ list: memberList, options: config })
           type = 3
           url = baseImg
         }

@@ -36,24 +36,20 @@
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.0.5",
-    "wechaty": "^1.11.41",
+    "wechaty": "^1.13.12",
     "wechaty-puppet-wechat": "^1.11.12"
   },
   "readme": "README.md",
   "dependencies": {
     "ix": "^4.5.2",
-    "mcanvas": "^2.0.8",
     "mqtt": "^4.2.6",
     "mustache": "^4.2.0",
     "nedb": "^1.8.0",
     "node-schedule": "^1.3.2",
+    "puppeteer": "^13.3.2",
     "qrcode-terminal": "^0.12.0",
     "superagent": "^5.2.2",
     "tencentcloud-sdk-nodejs": "^4.0.30"
-  },
-  "peerDependencies": {
-    "wechaty": "^1.11.41",
-    "wechaty-puppet-wechat": "^1.11.12"
   },
   "publishConfig": {
     "registry": " https://registry.npmjs.org/"

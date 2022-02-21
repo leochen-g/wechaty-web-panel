@@ -42,9 +42,14 @@ async function updateContactInfo(that) {
     const contactList = await that.Contact.findAll()
     let res = []
     const notids = ['filehelper', 'fmessage']
-    let realContact = hasWeixin ? contactList.filter((item) => item._payload.type == 1 && item._payload.friend && !notids.includes(item._payload.id)) : contactList
+    let realContact = hasWeixin
+      ? contactList.filter((item) => {
+          const payload = item.payload || item._payload
+          return payload.type === 1 && payload.friend && !notids.includes(payload.id)
+        })
+      : contactList
     for (let i of realContact) {
-      let contact = i._payload
+      let contact = i.payload || i._payload
       let obj = {
         robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
         contactId: hasWeixin ? contact.id : MD5(contactSelf.name + contact.name + contact.alias + contact.province + contact.city + contact.gender),
@@ -92,7 +97,7 @@ async function updateRoomInfo(that) {
     const roomList = await that.Room.findAll()
     let res = []
     for (let i of roomList) {
-      let room = i._payload
+      let room = i.payload || i._payload
       let obj = {
         robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
         roomId: MD5(room.topic),
