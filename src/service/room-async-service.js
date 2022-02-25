@@ -1,9 +1,6 @@
-const { log } = require('wechaty')
-const { Message } = require('wechaty').types
 const Mustache = require('mustache')
 
 function roomTalker(options) {
-  log.verbose('WechatyPluginContrib', 'roomTalker(%s)', JSON.stringify(options))
   if (!options) {
     return () => undefined
   }
@@ -12,7 +9,6 @@ function roomTalker(options) {
   }
   const optionList = options
   return async function talkRoom(room, contact, mustacheView) {
-    log.verbose('WechatyPluginContrib', 'roomTalker() talkRoom(%s, %s, %s)', room, contact || '', mustacheView ? JSON.stringify(mustacheView) : '')
     for (const option of optionList) {
       let msg
       if (option instanceof Function) {
@@ -47,18 +43,13 @@ function roomTalker(options) {
 }
 
 function messageMapper(mapperOptions, one) {
-  log.verbose('WechatyPluginContrib', 'messageMapper(%s)', typeof mapperOptions === 'function' ? 'function' : JSON.stringify(mapperOptions))
-
   return async function mapMessage(message) {
-    log.verbose('WechatyPluginContrib', 'mapMessage(%s)', message)
-
     return normalizeMappedMessageList(mapperOptions, message, one)
   }
 }
 
 async function normalizeMappedMessageList(options, message, one) {
   try {
-    log.verbose('WechatyPluginContrib', 'normalizeMappedMessageList(%s, %s)', JSON.stringify(options), message)
     const msgList = []
     let optionList
     if (Array.isArray(options)) {
@@ -88,8 +79,6 @@ async function normalizeMappedMessageList(options, message, one) {
 }
 
 function messageMatcher(matcherOptions) {
-  log.verbose('WechatyPluginContrib', 'messageMatcher(%s)', JSON.stringify(matcherOptions))
-
   if (!matcherOptions) {
     return () => Promise.resolve(false)
   }
@@ -102,7 +91,6 @@ function messageMatcher(matcherOptions) {
 
   return async function matchMessage(message) {
     try {
-      log.verbose('WechatyPluginContrib', 'messageMatcher() matchMessage(%s)', message)
       const room = message.room()
       const roomTopic = await room.topic()
       const talker = message.talker()
@@ -185,7 +173,7 @@ const bidirectionalMapper = async (message) => {
   try {
     const abbrRoomTopicForDevelopersHome = abbrRoomTopicByRegex(/\s*([^\s]*\s*[^\s]+)$/)
     // Drop all messages if not Text
-    if (message.type() !== Message.Text) {
+    if (message.type() !== 7) {
       return
     }
 
@@ -219,7 +207,7 @@ const unidirectionalMapper = async (message, one) => {
     const room = message.room()
     const topic = await room.topic()
     switch (message.type()) {
-      case Message.Text:
+      case 7:
         messageList.push(`${prefix}: ${message.text()}`)
         break
 
@@ -245,14 +233,11 @@ const unidirectionalMapper = async (message, one) => {
 }
 
 const isMatchConfig = (config) => {
-  log.verbose('WechatyPluginContrib', 'ManyToManyRoomConnector() isMatchConfig(%s)', JSON.stringify(config))
-
   const matchWhitelist = messageMatcher(config.whitelist)
   const matchBlacklist = messageMatcher(config.blacklist)
 
   return async function isMatch(message) {
     try {
-      log.verbose('WechatyPluginContrib', 'ManyToManyRoomConnector() isMatchConfig() isMatch(%s)', message.toString())
       if (message.self()) {
         return
       }
@@ -292,7 +277,6 @@ const isMatchConfig = (config) => {
  */
 async function manyToMany(that, config, msg) {
   try {
-    log.verbose('WechatyPluginContrib', 'ManyToManyRoomConnector(%s)', JSON.stringify(config))
     const isMatch = isMatchConfig(config)
     const mapMessage = messageMapper(config.map)
     const matchAndForward = async (message, roomList) => {
@@ -339,7 +323,6 @@ async function manyToMany(that, config, msg) {
 
 async function manyToOne(that, config, msg) {
   try {
-    log.verbose('WechatyPluginContrib', 'ManyToOneRoomConnector(%s)', JSON.stringify(config))
     const isMatch = isMatchConfig(config)
     const mapMessage = messageMapper(config.map)
     const matchAndForward = async (message, room) => {
@@ -352,7 +335,7 @@ async function manyToOne(that, config, msg) {
         const talkRoom = roomTalker(msgList)
         await talkRoom(room)
       } catch (e) {
-        log.error('WechatyPluginContrib', 'ManyToOneRoomConnector() filterThenToManyRoom(%s, %s) rejection: %s', message, room, e)
+        console.log('WechatyPluginContrib, ManyToOneRoomConnector() filterThenToManyRoom(%s, %s) rejection: %s')
       }
     }
     let oneRoom = ''
@@ -374,7 +357,6 @@ async function manyToOne(that, config, msg) {
  */
 async function oneToMany(that, config, msg) {
   try {
-    log.verbose('WechatyPluginContrib', 'OneToManyRoomConnector(%s)', JSON.stringify(config))
     const isMatch = isMatchConfig(config)
     const mapMessage = messageMapper(config.map, config.one)
     const matchAndForward = async (message, roomList) => {
@@ -393,7 +375,7 @@ async function oneToMany(that, config, msg) {
           }
         }
       } catch (e) {
-        log.error('WechatyPluginContrib', 'OneToManyRoomConnector() filterThenToManyRoom(%s, %s) rejection: %s', message, roomList.join(','), e)
+        console.log('WechatyPluginContrib', 'OneToManyRoomConnector() filterThenToManyRoom(%s, %s) rejection: %s')
       }
     }
     let manyRoomList = []
@@ -422,7 +404,7 @@ async function dispatchAsync(that, msg, list) {
     const type = msg.type()
     const content = msg.text()
     const mentionSelf = content.includes(`@${userSelfName}`)
-    if (that.Message.Text === type && mentionSelf) {
+    if (7 === type && mentionSelf) {
       // 如果内容中有提及机器人的内容，不进行转发
       return
     }
@@ -431,7 +413,7 @@ async function dispatchAsync(that, msg, list) {
       config.blacklist = [async () => true]
       if (config.forward === 1) {
         config.map = bidirectionalMapper
-        config.whitelist = [async (message) => message.type() === Message.Text]
+        config.whitelist = [async (message) => message.type() === 7]
       } else if (config.forward === 2) {
         config.blacklist = []
         config.map = unidirectionalMapper
