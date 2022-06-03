@@ -67,7 +67,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     const contactName = contact.name()
     const roomName = await room.topic()
     const type = msg.type()
-    const userSelfName = that.currentUser.name()
+    const userSelfName = that.currentUser?.name?.()
     let content = ''
     let replys = ''
     let contactId = contact.id || '111'
