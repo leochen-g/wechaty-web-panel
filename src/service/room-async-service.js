@@ -400,7 +400,7 @@ async function oneToMany(that, config, msg) {
  */
 async function dispatchAsync(that, msg, list) {
   try {
-    const userSelfName = that.currentUser.name()
+    const userSelfName = that.currentUser?.name?.()
     const type = msg.type()
     const content = msg.text()
     const mentionSelf = content.includes(`@${userSelfName}`)
