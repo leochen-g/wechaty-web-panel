@@ -12,5 +12,5 @@ bot
         apiKey: '',
         apiSecret: ''
     }))
-    .start()
+bot.start()
     .catch((e) => console.error(e))
