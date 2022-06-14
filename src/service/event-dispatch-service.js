@@ -26,6 +26,9 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       case 'mingyan':
         content = await api.getMingYan()
         break
+      case 'sweetword':
+        content = await api.getSweetWord()
+        break
       case 'star':
         let xing = getConstellation(msg)
         content = await api.getStar(xing)
