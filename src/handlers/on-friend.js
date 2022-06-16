@@ -15,7 +15,7 @@ async function onFriend(friendship) {
     console.log(logMsg)
     if (config.autoAcceptFriend) {
       switch (friendship.type()) {
-        case Friendship.Type.Receive:
+        case 2:
           if (config.acceptFriendKeyWords.length === 0) {
             console.log('无认证关键词,10秒后将会自动通过好友请求')
             await delay(10000)
@@ -28,8 +28,16 @@ async function onFriend(friendship) {
             console.log('未触发任何关键词，好友自动添加失败')
           }
           break
-        case Friendship.Type.Confirm:
+        case 1:
           logMsg = '已确认添加好友：' + name
+          console.log(logMsg)
+          break
+        case 0:
+          logMsg = '未知错误' + name
+          console.log(logMsg)
+          break
+        case 3:
+          logMsg = '开启了验证' + name
           console.log(logMsg)
           break
       }
