@@ -176,17 +176,13 @@ async function keywordsMsg({ msg, config }) {
 async function robotMsg({ msg, name, id, config }) {
   try {
     let msgArr = [] // 返回的消息列表
-    let obj = { type: 1, content: '', url: '' } // 消息主体
     if (config.autoReply) {
       console.log('开启了机器人自动回复功能')
-      obj.type = 1
-      obj.content = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
+      msgArr = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
     } else {
       console.log('没有开启机器人自动回复功能')
-      obj.type = 1
-      obj.content = ''
+      msgArr = [{ type: 1, content: '', url: '' }]
     }
-    msgArr.push(obj)
     return msgArr
   } catch (e) {
     console.log('robotMsg error:', e)

@@ -234,6 +234,43 @@ function getConstellation(astro) {
 }
 
 /**
+ * 获取新闻的英文
+ * @param {*} msg
+ */
+function getNewsType(msg) {
+  const NewsMap = {
+    '社会': 5,
+    '国内': 7,
+    '国际': 8,
+    '娱乐': 10,
+    '美女图片': 11,
+    '体育': 12,
+    '科技': 13,
+    '奇闻异事': 41,
+    '健康知识': 17,
+    '旅游': 18,
+    '汉服': 38,
+    '房产': 37,
+    '科学探索': 36,
+    '汽车': 35,
+    '互联网': 34,
+    '动漫': 33,
+    '财经': 32,
+    '游戏': 32,
+    'CBA': 30,
+    '人工智能': 29,
+    '区块链': 28,
+    '军事': 27,
+    '足球': 26,
+    '创业': 24,
+    '移动互联': 23,
+    'IT': 22,
+    'VR科技': 21
+  }
+  return NewsMap[msg] || 7
+}
+
+/**
  * 返回指定范围的随机整数
  * @param {*} min
  * @param {*} max
@@ -608,4 +645,5 @@ module.exports = {
   groupArray,
   getRoomAvatarList,
   getRoomAvatar,
+  getNewsType
 }

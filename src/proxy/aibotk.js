@@ -55,7 +55,7 @@ async function getConfig() {
     }
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
-    let cres = await updateConfig(config)
+    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', ...config })
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)
@@ -372,6 +372,27 @@ async function getMqttConfig() {
   }
 }
 
+/**
+ * 获取实时素材
+ * @param {*} version
+ */
+async function getMaterial(id) {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/wechat/material',
+      params: {
+        id,
+      },
+    }
+    let content = await aiBotReq(option)
+    console.log('素材', content.data)
+    return content.data
+  } catch (error) {
+    console.log('获取mqtt配置错误', error)
+  }
+}
+
 module.exports = {
   getConfig,
   getScheduleList,
@@ -391,4 +412,5 @@ module.exports = {
   getMqttConfig,
   getMeiNv,
   getOne,
+  getMaterial,
 }

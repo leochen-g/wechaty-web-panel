@@ -1,9 +1,10 @@
 const { getNews, getTXweather, getSweetWord } = require('../proxy/api')
-const { sendFriend, sendRoom, asyncData, getOne } = require('../proxy/aibotk')
+const { sendFriend, sendRoom, asyncData, getOne, getMaterial } = require('../proxy/aibotk')
 const { getUser } = require('../common/userDb')
 const { formatDate, getDay, MD5, groupArray, delay } = require('../lib')
 const { UrlLink, MiniProgram } = require('wechaty')
 const { FileBox } = require('file-box')
+const { allConfig } = require('../common/configDb')
 /**
  * 获取每日新闻内容
  * @param {*} sortId 新闻资讯分类Id
@@ -156,6 +157,12 @@ async function addRoomWelcomeSay(room, roomName, contactName, msg) {
  * @param {*} isRoom
  */
 async function roomSay(room, contact, msg) {
+  console.log('msg', msg)
+  const config = await allConfig()
+  const { role } = config.userInfo
+  if (msg.id && role === 'vip') {
+    msg = await getMaterial(msg.id)
+  }
   try {
     if (msg.type === 1 && msg.content) {
       // 文字
@@ -208,6 +215,12 @@ async function roomSay(room, contact, msg) {
  *  type 1 文字 2 图片url 3 图片base64 4 url链接 5 小程序  6 名片
  */
 async function contactSay(contact, msg, isRoom = false) {
+  console.log('msg', msg)
+  const config = await allConfig()
+  const { role } = config.userInfo
+  if (msg.id && role === 'vip') {
+    msg = await getMaterial(msg.id)
+  }
   try {
     if (msg.type === 1 && msg.content) {
       // 文字

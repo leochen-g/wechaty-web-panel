@@ -1,10 +1,11 @@
 const api = require('../proxy/api')
 const { getConfig, getRoomPhotoConfig, getMeiNv } = require('../proxy/aibotk')
-const { getConstellation, msgArr, getAllSchedule, getRoomAvatar } = require('../lib')
+const { getConstellation, msgArr, getAllSchedule, getRoomAvatar, getNewsType } = require('../lib')
 const { generateAvatar, generateRoomImg } = require('../puppeteer-paint/lanuch')
 const { initTaskLocalSchedule } = require('../task/index')
 const { updateContactAndRoom, updateContactOnly, updateRoomOnly } = require('../common/index')
 const { chatTencent } = require('../proxy/tencent')
+const { getTencentOpenReply } = require('../proxy/tencent-open')
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -32,6 +33,10 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       case 'star':
         let xing = getConstellation(msg)
         content = await api.getStar(xing)
+        break
+      case 'news':
+        let newsId = getNewsType(msg)
+        content = await api.getNews(newsId)
         break
       case 'xing':
         content = await api.getXing(msg)
@@ -134,25 +139,38 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
  */
 async function dispatchAiBot(bot, msg, name, id) {
   try {
-    let res
+    let res, replys
     switch (bot) {
       case 0:
+        // 天行机器人
         res = await api.getResByTX(msg, id)
+        replys = [{ type: 1, res }]
         break
       case 1:
+        // 天行图灵机器人
         res = await api.getResByTXTL(msg, id)
+        replys = [{ type: 1, res }]
         break
       case 2:
+        // 图灵机器人
         res = await api.getResByTL(msg, id)
+        replys = [{ type: 1, res }]
         break
       case 3:
+        // 微信闲聊
         res = await chatTencent(msg, id)
+        replys = [{ type: 1, res }]
+        break
+      case 5:
+        // 微信开放对话平台
+        res = await getTencentOpenReply({ msg, id, userInfo: { name } })
+        replys = res
         break
       default:
-        res = ''
+        replys = [{ type: 1, content: '' }]
         break
     }
-    return res
+    return replys
   } catch (e) {
     console.log('机器人接口信息获取失败', e)
     return ''

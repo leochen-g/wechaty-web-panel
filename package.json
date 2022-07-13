@@ -41,7 +41,9 @@
   },
   "readme": "README.md",
   "dependencies": {
+    "axios": "^0.27.2",
     "ix": "^4.5.2",
+    "jsonwebtoken": "^8.5.1",
     "mqtt": "^4.2.6",
     "mustache": "^4.2.0",
     "nedb": "^1.8.0",
