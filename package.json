@@ -37,9 +37,13 @@
     "eslint-plugin-prettier": "^3.1.4",
     "prettier": "^2.0.5",
     "wechaty": "^1.20.2",
-    "wechaty-puppet-wechat": "^1.18.1"
+    "wechaty-puppet-wechat": "^1.18.4"
   },
   "readme": "README.md",
+  "engines": {
+    "node": ">=16",
+    "npm": ">=7"
+  },
   "dependencies": {
     "axios": "^0.27.2",
     "ix": "^4.5.2",
