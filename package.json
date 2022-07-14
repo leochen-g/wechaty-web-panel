@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -60,6 +60,6 @@
   "publishConfig": {
     "registry": " https://registry.npmjs.org/"
   },
-  "_id": "wechaty-web-panel@1.0.5",
-  "_commitid": "378e0c1"
+  "_id": "wechaty-web-panel@1.0.6",
+  "_commitid": "afa6242"
 }
