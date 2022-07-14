@@ -162,7 +162,6 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
     const data = {
       signature,
       query: msg,
-      env: 'debug',
     }
     const res = await axios.post(`https://openai.weixin.qq.com/openapi/aibot/eTZV8kYIvKnmvQJgXsy7e7f3WDWeGf`, data, {})
     const resData = res.data
