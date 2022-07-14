@@ -144,22 +144,22 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 0:
         // 天行机器人
         res = await api.getResByTX(msg, id)
-        replys = [{ type: 1, res }]
+        replys = [{ type: 1, content: res }]
         break
       case 1:
         // 天行图灵机器人
         res = await api.getResByTXTL(msg, id)
-        replys = [{ type: 1, res }]
+        replys = [{ type: 1, content: res }]
         break
       case 2:
         // 图灵机器人
         res = await api.getResByTL(msg, id)
-        replys = [{ type: 1, res }]
+        replys = [{ type: 1, content: res }]
         break
       case 3:
         // 微信闲聊
         res = await chatTencent(msg, id)
-        replys = [{ type: 1, res }]
+        replys = [{ type: 1, content: res }]
         break
       case 5:
         // 微信开放对话平台

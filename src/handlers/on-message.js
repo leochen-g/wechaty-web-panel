@@ -3,6 +3,24 @@ const { getContactTextReply, getRoomTextReply } = require('../common/reply')
 const { delay } = require('../lib/index')
 const { dispatchAsync } = require('../service/room-async-service')
 const { allConfig } = require('../common/configDb')
+const { getAibotConfig } = require('../common/aiDb')
+
+/**
+ * 检测是否属于忽略的消息
+ * @param msg 用户信息
+ * @param list 需要忽略的列表
+ */
+function checkIgnore(msg, list) {
+  if (!list.length) return false
+  for (let item of list) {
+    const word = item.word
+    const type = item.type
+    if ((type === 'start' && msg.startsWith(word)) || (type === 'end' && msg.endsWith(word)) || (type === 'equal' && msg === word) || (type === 'include' && msg.includes(word))) {
+      return true
+    }
+  }
+  return false
+}
 
 /**
  * 根据消息类型过滤私聊消息事件
@@ -11,6 +29,7 @@ const { allConfig } = require('../common/configDb')
  */
 async function dispatchFriendFilterByMsgType(that, msg) {
   try {
+    const aibotConfig = await getAibotConfig()
     const type = msg.type()
     const contact = msg.talker() // 发消息人
     const isOfficial = contact.type() === that.Contact.Type.Official
@@ -21,8 +40,9 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         content = msg.text()
         if (!isOfficial) {
           console.log(`发消息人${await contact.name()}:${content}`)
-          if (content.trim()) {
-            replys = await getContactTextReply(that, contact, content)
+          const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages)
+          if (content.trim() && !isIgnore) {
+            replys = await getContactTextReply(that, contact, content.trim())
             for (let reply of replys) {
               await delay(1000)
               await contactSay(contact, reply)
@@ -62,6 +82,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
  * @param {*} msg 消息主体
  */
 async function dispatchRoomFilterByMsgType(that, room, msg) {
+  const aibotConfig = await getAibotConfig()
   try {
     const contact = msg.talker() // 发消息人
     const contactName = contact.name()
@@ -79,6 +100,9 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         const mentionSelf = content.includes(`@${userSelfName}`)
         if (mentionSelf) {
           content = content.replace(/@[^,，：:\s@]+/g, '').trim()
+          // 检测是否需要这条消息
+          const isIgnore = checkIgnore(content, aibotConfig.ignoreMessages)
+          if (isIgnore) return
           replys = await getRoomTextReply(that, content, contactName, contactId, contactAvatar, room)
           for (let reply of replys) {
             await delay(1000)
