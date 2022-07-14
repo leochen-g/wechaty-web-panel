@@ -317,7 +317,7 @@ async function drawRoomPhoto(roomName, list, contactName) {
 async function putqn(base, name) {
   try {
     const token = await getQiToken()
-    const namebase = Buffer.from(name).toString('base64').replace('=', '')
+    const namebase = Buffer.from(name).toString('base64').replace(/=/g, '')
     let filename = 'wechat/avatar/' + namebase + '.jpeg'
     let base_file_name = Buffer.from(filename).toString('base64').replace('+', '-').replace('/', '_')
     let options = {
@@ -330,7 +330,7 @@ async function putqn(base, name) {
     }
     let content = await req(options)
     console.log('上传结果', content.key)
-    return 'http://image.xkboke.com/' + content.key
+    return 'https://img.aibotk.com/' + content.key
   } catch (e) {
     console.log('上传失败', e.Error)
   }
