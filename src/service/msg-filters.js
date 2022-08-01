@@ -3,6 +3,7 @@ const { setSchedule, updateSchedule } = require('../proxy/aibotk')
 const { contentDistinguish, setLocalSchedule, isRealDate } = require('../lib')
 const { generateAvatar } = require('../puppeteer-paint/lanuch')
 const { addRoom } = require('../common/index')
+const { service, callbackAibotApi } = require('../proxy/superagent')
 
 function emptyMsg() {
   let msgArr = [] // 返回的消息列表
@@ -121,6 +122,48 @@ async function getEventReply(that, event, msg, name, id, avatar, room) {
     return reply
   } catch (e) {
     console.log('getEventReply error', e)
+    return []
+  }
+}
+
+/**
+ * 回调函数事件
+ * @param that
+ * @param msg
+ * @param name
+ * @param id
+ * @param config
+ * @param room
+ * @returns {Promise<AxiosResponse<any>|[]>}
+ */
+async function callbackEvent({ that, msg, name, id, config, room }) {
+  try {
+    for (let item of config.callBackEvents) {
+      for (let key of item.keywords) {
+        if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
+          msg = msg.trim()
+          const data = {
+            uid: id,
+            word: msg,
+          }
+          item.moreData &&
+            item.moreData.length &&
+            item.moreData.forEach((mItem) => {
+              data[mItem.key] = data[mItem.value]
+            })
+          if (item.type === 100) {
+            let res = await service.post(item.customUrl, data)
+            return res
+          } else if (item.type === 1) {
+            let res = await callbackAibotApi(item.postUrl, data)
+            return res
+          }
+        }
+      }
+    }
+    return []
+  } catch (e) {
+    console.log('error', e)
     return []
   }
 }
@@ -248,6 +291,7 @@ async function avatarCrop({ msg, name, config, avatar }) {
 }
 
 module.exports = {
+  callbackEvent,
   avatarCrop,
   emptyMsg,
   officialMsg,

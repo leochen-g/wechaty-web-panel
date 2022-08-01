@@ -35,6 +35,7 @@ async function getMsgReply(resArray, { that, msg, name, contact, config, avatar,
 async function filterFriendMsg(that, contact, msg) {
   try {
     const config = await allConfig() // 获取配置信息
+    console.log('callback', config.callBackEvents)
     const name = contact.name()
     const id = contact.id
     const avatar = await contact.avatar()
@@ -44,6 +45,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
       { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
       { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
+      { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },
@@ -73,6 +75,7 @@ async function filterRoomMsg(that, msg, name, id, avatar, room) {
     const config = await allConfig() // 获取配置信息
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
+      { bool: config.callbackEvents && config.callbackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },

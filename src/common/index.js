@@ -182,7 +182,6 @@ async function roomSay(room, contact, msg) {
       await delay(500)
       await room.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
-      console.log('in url')
       let url = new UrlLink({
         description: msg.description,
         thumbnailUrl: msg.thumbUrl,
