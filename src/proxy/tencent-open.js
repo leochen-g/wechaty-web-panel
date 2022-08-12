@@ -157,13 +157,17 @@ function getFormatReply(answer, options = [], userInfo, puppetType) {
 
 async function getTencentOpenReply({ msg, id, userInfo }) {
   const config = await allConfig()
+  if (!config.tencentAESKey || !config.tencentToken) {
+    console.log('请到智能微秘书平台配置AESKey 和token 参数方可使用')
+    return [{ type: 1, content: '请到平台配置AESKey 和token 参数方可使用' }]
+  }
   try {
     const signature = await getSignature(id, config.tencentAESKey)
     const data = {
       signature,
       query: msg,
     }
-    const res = await axios.post(`https://openai.weixin.qq.com/openapi/aibot/eTZV8kYIvKnmvQJgXsy7e7f3WDWeGf`, data, {})
+    const res = await axios.post(`https://openai.weixin.qq.com/openapi/aibot/${config.tencentToken}`, data, {})
     const resData = res.data
     if (!resData.errcode) {
       let answer = resData.answer // 存放回答
@@ -211,6 +215,8 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
           ]
         }
       }
+    } else {
+      console.log('微信开放对话平台报错：', resData.errcode + resData.errmsg)
     }
   } catch (e) {
     console.log('error', e)
