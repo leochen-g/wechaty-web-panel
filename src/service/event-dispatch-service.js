@@ -1,11 +1,11 @@
-const api = require('../proxy/api')
-const { getConfig, getRoomPhotoConfig, getMeiNv } = require('../proxy/aibotk')
-const { getConstellation, msgArr, getAllSchedule, getRoomAvatar, getNewsType } = require('../lib')
-const { generateAvatar, generateRoomImg } = require('../puppeteer-paint/lanuch')
-const { initTaskLocalSchedule } = require('../task/index')
-const { updateContactAndRoom, updateContactOnly, updateRoomOnly } = require('../common/index')
-const { chatTencent } = require('../proxy/tencent')
-const { getTencentOpenReply } = require('../proxy/tencent-open')
+import api from '../proxy/api.js'
+import { getConfig, getRoomPhotoConfig, getMeiNv } from '../proxy/aibotk.js'
+import { getConstellation, msgArr, getAllSchedule, getRoomAvatar, getNewsType } from '../lib/index.js'
+import { generateAvatar, generateRoomImg } from '../puppeteer-paint/lanuch.js'
+import { initTaskLocalSchedule } from '../task/index.js'
+import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
+import { chatTencent } from '../proxy/tencent.js'
+import { getTencentOpenReply } from '../proxy/tencent-open.js'
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -129,7 +129,6 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
     return []
   }
 }
-
 /**
  * 派发不同的机器人处理回复内容
  * @param {*} bot 机器人类别 0 天行机器人 1 天行的图灵机器人 2 图灵机器人 3 腾讯闲聊机器人
@@ -176,8 +175,9 @@ async function dispatchAiBot(bot, msg, name, id) {
     return ''
   }
 }
-
-module.exports = {
+export { dispatchEventContent }
+export { dispatchAiBot }
+export default {
   dispatchEventContent,
   dispatchAiBot,
 }

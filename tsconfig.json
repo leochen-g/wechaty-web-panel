@@ -1,0 +1,15 @@
+{
+  "extends": "@chatie/tsconfig",
+  "compilerOptions": {
+    "outDir": "dist/esm",
+    "allowJs": true
+  },
+  "exclude": [
+    "node_modules/",
+    "dist/",
+  ],
+  "include": [
+    "test/**/*.js",
+    "src/**/*.js",
+  ],
+}

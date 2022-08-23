@@ -1,7 +1,6 @@
-const Qrterminal = require('qrcode-terminal')
-const { throttle } = require('../lib/index')
-const { setQrCode } = require('../proxy/aibotk')
-
+import Qrterminal from 'qrcode-terminal'
+import { throttle } from '../lib/index.js'
+import { setQrCode } from '../proxy/aibotk.js'
 /**
  * 扫描登录，显示二维码
  */
@@ -12,5 +11,4 @@ async function onScan(qrcode, status) {
   const qrImgUrl = ['https://api.qrserver.com/v1/create-qr-code/?data=', encodeURIComponent(qrcode)].join('')
   console.log(qrImgUrl)
 }
-
-module.exports = onScan
+export default onScan

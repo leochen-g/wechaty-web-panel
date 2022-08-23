@@ -26,4 +26,5 @@ pids
 npm-debug.log
 /yarn.lock
 *.template.js
+dist
 

@@ -1,5 +1,5 @@
-const cdb = require('../lib/nedb.js')()
-
+import nedb from '../lib/nedb.js'
+const cdb = nedb()
 /**
  * 添加配置文件
  * @param {*} config
@@ -12,7 +12,6 @@ async function addConfig(info) {
     console.log('插入数据错误', error)
   }
 }
-
 /**
  * 更新配置文件
  * @param {*} config
@@ -75,8 +74,13 @@ async function roomTaskSchedule() {
     console.log('获取每日任务', error)
   }
 }
-
-module.exports = {
+export { addConfig }
+export { updateConfig }
+export { allConfig }
+export { dayTaskSchedule }
+export { roomNewsSchedule }
+export { roomTaskSchedule }
+export default {
   addConfig,
   updateConfig,
   allConfig,

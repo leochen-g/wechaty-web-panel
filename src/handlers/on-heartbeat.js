@@ -1,5 +1,4 @@
-const { sendHeartBeat } = require('../proxy/aibotk')
-
+import { sendHeartBeat } from '../proxy/aibotk.js'
 async function onHeartBeat(str) {
   if (!str) {
     await sendHeartBeat('dead')
@@ -8,5 +7,4 @@ async function onHeartBeat(str) {
     await sendHeartBeat('scan')
   }
 }
-
-module.exports = onHeartBeat
+export default onHeartBeat

@@ -1,9 +1,9 @@
-const superagent = require('superagent')
-const { getFormatQuery } = require('../lib/index')
-const { getAibotConfig } = require('../common/aiDb')
-const { AIBOTK, TXHOST } = require('./config')
-const { allConfig } = require('../common/configDb')
-const axios = require('axios')
+import superagent from 'superagent'
+import { getFormatQuery } from '../lib/index.js'
+import { getAibotConfig } from '../common/aiDb.js'
+import { AIBOTK, TXHOST } from './config.js'
+import { allConfig } from '../common/configDb.js'
+import axios from 'axios'
 const service = axios.create({
   // 定义统一的请求头部
   headers: {
@@ -46,7 +46,6 @@ service.interceptors.response.use(
     return Promise.resolve(res)
   }
 )
-
 /**
  * 封装get请求
  * @param {*} url 地址
@@ -81,7 +80,6 @@ function get({ url, params, contentType = 'application/x-www-form-urlencoded', p
       })
   })
 }
-
 /**
  * 封装post请求
  * @param {*} url 地址
@@ -117,7 +115,6 @@ function post({ url, params, contentType = 'application/x-www-form-urlencoded', 
       })
   })
 }
-
 function req(option) {
   if (!option) return
   if (option.method === 'POST') {
@@ -126,7 +123,6 @@ function req(option) {
     return get(option)
   }
 }
-
 async function txReq(option) {
   const config = await allConfig()
   if (!option) return
@@ -140,7 +136,6 @@ async function txReq(option) {
     return get({ url: TXHOST + option.url, params, contentType: option.contentType })
   }
 }
-
 async function aiBotReq(option) {
   const env = await getAibotConfig()
   const { apiKey, apiSecret } = env
@@ -156,7 +151,6 @@ async function aiBotReq(option) {
     return get({ url: AIBOTK + option.url, params, contentType: option.contentType, platform: option.platform || 'aibot' })
   }
 }
-
 async function callbackAibotApi(url, data) {
   const env = await getAibotConfig()
   const { apiKey, apiSecret } = env
@@ -168,8 +162,12 @@ async function callbackAibotApi(url, data) {
   let res = await service.post(url, data)
   return res
 }
-
-module.exports = {
+export { req }
+export { txReq }
+export { aiBotReq }
+export { service }
+export { callbackAibotApi }
+export default {
   req,
   txReq,
   aiBotReq,

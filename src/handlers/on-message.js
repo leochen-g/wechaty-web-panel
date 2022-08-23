@@ -1,10 +1,9 @@
-const { contactSay, roomSay } = require('../common')
-const { getContactTextReply, getRoomTextReply } = require('../common/reply')
-const { delay } = require('../lib/index')
-const { dispatchAsync } = require('../service/room-async-service')
-const { allConfig } = require('../common/configDb')
-const { getAibotConfig } = require('../common/aiDb')
-
+import { contactSay, roomSay } from '../common/index.js'
+import { getContactTextReply, getRoomTextReply } from '../common/reply.js'
+import { delay } from '../lib/index.js'
+import { dispatchAsync } from '../service/room-async-service.js'
+import { allConfig } from '../common/configDb.js'
+import { getAibotConfig } from '../common/aiDb.js'
 /**
  * 检测是否属于忽略的消息
  * @param msg 用户信息
@@ -21,7 +20,6 @@ function checkIgnore(msg, list) {
   }
   return false
 }
-
 /**
  * 根据消息类型过滤私聊消息事件
  * @param {*} that bot实例
@@ -74,7 +72,6 @@ async function dispatchFriendFilterByMsgType(that, msg) {
     console.log('监听消息错误', error)
   }
 }
-
 /**
  * 根据消息类型过滤群消息事件
  * @param {*} that bot实例
@@ -133,7 +130,6 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     console.log('error', e)
   }
 }
-
 async function onMessage(msg) {
   try {
     const config = await allConfig()
@@ -159,5 +155,4 @@ async function onMessage(msg) {
     console.log('监听消息失败', e)
   }
 }
-
-module.exports = onMessage
+export default onMessage

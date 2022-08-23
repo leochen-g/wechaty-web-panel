@@ -1,7 +1,7 @@
-const { aiBotReq, req } = require('./superagent')
-const { updateConfig } = require('../common/configDb')
-const pjson = require('../../package.json')
-
+import { aiBotReq, req } from './superagent.js'
+import { updateConfig } from '../common/configDb.js'
+import { readFile } from 'fs/promises'
+const packageJson = JSON.parse(await readFile(new URL('../../package.json')))
 /**
  * 获取美女图片
  */
@@ -41,7 +41,6 @@ async function getOne() {
     return '今日一句似乎已经消失'
   }
 }
-
 /**
  * 获取配置文件
  * @returns {Promise<*>}
@@ -61,7 +60,6 @@ async function getConfig() {
     console.log('获取配置文件失败:' + e)
   }
 }
-
 /**
  * 获取定时提醒任务列表
  */
@@ -80,7 +78,6 @@ async function getScheduleList() {
     console.log('获取定时任务失败:' + error)
   }
 }
-
 /**
  * 设置定时提醒任务
  * @param {*} obj 任务详情
@@ -99,7 +96,6 @@ async function setSchedule(obj) {
     console.log('添加定时任务失败', error)
   }
 }
-
 /**
  * 更新定时提醒任务
  */
@@ -116,7 +112,6 @@ async function updateSchedule(id) {
     console.log('更新定时任务失败', error)
   }
 }
-
 /**
  * 登录二维码推送
  * @param url
@@ -140,7 +135,6 @@ async function setQrCode(url, status) {
     console.log('推送登录二维码失败', error)
   }
 }
-
 /**
  * 推送登录状态的心跳
  * @param heart
@@ -159,7 +153,6 @@ async function sendHeartBeat(heart) {
     console.log('推送心跳失败', error)
   }
 }
-
 /**
  * 推送错误
  * @param error
@@ -178,7 +171,6 @@ async function sendError(error) {
     console.log('推送错误失败', e)
   }
 }
-
 /**
  * 更新头像
  * @returns {Promise<void>}
@@ -254,7 +246,6 @@ async function asyncData(robotId, type) {
     console.log('同步好友列表失败', error)
   }
 }
-
 /**
  * 获取上传token
  * @returns {Promise<*>}
@@ -344,16 +335,15 @@ async function updatePanelVersion() {
     let option = {
       method: 'POST',
       url: '/webPanel/version',
-      params: { version: pjson.version || '0.2.11' },
+      params: { version: packageJson.version || '0.2.11' },
     }
-    console.log('更新插件版本号', pjson.version)
+    console.log('更新插件版本号', packageJson.version)
     let content = await aiBotReq(option)
     return content.data
   } catch (error) {
     console.log('error', error)
   }
 }
-
 /**
  * 获取mqtt信息
  * @param {*} version
@@ -371,7 +361,6 @@ async function getMqttConfig() {
     console.log('获取mqtt配置错误', error)
   }
 }
-
 /**
  * 获取实时素材
  * @param {*} version
@@ -392,8 +381,26 @@ async function getMaterial(id) {
     console.log('获取mqtt配置错误', error)
   }
 }
-
-module.exports = {
+export { getConfig }
+export { getScheduleList }
+export { setSchedule }
+export { updateSchedule }
+export { setQrCode }
+export { sendHeartBeat }
+export { sendError }
+export { sendRobotInfo }
+export { putqn }
+export { sendFriend }
+export { sendRoom }
+export { asyncData }
+export { drawRoomPhoto }
+export { updatePanelVersion }
+export { getRoomPhotoConfig }
+export { getMqttConfig }
+export { getMeiNv }
+export { getOne }
+export { getMaterial }
+export default {
   getConfig,
   getScheduleList,
   setSchedule,

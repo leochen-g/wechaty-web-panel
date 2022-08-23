@@ -1,11 +1,10 @@
-const mqtt = require('mqtt')
-const { allConfig } = require('../common/configDb')
-const { contactSay, roomSay } = require('../common/index')
-const { getConfig, getMqttConfig } = require('../proxy/aibotk')
-const { dispatchEventContent } = require('../service/event-dispatch-service')
-const { sendRoomTaskMessage, sendContactTaskMessage } = require('../task/index')
-const { randomRange } = require('../lib/index')
-
+import * as mqtt from 'mqtt'
+import { allConfig } from '../common/configDb.js'
+import { contactSay, roomSay } from '../common/index.js'
+import { getConfig, getMqttConfig } from './aibotk.js'
+import { dispatchEventContent } from '../service/event-dispatch-service.js'
+import { sendRoomTaskMessage, sendContactTaskMessage } from '../task/index.js'
+import { randomRange } from '../lib/index.js'
 async function initMqtt(that) {
   try {
     await getConfig() // 获取配置文件
@@ -84,7 +83,7 @@ async function initMqtt(that) {
     console.log('mqtt 创建链接失败', e)
   }
 }
-
-module.exports = {
+export { initMqtt }
+export default {
   initMqtt,
 }

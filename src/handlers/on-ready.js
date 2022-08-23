@@ -1,8 +1,7 @@
-const common = require('../common/index')
-const { delay } = require('../lib/index')
-const { setQrCode, sendHeartBeat, asyncData } = require('../proxy/aibotk')
-const { getUser } = require('../common/userDb')
-
+import common from '../common/index.js'
+import { delay } from '../lib/index.js'
+import { setQrCode, sendHeartBeat, asyncData } from '../proxy/aibotk.js'
+import { getUser } from '../common/userDb.js'
 /**
  * 准备好的事件
  */
@@ -18,5 +17,4 @@ async function onReady() {
     console.log('on ready error:', e)
   }
 }
-
-module.exports = onReady
+export default onReady

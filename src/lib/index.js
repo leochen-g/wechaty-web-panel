@@ -1,8 +1,7 @@
-const Crypto = require('crypto')
-const schedule = require('node-schedule')
-const fs = require('fs')
-const { addRoom, getRoom } = require('../common/roomAvatarDb')
-
+import Crypto from 'crypto'
+import * as schedule from 'node-schedule'
+import fs from 'fs'
+import { addRoom, getRoom } from '../common/roomAvatarDb.js'
 /**
  * 设置定时器
  * @param {*} date 日期
@@ -20,7 +19,6 @@ const { addRoom, getRoom } = require('../common/roomAvatarDb')
 // │ │ └─────────────── hour (0 - 23)
 // │ └──────────────────── minute (0 - 59)
 // └───────────────────────── second (0 - 59, OPTIONAL)
-
 // 每分钟的第30秒触发： '30 * * * * *'
 //
 // 每小时的1分30秒触发 ：'30 1 * * * *'
@@ -30,7 +28,6 @@ const { addRoom, getRoom } = require('../common/roomAvatarDb')
 // 每月的1日1点1分30秒触发 ：'30 1 1 1 * *'
 //
 // 每周1的1点1分30秒触发 ：'30 1 1 * * 1'
-
 function setLocalSchedule(date, callback, name) {
   if (name) {
     schedule.scheduleJob(name, { rule: date, tz: 'Asia/Shanghai' }, callback)
@@ -38,12 +35,10 @@ function setLocalSchedule(date, callback, name) {
     schedule.scheduleJob({ rule: date, tz: 'Asia/Shanghai' }, callback)
   }
 }
-
 // 取消任务
 function cancelLocalSchedule(name) {
   schedule.cancelJob(name)
 }
-
 // 取消指定任务
 function cancelAllSchedule(type) {
   for (let i in schedule.scheduledJobs) {
@@ -52,7 +47,6 @@ function cancelAllSchedule(type) {
     }
   }
 }
-
 /**
  * 获取所有定时任务的job名
  *
@@ -62,7 +56,6 @@ function getAllSchedule() {
     console.log(i)
   }
 }
-
 /**
  * 延时函数
  * @param {*} ms 毫秒
@@ -70,7 +63,6 @@ function getAllSchedule() {
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
-
 /**
  * 读取文件
  */
@@ -91,7 +83,6 @@ const loadFile = {
     return this.data
   },
 }
-
 /**
  * 获取周几
  * @param {*} date 日期
@@ -102,7 +93,6 @@ function getDay(date) {
   var iDays = parseInt(Math.abs(date2.getTime() - date1.getTime()) / 1000 / 60 / 60 / 24)
   return iDays
 }
-
 /**
  * 格式化日期
  * @param {*} date
@@ -144,7 +134,6 @@ function formatDate(date) {
   }
   return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ' ' + str
 }
-
 /**
  * 获取今天日期
  * @returns 2019-7-19
@@ -156,7 +145,6 @@ function getToday() {
   let day = date.getDate()
   return year + '-' + month + '-' + day + ' '
 }
-
 /**
  * 转换定时日期格式
  * @param {*} time
@@ -166,7 +154,6 @@ function convertTime(time) {
   let array = time.split(':')
   return '0 ' + array[1] + ' ' + array[0] + ' * * *'
 }
-
 //
 /**
  * 判断日期时间格式是否正确
@@ -186,7 +173,6 @@ function isRealDate(str) {
   if (d.getMinutes() != r[5]) return false
   return true
 }
-
 /**
  * 获取星座的英文
  * @param {*} msg
@@ -232,44 +218,42 @@ function getConstellation(astro) {
     return 'pisces'
   }
 }
-
 /**
  * 获取新闻的英文
  * @param {*} msg
  */
 function getNewsType(msg) {
   const NewsMap = {
-    '社会': 5,
-    '国内': 7,
-    '国际': 8,
-    '娱乐': 10,
-    '美女图片': 11,
-    '体育': 12,
-    '科技': 13,
-    '奇闻异事': 41,
-    '健康知识': 17,
-    '旅游': 18,
-    '汉服': 38,
-    '房产': 37,
-    '科学探索': 36,
-    '汽车': 35,
-    '互联网': 34,
-    '动漫': 33,
-    '财经': 32,
-    '游戏': 32,
-    'CBA': 30,
-    '人工智能': 29,
-    '区块链': 28,
-    '军事': 27,
-    '足球': 26,
-    '创业': 24,
-    '移动互联': 23,
-    'IT': 22,
-    'VR科技': 21
+    社会: 5,
+    国内: 7,
+    国际: 8,
+    娱乐: 10,
+    美女图片: 11,
+    体育: 12,
+    科技: 13,
+    奇闻异事: 41,
+    健康知识: 17,
+    旅游: 18,
+    汉服: 38,
+    房产: 37,
+    科学探索: 36,
+    汽车: 35,
+    互联网: 34,
+    动漫: 33,
+    财经: 32,
+    游戏: 32,
+    CBA: 30,
+    人工智能: 29,
+    区块链: 28,
+    军事: 27,
+    足球: 26,
+    创业: 24,
+    移动互联: 23,
+    IT: 22,
+    VR科技: 21,
   }
   return NewsMap[msg] || 7
 }
-
 /**
  * 返回指定范围的随机整数
  * @param {*} min
@@ -279,7 +263,6 @@ function randomRange(min, max) {
   // min最小值，max最大值
   return Math.floor(Math.random() * (max - min)) + min
 }
-
 /**
  * 写入文件内容
  * @param fpath
@@ -297,7 +280,6 @@ async function writeFile(fpath, encoding) {
     })
   })
 }
-
 /**
  * 解析响应数据
  * @param {*} content 内容
@@ -306,7 +288,6 @@ function parseBody(content) {
   if (!content) return
   return JSON.parse(content.text)
 }
-
 /**
  * MD5加密
  * @return {string}
@@ -314,7 +295,6 @@ function parseBody(content) {
 function MD5(str) {
   return Crypto.createHash('md5').update(str).digest('hex')
 }
-
 /**
  * 对象内容按照字母排序
  * @param obj
@@ -327,7 +307,6 @@ function objKeySort(obj) {
   }
   return newObj
 }
-
 /**
  * 根据排序后的数据返回url参数
  * @param datas
@@ -345,7 +324,6 @@ function getQueryString(datas) {
   }
   return url
 }
-
 /**
  * 获取MD5加密后的Sign
  * @param secret
@@ -356,7 +334,6 @@ function getSign(secret, query) {
   const stringSignTemp = `${query}&ApiSecret=${secret}`
   return MD5(stringSignTemp).toUpperCase()
 }
-
 /**
  * 生成n位随机数
  * @param n
@@ -369,7 +346,6 @@ function rndNum(n) {
   }
   return rnd
 }
-
 /**
  * 生成加密后的对象
  * @param apiKey
@@ -388,7 +364,6 @@ function getFormatQuery(apiKey, apiSecret, params = {}) {
   query.sign = sign
   return query
 }
-
 /**
  * 生成回复内容
  * @param type 内容类型
@@ -400,7 +375,6 @@ function msgArr(type = 1, content = '', url = '') {
   let obj = { type: type, content: content, url: url }
   return [obj]
 }
-
 /**
  * 设置提醒内容解析
  * @param {*} keywordArray 分词后内容
@@ -435,7 +409,6 @@ function contentDistinguish(keywordArray, name) {
   }
   return scheduleObj
 }
-
 //过滤联系人
 /**
  * @param {*} param1
@@ -467,7 +440,6 @@ function filterContacts(contacts, query) {
     return arr.indexOf(false) < 0
   })
 }
-
 /**
  * 格式化联系人
  * @param {*} data
@@ -493,7 +465,6 @@ function formatContacts(data) {
   })
   return arr
 }
-
 /**
  * 函数节流
  * @param fn
@@ -513,21 +484,18 @@ function throttle(fn, wait) {
     }
   }
 }
-
 /**
  * @return {string}
  */
 function Base64Encode(str) {
   return Buffer.from(str).toString('base64')
 }
-
 /**
  * @return {string}
  */
 function Base64Decode(str) {
   return Buffer.from(str, 'base64').toString('ascii')
 }
-
 /**
  * 数组拆分
  * @param {array} array 数组
@@ -541,7 +509,6 @@ function groupArray(array, subGroupLength) {
   }
   return newArray
 }
-
 /**
  * 获取群用户列表
  * @param {*}} room
@@ -580,7 +547,6 @@ async function getRoomAvatarList(room, name) {
     console.log('获取群成员头像列表失败', e)
   }
 }
-
 /**
  * 设置中心位置
  */
@@ -593,7 +559,6 @@ function setFirstAvatr(list, name) {
   temp.unshift(say[0])
   return temp
 }
-
 /**
  * 获取群头像列表
  * @param {*} roomObj
@@ -619,7 +584,33 @@ async function getRoomAvatar(roomObj, roomName, name) {
     console.log('getRoomAvatar error', e)
   }
 }
-module.exports = {
+export { Base64Encode }
+export { Base64Decode }
+export { setLocalSchedule }
+export { parseBody }
+export { delay }
+export { getToday }
+export { convertTime }
+export { getDay }
+export { formatDate }
+export { isRealDate }
+export { getConstellation }
+export { randomRange }
+export { writeFile }
+export { MD5 }
+export { getFormatQuery }
+export { contentDistinguish }
+export { msgArr }
+export { throttle }
+export { formatContacts }
+export { filterContacts }
+export { cancelAllSchedule }
+export { getAllSchedule }
+export { groupArray }
+export { getRoomAvatarList }
+export { getRoomAvatar }
+export { getNewsType }
+export default {
   Base64Encode,
   Base64Decode,
   setLocalSchedule,
@@ -645,5 +636,5 @@ module.exports = {
   groupArray,
   getRoomAvatarList,
   getRoomAvatar,
-  getNewsType
+  getNewsType,
 }

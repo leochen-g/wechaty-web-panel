@@ -1,7 +1,6 @@
-const path = require('path')
-const { addRoomWelcomeSay } = require('../common/index')
-const { allConfig } = require('../common/configDb')
-
+import path from 'path'
+import { addRoomWelcomeSay } from '../common/index.js'
+import { allConfig } from '../common/configDb.js'
 /**
  * 判断配置中是否存在此群
  * @param {*} arr 配置的群组
@@ -36,5 +35,4 @@ async function onRoomjoin(room, inviteeList, inviter, date) {
     console.log('on room join error: ', e)
   }
 }
-
-module.exports = onRoomjoin
+export default onRoomjoin

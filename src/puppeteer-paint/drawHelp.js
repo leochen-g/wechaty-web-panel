@@ -35,7 +35,6 @@ async function generateRoomImg({ list, options }) {
       lastCircleNumber: I,
     }
   }
-
   const patternCircle = function (mc, t, info, i) {
     let r, n, s, g, d, h, f, v, b, w, y, C, _, k, I, x, S, j, q
     r = i.x
@@ -80,14 +79,12 @@ async function generateRoomImg({ list, options }) {
     }
     return mc
   }
-
   /**
    * 绘制标题
    * @param {*} mc
    * @param {*} title
    * @param {*} titleInfo
    */
-
   const drawTitle = function (mc, title, titleInfo) {
     mc.text(title, {
       align: 'center',
@@ -138,7 +135,6 @@ async function generateRoomImg({ list, options }) {
       console.log('cropImg error', error)
     }
   }
-
   return new Promise(async (resolve, reject) => {
     let MCanvas = window.MCanvas.MCanvas
     let MImage = window.MCanvas.MImage
@@ -186,7 +182,6 @@ async function generateRoomImg({ list, options }) {
     }
   })
 }
-
 async function generateAvatar({ avatar, coverImg }) {
   coverImg = coverImg || 'http://image.xkboke.com/hat.png'
   return new Promise(async (resolve, reject) => {
@@ -230,8 +225,9 @@ async function generateAvatar({ avatar, coverImg }) {
     }
   })
 }
-
-module.exports = {
+export { generateAvatar }
+export { generateRoomImg }
+export default {
   generateAvatar,
   generateRoomImg,
 }

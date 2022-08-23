@@ -1,8 +1,7 @@
-const tencentcloud = require('tencentcloud-sdk-nodejs')
+import * as tencentcloud from 'tencentcloud-sdk-nodejs'
+import { allConfig } from '../common/configDb.js'
 const NlpClient = tencentcloud.nlp.v20190408.Client
-const { allConfig } = require('../common/configDb')
 let client = ''
-
 async function initClient() {
   const config = await allConfig()
   //初始化腾讯闲聊机器人，创建链接
@@ -20,7 +19,6 @@ async function initClient() {
   }
   client = new NlpClient(clientConfig)
 }
-
 async function chatTencent(word) {
   try {
     const params = {
@@ -35,6 +33,7 @@ async function chatTencent(word) {
     console.log('腾讯闲聊机器人请求失败：', e)
   }
 }
-module.exports = {
+export { chatTencent }
+export default {
   chatTencent,
 }
