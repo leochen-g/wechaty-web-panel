@@ -75,7 +75,7 @@ async function filterRoomMsg(that, msg, name, id, avatar, room) {
     const config = await allConfig() // 获取配置信息
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
-      { bool: config.callbackEvents && config.callbackEvents.length > 0, method: 'callbackEvent' },
+      { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },
