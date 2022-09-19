@@ -1,4 +1,4 @@
-const Datastore = require('nedb')
+import Datastore from 'nedb'
 function DB(database) {
   let options = {
     filename: database,
@@ -82,6 +82,6 @@ DB.prototype.remove = function (query, options) {
     })
   })
 }
-module.exports = (database) => {
+export default (database) => {
   return new DB(database)
 }

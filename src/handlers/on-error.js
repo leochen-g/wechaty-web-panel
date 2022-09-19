@@ -1,5 +1,4 @@
-const { sendError } = require('../proxy/aibotk')
-
+import { sendError } from '../proxy/aibotk.js'
 async function onError(error) {
   try {
     console.log('错误', error)
@@ -13,5 +12,4 @@ async function onError(error) {
     console.log('上报错误失败', e)
   }
 }
-
-module.exports = onError
+export default onError

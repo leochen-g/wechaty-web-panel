@@ -1,11 +1,13 @@
-const api = require('../proxy/api')
-const { getConfig, getRoomPhotoConfig, getMeiNv } = require('../proxy/aibotk')
-const { getConstellation, msgArr, getAllSchedule, getRoomAvatar, getNewsType } = require('../lib')
-const { generateAvatar, generateRoomImg } = require('../puppeteer-paint/lanuch')
-const { initTaskLocalSchedule } = require('../task/index')
-const { updateContactAndRoom, updateContactOnly, updateRoomOnly } = require('../common/index')
-const { chatTencent } = require('../proxy/tencent')
-const { getTencentOpenReply } = require('../proxy/tencent-open')
+import api from '../proxy/api.js'
+import { getConfig, getRoomPhotoConfig, getMeiNv, getWordCloudConfig, getWordCloud } from '../proxy/aibotk.js'
+import { getConstellation, msgArr, getRoomAvatar, getNewsType } from '../lib/index.js'
+import { generateAvatar, generateRoomImg } from '../puppeteer-paint/lanuch.js'
+import { initTaskLocalSchedule } from '../task/index.js'
+import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
+import { chatTencent } from '../proxy/tencent.js'
+import { getTencentOpenReply } from '../proxy/tencent-open.js'
+import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
+
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -102,6 +104,49 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
           url = baseImg
         }
         break
+      case 'roomCloud': {
+        let wordContent = ''
+        const roomName = await room.topic() // 获取群名
+        const config = await getWordCloudConfig(roomName)
+        if (!config.authList) {
+          content = '本群暂未开通群词云功能，请联系群主或管理员开启'
+        } else if (config.authList.length) {
+          if (config.authList.includes(name)) {
+            wordContent = await getRoomRecordContent(roomName, config.day)
+            const baseImg = await getWordCloud(wordContent, config.background, config.border)
+            type = 3
+            url = baseImg
+          } else {
+            content = '很抱歉，你没有生成群词云的权限，请联系管理员或群主开通'
+          }
+        } else {
+          wordContent = await getRoomRecordContent(roomName, config.day)
+          const baseImg = await getWordCloud(wordContent, config.background, config.border)
+          type = 3
+          url = baseImg
+        }
+        break
+      }
+      case 'removeRecord': {
+        const roomName = await room.topic() // 获取群名
+        const config = await getWordCloudConfig(roomName)
+        if (config.authList) {
+          if(config.authList.length) {
+            if (config.authList.includes(name)) {
+              await removeRecord(roomName)
+              content = '清除成功'
+            } else {
+              content = '很抱歉，你没有权限清楚记录'
+            }
+          } else {
+            await removeRecord(roomName)
+            content = '清除成功'
+          }
+        } else {
+          content = '本群暂未开通群词云功能，无需清楚记录'
+        }
+        break
+      }
       case 'reloadFriendOnly':
         await updateContactOnly(that)
         content = '更新好友列表成功，请稍等两分钟后生效'
@@ -117,7 +162,6 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       case 'updateConfig':
         await getConfig()
         await initTaskLocalSchedule(that)
-        getAllSchedule()
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:
@@ -129,7 +173,6 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
     return []
   }
 }
-
 /**
  * 派发不同的机器人处理回复内容
  * @param {*} bot 机器人类别 0 天行机器人 1 天行的图灵机器人 2 图灵机器人 3 腾讯闲聊机器人
@@ -176,8 +219,9 @@ async function dispatchAiBot(bot, msg, name, id) {
     return ''
   }
 }
-
-module.exports = {
+export { dispatchEventContent }
+export { dispatchAiBot }
+export default {
   dispatchEventContent,
   dispatchAiBot,
 }

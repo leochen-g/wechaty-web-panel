@@ -1,10 +1,9 @@
-const { delay, MD5 } = require('../lib')
-const { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } = require('../proxy/aibotk')
-const { addUser } = require('../common/userDb')
-const { initAllSchedule } = require('../task')
-const { initMqtt } = require('../proxy/mqtt')
-const { allConfig } = require('../common/configDb')
-
+import { delay, MD5 } from '../lib'
+import { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
+import { addUser } from '../db/userDb.js'
+import { initAllSchedule } from '../task'
+import { initMqtt } from '../proxy/mqtt.js'
+import { allConfig } from '../db/configDb.js'
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户
@@ -35,5 +34,4 @@ async function onLogin(user) {
     console.log('登录后初始化失败', e)
   }
 }
-
-module.exports = onLogin
+export default onLogin

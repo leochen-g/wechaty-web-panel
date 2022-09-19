@@ -8,3 +8,4 @@ README_zh-CN.md
 *.map
 src/
 coverage
+index.template.js

@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer')
-const mainConfig = require('./mainConfig')
+import puppeteer from 'puppeteer'
+import mainConfig from './mainConfig.js'
 class BrowserManage {
   browserDestructionTimeout //清理浏览器实例
   browserInstance //浏览器实例
@@ -34,4 +34,4 @@ class BrowserManage {
     })
   }
 }
-module.exports = new BrowserManage()
+export default new BrowserManage()

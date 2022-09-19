@@ -1,5 +1,5 @@
-const db = require('../lib/nedb.js')()
-
+import nedb from './nedb.js'
+const db = nedb()
 async function addUser(info) {
   try {
     let doc = await db.insert(info)
@@ -8,7 +8,6 @@ async function addUser(info) {
     console.log('插入数据错误', error)
   }
 }
-
 async function getUser() {
   try {
     let search = await db.find({})
@@ -17,8 +16,9 @@ async function getUser() {
     console.log('查询数据错误', error)
   }
 }
-
-module.exports = {
+export { addUser }
+export { getUser }
+export default {
   addUser,
   getUser,
 }

@@ -1,10 +1,9 @@
-const { getNews, getTXweather, getSweetWord } = require('../proxy/api')
-const { sendFriend, sendRoom, asyncData, getOne, getMaterial } = require('../proxy/aibotk')
-const { getUser } = require('../common/userDb')
-const { formatDate, getDay, MD5, groupArray, delay } = require('../lib')
-const { UrlLink, MiniProgram } = require('wechaty')
-const { FileBox } = require('file-box')
-const { allConfig } = require('../common/configDb')
+import { getNews, getTXweather, getSweetWord } from '../proxy/api.js'
+import { sendFriend, sendRoom, asyncData, getOne, getMaterial } from '../proxy/aibotk.js'
+import { getUser } from '../db/userDb.js'
+import { formatDate, getDay, MD5, groupArray, delay } from '../lib/index.js'
+import { FileBox } from 'file-box'
+import { allConfig } from '../db/configDb.js'
 /**
  * 获取每日新闻内容
  * @param {*} sortId 新闻资讯分类Id
@@ -16,7 +15,6 @@ async function getEveryDayRoomContent(sortId, endWord = '微信小助手') {
   let content = `${today}\n${news}\n————————${endWord}`
   return content
 }
-
 /**
  * 获取每日说内容
  * @param {*} date 与朋友的纪念日
@@ -32,7 +30,6 @@ async function getEveryDayContent(date, city, endWord) {
   let str = `${today}\n我们在一起的第${memorialDay}天\n\n元气满满的一天开始啦,要开心噢^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n情话对你说:\n${sweetWord}\n\n————————${endWord}`
   return str
 }
-
 /**
  * 更新用户信息
  */
@@ -73,7 +70,6 @@ async function updateContactInfo(that) {
     console.log('e', e)
   }
 }
-
 /**
  * 分批次更新好友信息
  * @param {*} list 好友列表
@@ -87,7 +83,6 @@ async function updateFriendInfo(list, num) {
     await delay(500)
   }
 }
-
 /**
  * 更新群列表
  */
@@ -115,7 +110,6 @@ async function updateRoomInfo(that) {
     console.log('e', e)
   }
 }
-
 /**
  * 更新群信息
  * @param {*} list 好友列表
@@ -129,7 +123,6 @@ async function updateRoomsInfo(list, num) {
     await delay(500)
   }
 }
-
 /**
  * 统一触发加群欢迎词
  * @param room 群
@@ -149,7 +142,6 @@ async function addRoomWelcomeSay(room, roomName, contactName, msg) {
     await room.say(obj)
   }
 }
-
 /**
  * 群关键词回复
  * @param {*} contact
@@ -182,7 +174,7 @@ async function roomSay(room, contact, msg) {
       await delay(500)
       await room.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
-      let url = new UrlLink({
+      let url = new this.UrlLink({
         description: msg.description,
         thumbnailUrl: msg.thumbUrl,
         title: msg.title,
@@ -191,7 +183,7 @@ async function roomSay(room, contact, msg) {
       console.log(url)
       await room.say(url)
     } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey) {
-      let miniProgram = new MiniProgram({
+      let miniProgram = new this.MiniProgram({
         appid: msg.appid,
         title: msg.title,
         pagePath: msg.pagePath,
@@ -205,7 +197,6 @@ async function roomSay(room, contact, msg) {
     console.log('群回复错误', e)
   }
 }
-
 /**
  * 私聊发送消息
  * @param contact
@@ -240,7 +231,7 @@ async function contactSay(contact, msg, isRoom = false) {
       let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
       await contact.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description && msg.thumbUrl) {
-      let url = new UrlLink({
+      let url = new this.UrlLink({
         description: msg.description,
         thumbnailUrl: msg.thumbUrl,
         title: msg.title,
@@ -248,7 +239,7 @@ async function contactSay(contact, msg, isRoom = false) {
       })
       await contact.say(url)
     } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey) {
-      let miniProgram = new MiniProgram({
+      let miniProgram = new this.MiniProgram({
         appid: msg.appid,
         title: msg.title,
         pagePath: msg.pagePath,
@@ -262,7 +253,6 @@ async function contactSay(contact, msg, isRoom = false) {
     console.log('私聊发送消息失败', e)
   }
 }
-
 /**
  * 统一邀请加群
  * @param that
@@ -274,7 +264,7 @@ async function addRoom(that, contact, roomName, replys) {
     try {
       for (const item of replys) {
         await delay(2000)
-        await contactSay(contact, item)
+        await contactSay.call(that, contact, item)
       }
       await room.add(contact)
     } catch (e) {
@@ -284,7 +274,6 @@ async function addRoom(that, contact, roomName, replys) {
     console.log(`不存在此群：${roomName}`)
   }
 }
-
 /**
  * 重新同步好友和群组
  * @param that
@@ -300,7 +289,6 @@ async function updateContactAndRoom(that) {
   await delay(3000)
   await updateContactInfo(that)
 }
-
 /**
  * 重新同步好友
  * @param that
@@ -312,7 +300,6 @@ async function updateContactOnly(that) {
   await delay(3000)
   await updateContactInfo(that)
 }
-
 /**
  * 重新同步群
  * @param that
@@ -324,8 +311,18 @@ async function updateRoomOnly(that) {
   await delay(3000)
   await updateRoomInfo(that)
 }
-
-module.exports = {
+export { updateRoomOnly }
+export { updateContactOnly }
+export { getEveryDayContent }
+export { getEveryDayRoomContent }
+export { updateContactInfo }
+export { updateRoomInfo }
+export { addRoom }
+export { contactSay }
+export { roomSay }
+export { addRoomWelcomeSay }
+export { updateContactAndRoom }
+export default {
   updateRoomOnly,
   updateContactOnly,
   getEveryDayContent,

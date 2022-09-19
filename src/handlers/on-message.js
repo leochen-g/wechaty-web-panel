@@ -1,10 +1,15 @@
-const { contactSay, roomSay } = require('../common')
-const { getContactTextReply, getRoomTextReply } = require('../common/reply')
-const { delay } = require('../lib/index')
-const { dispatchAsync } = require('../service/room-async-service')
-const { allConfig } = require('../common/configDb')
-const { getAibotConfig } = require('../common/aiDb')
-
+import { contactSay, roomSay } from '../common'
+import { getContactTextReply, getRoomTextReply } from '../common/reply.js'
+import { delay } from '../lib'
+import { dispatchAsync } from '../service/room-async-service.js'
+import { allConfig } from '../db/configDb.js'
+import { getAibotConfig } from '../db/aiDb.js'
+import { addRoomRecord } from '../db/roomDb.js'
+const ignoreRecord = [
+  { type: "include", word: "加入了群聊" },
+  { type: "include", word: "与群里其他人都不是朋友关系" },
+  { type: "include", word: "收到一条暂不支持的消息类型" },
+]
 /**
  * 检测是否属于忽略的消息
  * @param msg 用户信息
@@ -21,7 +26,6 @@ function checkIgnore(msg, list) {
   }
   return false
 }
-
 /**
  * 根据消息类型过滤私聊消息事件
  * @param {*} that bot实例
@@ -45,7 +49,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
             replys = await getContactTextReply(that, contact, content.trim())
             for (let reply of replys) {
               await delay(1000)
-              await contactSay(contact, reply)
+              await contactSay.call(that, contact, reply)
             }
           }
         } else {
@@ -74,7 +78,6 @@ async function dispatchFriendFilterByMsgType(that, msg) {
     console.log('监听消息错误', error)
   }
 }
-
 /**
  * 根据消息类型过滤群消息事件
  * @param {*} that bot实例
@@ -83,6 +86,8 @@ async function dispatchFriendFilterByMsgType(that, msg) {
  */
 async function dispatchRoomFilterByMsgType(that, room, msg) {
   const aibotConfig = await getAibotConfig()
+  const config = await allConfig()
+  const { role } = config.userInfo
   try {
     const contact = msg.talker() // 发消息人
     const contactName = contact.name()
@@ -106,8 +111,14 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           replys = await getRoomTextReply(that, content, contactName, contactId, contactAvatar, room)
           for (let reply of replys) {
             await delay(1000)
-            await roomSay(room, contact, reply)
+            await roomSay.call(that, room, contact, reply)
           }
+        }
+        const cloudRoom = config.cloudRoom
+        if (role === 'vip' && cloudRoom.includes(roomName) && !checkIgnore(content, ignoreRecord)) {
+          const regex = /(<([^>]+)>)/ig
+          content = content.replace(regex, "");
+          addRoomRecord({ roomName, roomId: room.id, content, contact: contactName, wxid: contactId, time: new Date().getTime() })
         }
         break
       case that.Message.Type.Emoticon:
@@ -133,7 +144,6 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     console.log('error', e)
   }
 }
-
 async function onMessage(msg) {
   try {
     const config = await allConfig()
@@ -159,5 +169,4 @@ async function onMessage(msg) {
     console.log('监听消息失败', e)
   }
 }
-
-module.exports = onMessage
+export default onMessage

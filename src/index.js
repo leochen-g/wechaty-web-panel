@@ -1,15 +1,15 @@
-const { addAibotConfig } = require('./common/aiDb')
-const onScan = require('./handlers/on-scan')
-const onLogin = require('./handlers/on-login')
-const onLogout = require('./handlers/on-logout')
-const onFriend = require('./handlers/on-friend')
-const onRoomjoin = require('./handlers/on-roomjoin')
-const onMessage = require('./handlers/on-message')
-const onReady = require('./handlers/on-ready')
-const onHeartbeat = require('./handlers/on-heartbeat')
-const onError = require('./handlers/on-error')
-const onRoomtopic = require('./handlers/on-roomtopic')
-const onRoomleave = require('./handlers/on-roomleave')
+import { addAibotConfig } from './db/aiDb.js'
+import onScan from './handlers/on-scan.js'
+import onLogin from './handlers/on-login.js'
+import onLogout from './handlers/on-logout.js'
+import onFriend from './handlers/on-friend.js'
+import onRoomjoin from './handlers/on-roomjoin.js'
+import onMessage from './handlers/on-message.js'
+import onReady from './handlers/on-ready.js'
+import onHeartbeat from './handlers/on-heartbeat.js'
+import onError from './handlers/on-error.js'
+import onRoomtopic from './handlers/on-roomtopic.js'
+import onRoomleave from './handlers/on-roomleave.js'
 let envKey = ''
 let envSecret = ''
 if (process.env['AIBOTK_KEY']) {
@@ -20,8 +20,7 @@ if (process.env['AIBOTK_SECRET']) {
   console.log('使用环境变量中的 aibotkSecret')
   envSecret = process.env['AIBOTK_SECRET']
 }
-
-module.exports = function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
+export default (function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
   const initConfig = {
     apiKey: envKey || config.apiKey,
     apiSecret: envSecret || config.apiSecret,
@@ -45,4 +44,4 @@ module.exports = function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) 
     if (!ignoreEvents.includes('heartbeat')) bot.on('heartbeat', onHeartbeat)
     if (!ignoreEvents.includes('error')) bot.on('error', onError)
   }
-}
+})

@@ -1,27 +1,23 @@
-const dispatch = require('./event-dispatch-service')
-const { setSchedule, updateSchedule } = require('../proxy/aibotk')
-const { contentDistinguish, setLocalSchedule, isRealDate } = require('../lib')
-const { generateAvatar } = require('../puppeteer-paint/lanuch')
-const { addRoom } = require('../common/index')
-const { service, callbackAibotApi } = require('../proxy/superagent')
-
+import dispatch from './event-dispatch-service.js'
+import { setSchedule, updateSchedule } from '../proxy/aibotk.js'
+import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.js'
+import { generateAvatar } from '../puppeteer-paint/lanuch.js'
+import { addRoom } from '../common/index.js'
+import { service, callbackAibotApi } from '../proxy/superagent.js'
 function emptyMsg() {
   let msgArr = [] // 返回的消息列表
   let obj = { type: 1, content: '我在呢', url: '' } // 消息主体
   msgArr.push(obj)
   return msgArr
 }
-
 function officialMsg() {
   console.log('字符超200字符，无效或官方消息，不做回复')
   return [{ type: 1, content: '', url: '' }]
 }
-
 function newFriendMsg({ config, name }) {
   console.log(`新添加好友：${name}，默认回复`)
   return config.newFriendReplys || [{ type: 1, content: '', url: '' }]
 }
-
 async function roomInviteMsg({ that, msg, contact, config }) {
   try {
     for (const item of config.roomJoinKeywords) {
@@ -45,7 +41,6 @@ async function roomInviteMsg({ that, msg, contact, config }) {
     return []
   }
 }
-
 /**
  * 添加定时提醒
  * @param that wechaty实例
@@ -74,7 +69,6 @@ async function addSchedule(that, obj) {
     return false
   }
 }
-
 async function scheduleJobMsg({ that, msg, name }) {
   try {
     let obj = { type: 1, content: '', url: '' } // 消息主体
@@ -106,7 +100,6 @@ async function scheduleJobMsg({ that, msg, name }) {
     return []
   }
 }
-
 /**
  * 获取事件处理返回的内容
  * @param {*} event 事件名
@@ -125,7 +118,6 @@ async function getEventReply(that, event, msg, name, id, avatar, room) {
     return []
   }
 }
-
 /**
  * 回调函数事件
  * @param that
@@ -134,7 +126,7 @@ async function getEventReply(that, event, msg, name, id, avatar, room) {
  * @param id
  * @param config
  * @param room
- * @returns {Promise<AxiosResponse<any>|[]>}
+ * @returns Promise
  */
 async function callbackEvent({ that, msg, name, id, config, room }) {
   try {
@@ -167,7 +159,6 @@ async function callbackEvent({ that, msg, name, id, config, room }) {
     return []
   }
 }
-
 async function eventMsg({ that, msg, name, id, avatar, config, room }) {
   try {
     for (let item of config.eventKeywords) {
@@ -185,12 +176,10 @@ async function eventMsg({ that, msg, name, id, avatar, config, room }) {
     return []
   }
 }
-
 /**
  * 关键词回复
  * @returns {Promise<*>}
  */
-
 async function keywordsMsg({ msg, config }) {
   try {
     if (config.replyKeywords && config.replyKeywords.length > 0) {
@@ -215,7 +204,6 @@ async function keywordsMsg({ msg, config }) {
     return []
   }
 }
-
 async function robotMsg({ msg, name, id, config }) {
   try {
     let msgArr = [] // 返回的消息列表
@@ -232,7 +220,6 @@ async function robotMsg({ msg, name, id, config }) {
     return []
   }
 }
-
 /**
  * 绘制头像
  * @param avatar
@@ -254,7 +241,6 @@ async function drawAvatar(avatar, coverImg) {
     return { type: 1, content: '你的头像属于高维世界产物，小助手能力不足，无法解析，待我修炼真经后为你提供服务' }
   }
 }
-
 /**
  * 头像处理
  * @param msg
@@ -289,8 +275,17 @@ async function avatarCrop({ msg, name, config, avatar }) {
     return []
   }
 }
-
-module.exports = {
+export { callbackEvent }
+export { avatarCrop }
+export { emptyMsg }
+export { officialMsg }
+export { newFriendMsg }
+export { roomInviteMsg }
+export { scheduleJobMsg }
+export { eventMsg }
+export { keywordsMsg }
+export { robotMsg }
+export default {
   callbackEvent,
   avatarCrop,
   emptyMsg,

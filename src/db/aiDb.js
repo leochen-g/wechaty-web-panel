@@ -1,5 +1,5 @@
-const adb = require('../lib/nedb')()
-
+import nedb from './nedb.js'
+const adb = nedb()
 async function addAibotConfig(info) {
   try {
     let doc = await adb.insert(info)
@@ -8,7 +8,6 @@ async function addAibotConfig(info) {
     console.log('插入数据错误', error)
   }
 }
-
 async function getAibotConfig() {
   try {
     let search = await adb.find({})
@@ -17,7 +16,9 @@ async function getAibotConfig() {
     console.log('查询数据错误', error)
   }
 }
-module.exports = {
+export { addAibotConfig }
+export { getAibotConfig }
+export default {
   addAibotConfig,
   getAibotConfig,
 }

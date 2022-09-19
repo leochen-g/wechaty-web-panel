@@ -1,6 +1,5 @@
-const browserManage = require('./index')
-const drawHelpers = require('./drawHelp')
-
+import browserManage from './index.js'
+import drawHelpers from './drawHelp.js'
 const generateRoomImg = async function (passedOptions) {
   const browser = await browserManage.getBrowser()
   const page = (await browser.pages())[0]
@@ -16,7 +15,6 @@ const generateRoomImg = async function (passedOptions) {
   // const buffer = Buffer.from(base64, 'base64')
   return base64 //返回Base64 编码的图片
 }
-
 const generateAvatar = async function (passedOptions) {
   const browser = await browserManage.getBrowser()
   const page = (await browser.pages())[0]
@@ -31,8 +29,9 @@ const generateAvatar = async function (passedOptions) {
   // await FileBox.fromBase64(base64).toFile('./test.png')
   return base64 //返回Base64 编码的图片
 }
-
-module.exports = {
+export { generateAvatar }
+export { generateRoomImg }
+export default {
   generateAvatar,
   generateRoomImg,
 }

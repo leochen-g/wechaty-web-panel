@@ -1,8 +1,7 @@
-const { setLocalSchedule, delay, cancelAllSchedule } = require('../lib')
-const { allConfig } = require('../common/configDb')
-const { getScheduleList, updateSchedule } = require('../proxy/aibotk')
-const { getEveryDayRoomContent, getEveryDayContent, roomSay } = require('../common')
-
+import { setLocalSchedule, delay, cancelAllSchedule } from '../lib/index.js'
+import { allConfig } from '../db/configDb.js'
+import { getScheduleList, updateSchedule } from '../proxy/aibotk.js'
+import { getEveryDayRoomContent, getEveryDayContent, roomSay } from '../common/index.js'
 /**
  * 群定时任务，针对群
  * @param {*} that bot对象
@@ -23,7 +22,7 @@ async function setRoomTask(that, item, name) {
           for (let reply of item.contents) {
             console.log('群定时任务开始发送，内容：', `${reply.type === 1 ? reply.content : reply.url}`)
             await delay(1000)
-            await roomSay(room, '', reply)
+            await roomSay.call(that, room, '', reply)
           }
         },
         name
@@ -33,7 +32,6 @@ async function setRoomTask(that, item, name) {
     console.log('设置群定时任务失败：', error)
   }
 }
-
 /**
  * 每日新闻资讯，针对群
  * @param {*} that bot对象
@@ -63,7 +61,6 @@ async function setEveryDayRoomSayTask(that, item, name) {
     console.log('设置群资讯定时任务失败：', error)
   }
 }
-
 /**
  * 立即发送资讯
  * @param {*} that bot对象
@@ -86,7 +83,7 @@ async function sendRoomTaskMessage(that, info) {
         for (let reply of item.contents) {
           console.log(`群【${item.roomName}】定时任务开始发送，内容：`, `${reply.type === 1 ? reply.content : reply.url}`)
           await delay(1000)
-          await roomSay(room, '', reply)
+          await roomSay.call(that, room, '', reply)
         }
       }
     }
@@ -94,7 +91,6 @@ async function sendRoomTaskMessage(that, info) {
     console.log('设置群资讯定时任务失败：', error)
   }
 }
-
 /**
  * 每日说定时任务设定，针对好友
  * @param {*} that bot对象
@@ -124,7 +120,6 @@ async function setEveryDayTask(that, item, name) {
     console.log('每日说任务设置失败')
   }
 }
-
 /**
  * 立即发送资讯
  * @param {*} that bot对象
@@ -147,7 +142,6 @@ async function sendContactTaskMessage(that, info) {
     console.log('设置群资讯定时任务失败：', error)
   }
 }
-
 /**
  * 设置定时任务
  * @param {*} that bot 对象
@@ -176,7 +170,6 @@ async function setScheduleTask(that, item, name) {
     console.log('setScheduleTask error', e)
   }
 }
-
 /**
  * 初始化提醒任务
  * @param {}} that
@@ -194,7 +187,6 @@ async function initTimeSchedule(that) {
     console.log('initTimeSchedule error', e)
   }
 }
-
 /**
  * 初始化定时任务
  * @param {}} that
@@ -223,7 +215,6 @@ async function initTaskLocalSchedule(that) {
     console.log('initTaskLocalSchedule error', e)
   }
 }
-
 /**
  * 初始化小助手任务
  * @param {*} that bot对象
@@ -235,8 +226,12 @@ async function initAllSchedule(that) {
   await initTimeSchedule(that)
   await initTaskLocalSchedule(that)
 }
-
-module.exports = {
+export { initTaskLocalSchedule }
+export { initAllSchedule }
+export { initTimeSchedule }
+export { sendRoomTaskMessage }
+export { sendContactTaskMessage }
+export default {
   initTaskLocalSchedule,
   initAllSchedule,
   initTimeSchedule,

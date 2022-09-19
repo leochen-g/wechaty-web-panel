@@ -1,7 +1,7 @@
-const { Friendship } = require('wechaty')
-const { delay } = require('../lib')
-const { allConfig } = require('../common/configDb')
-
+import * as wechaty from 'wechaty'
+import { delay } from '../lib'
+import { allConfig } from '../db/configDb.js'
+const { Friendship } = wechaty
 /**
  * 好友添加
  */
@@ -48,5 +48,4 @@ async function onFriend(friendship) {
     console.log('添加好友出错：', e)
   }
 }
-
-module.exports = onFriend
+export default onFriend

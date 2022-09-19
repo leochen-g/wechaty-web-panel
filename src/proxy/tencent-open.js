@@ -1,7 +1,6 @@
-const jwt = require('jsonwebtoken')
-const { allConfig } = require('../common/configDb')
-const axios = require('axios')
-
+import jwt from 'jsonwebtoken'
+import { allConfig } from '../db/configDb.js'
+import * as axios from 'axios'
 async function getSignature(id, encodingAESKey) {
   const token = jwt.sign(
     {
@@ -12,7 +11,6 @@ async function getSignature(id, encodingAESKey) {
   )
   return token
 }
-
 function checkType(answer) {
   var i = ''
   i = '[object Object]' === Object.prototype.toString.call(answer) ? JSON.stringify(answer) : answer
@@ -42,7 +40,6 @@ function checkType(answer) {
     s
   )
 }
-
 /**
  * 判断是不是多个回复
  * @param answer
@@ -51,7 +48,6 @@ function checkType(answer) {
 function isMultiple(answer) {
   return /{\s*"multimsg"\s*:/.test(answer)
 }
-
 /**
  * 对多重回复的处理
  * @param answer
@@ -67,7 +63,6 @@ function getMultiList(answer) {
   })
   return res
 }
-
 /**
  * 格式化开放平台回复内容
  * @param answer
@@ -154,7 +149,6 @@ function getFormatReply(answer, options = [], userInfo, puppetType) {
   }
   return replys
 }
-
 async function getTencentOpenReply({ msg, id, userInfo }) {
   const config = await allConfig()
   if (!config.tencentAESKey || !config.tencentToken) {
@@ -222,7 +216,7 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
     console.log('error', e)
   }
 }
-
-module.exports = {
+export { getTencentOpenReply }
+export default {
   getTencentOpenReply,
 }

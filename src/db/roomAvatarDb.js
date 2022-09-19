@@ -1,5 +1,5 @@
-const rdb = require('../lib/nedb.js')()
-
+import nedb from './nedb.js'
+const rdb = nedb()
 async function addRoom(info) {
   try {
     let doc = await rdb.insert(info)
@@ -8,7 +8,6 @@ async function addRoom(info) {
     console.log('插入数据错误', error)
   }
 }
-
 async function getRoom(name) {
   try {
     let search = await rdb.find({ name })
@@ -17,8 +16,9 @@ async function getRoom(name) {
     console.log('查询数据错误', error)
   }
 }
-
-module.exports = {
+export { addRoom }
+export { getRoom }
+export default {
   addRoom,
   getRoom,
 }

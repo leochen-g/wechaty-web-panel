@@ -1,10 +1,9 @@
-const { allConfig } = require('../common/configDb')
-const msgFilter = require('./msg-filters')
+import { allConfig } from '../db/configDb.js'
+import msgFilter from './msg-filters.js'
 const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '微信团队', 'recommendation message'] // 微信官方账户，针对此账户不做任何回复
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
 const REMINDKEY = '提醒'
 const NEWADDFRIEND = '你已添加'
-
 async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, id, room }) {
   try {
     let msgArr = []
@@ -23,7 +22,6 @@ async function getMsgReply(resArray, { that, msg, name, contact, config, avatar,
     return []
   }
 }
-
 /**
  * 微信好友文本消息事件过滤
  *
@@ -57,7 +55,6 @@ async function filterFriendMsg(that, contact, msg) {
     console.log('filterFriendMsg error', e)
   }
 }
-
 /**
  * 微信群文本消息事件监听
  * @param {*} msg 群消息内容
@@ -87,8 +84,9 @@ async function filterRoomMsg(that, msg, name, id, avatar, room) {
     console.log('filterRoomMsg error', e)
   }
 }
-
-module.exports = {
+export { filterFriendMsg }
+export { filterRoomMsg }
+export default {
   filterFriendMsg,
   filterRoomMsg,
 }

@@ -1,8 +1,7 @@
-const { req, txReq } = require('./superagent')
-const { EMOHOST, TULING, ONE, MEINV } = require('./config')
-const { randomRange, MD5 } = require('../lib/index')
-const { allConfig } = require('../common/configDb')
-
+import { req, txReq } from './superagent.js'
+import { EMOHOST, TULING, ONE, MEINV } from './config.js'
+import { randomRange, MD5 } from '../lib/index.js'
+import { allConfig } from '../db/configDb.js'
 /**
  * 天行图灵聊天机器人
  * @param {*} word 发送内容
@@ -28,7 +27,6 @@ async function getResByTXTL(word, id) {
     console.log('天行图灵聊天机器人请求失败：', error)
   }
 }
-
 /**
  * 天行聊天机器人
  * @param {*} word 内容
@@ -66,7 +64,6 @@ async function getResByTX(word, id) {
     console.log('天行聊天机器人请求失败：', error)
   }
 }
-
 /**
  * 图灵智能聊天机器人
  * @param {*} word 内容
@@ -101,7 +98,6 @@ async function getResByTL(word, id) {
     console.log('图灵聊天机器人请求失败：', error)
   }
 }
-
 /**
  * 获取垃圾分类结果
  * @param {String} word 垃圾名称
@@ -135,7 +131,6 @@ async function getRubbishType(word) {
     console.log('垃圾分类请求失败：', error)
   }
 }
-
 /**
  * 土味情话获取
  */
@@ -158,7 +153,6 @@ async function getSweetWord() {
     console.log('获取土情话接口失败', err)
   }
 }
-
 /**
  * 获取天行天气
  */
@@ -184,7 +178,6 @@ async function getTXweather(city) {
     console.log('获取天气接口失败', err)
   }
 }
-
 /**
  * 获取每日新闻内容
  * @param {*} id 新闻频道对应的ID
@@ -211,7 +204,6 @@ async function getNews(id) {
     console.log('获取天行新闻失败', error)
   }
 }
-
 /**
  * 获取名人名言
  */
@@ -232,7 +224,6 @@ async function getMingYan() {
     console.log('获取天行名人名言失败', error)
   }
 }
-
 /**
  * 获取星座运势
  * @param {string} satro 星座
@@ -257,7 +248,6 @@ async function getStar(astro) {
     console.log('获取天行星座运势失败', error)
   }
 }
-
 /**
  * 获取姓氏起源
  * @param {string} 姓
@@ -279,7 +269,6 @@ async function getXing(name) {
     console.log('获取天行姓氏起源失败', error)
   }
 }
-
 /**
  * 获取顺口溜
  */
@@ -300,7 +289,6 @@ async function getSkl() {
     console.log('获取天行顺口溜失败', error)
   }
 }
-
 /**
  * 获取老黄历
  */
@@ -321,7 +309,6 @@ async function getLunar(date) {
     console.log('获取天行老黄历失败', error)
   }
 }
-
 /**
  * 天行神回复
  */
@@ -342,7 +329,6 @@ async function getGoldReply() {
     console.log('获取天行神回复失败', error)
   }
 }
-
 /**
  * 天行歇后语
  */
@@ -363,7 +349,6 @@ async function getXhy() {
     console.log('获取天行歇后语失败', error)
   }
 }
-
 /**
  * 天行绕口令
  */
@@ -384,7 +369,6 @@ async function getRkl() {
     console.log('获取天行绕口令失败', error)
   }
 }
-
 /**
  * 天行短连接
  */
@@ -405,7 +389,6 @@ async function getShortUrl(url) {
     console.log('获取天行短连接失败', error)
   }
 }
-
 /**
  * 获取自定义头像
  * @param {*} base
@@ -430,7 +413,6 @@ async function getAvatar(base, type) {
     console.log('获取自定义头像失败', e)
   }
 }
-
 /**
  * 获取表情包
  * @param {*} msg
@@ -467,7 +449,6 @@ async function getEmo(msg) {
     console.log('获取表情包失败', e)
   }
 }
-
 /**
  * 获取美女图片
  */
@@ -536,7 +517,27 @@ async function getCname() {
     console.log('获取天行短连接失败', error)
   }
 }
-module.exports = {
+export { getResByTXTL }
+export { getResByTX }
+export { getResByTL }
+export { getTXweather }
+export { getRubbishType }
+export { getSweetWord }
+export { getNews }
+export { getMingYan }
+export { getStar }
+export { getXing }
+export { getSkl }
+export { getLunar }
+export { getGoldReply }
+export { getXhy }
+export { getRkl }
+export { getAvatar }
+export { getEmo }
+export { getMeiNv }
+export { getNcov }
+export { getCname }
+export default {
   getResByTXTL,
   getResByTX,
   getResByTL,
