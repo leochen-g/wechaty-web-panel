@@ -20,7 +20,7 @@ if (process.env['AIBOTK_SECRET']) {
   console.log('使用环境变量中的 aibotkSecret')
   envSecret = process.env['AIBOTK_SECRET']
 }
-export default (function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
+function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
   const initConfig = {
     apiKey: envKey || config.apiKey,
     apiSecret: envSecret || config.apiSecret,
@@ -44,4 +44,7 @@ export default (function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
     if (!ignoreEvents.includes('heartbeat')) bot.on('heartbeat', onHeartbeat)
     if (!ignoreEvents.includes('error')) bot.on('error', onError)
   }
-})
+}
+export {
+  WechatyWebPanelPlugin
+}
