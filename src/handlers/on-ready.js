@@ -1,6 +1,6 @@
 import common from '../common'
-import { delay } from '../lib'
-import { setQrCode, sendHeartBeat, asyncData } from '../proxy/aibotk.js'
+import { delay } from '../lib/index.js'
+import {  sendHeartBeat } from '../proxy/aibotk.js'
 import { getUser } from '../db/userDb.js'
 /**
  * 准备好的事件

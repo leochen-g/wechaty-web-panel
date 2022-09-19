@@ -1,5 +1,5 @@
 import Qrterminal from 'qrcode-terminal'
-import { throttle } from '../lib'
+import { throttle } from '../lib/index.js'
 import { setQrCode } from '../proxy/aibotk.js'
 /**
  * 扫描登录，显示二维码

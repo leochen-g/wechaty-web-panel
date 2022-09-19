@@ -1,5 +1,5 @@
-// export const AIBOTK = 'https://api-bot.aibotk.com/open/v1/api'
-export const AIBOTK = 'http://0.0.0.0:7002/open/v1/api'
+export const AIBOTK = 'https://api-bot.aibotk.com/open/v1/api'
+// export const AIBOTK = 'http://0.0.0.0:7002/open/v1/api'
 export const ONE = 'http://wufazhuce.com/'
 export const TULING = 'http://openapi.tuling123.com/openapi/api/v2'
 export const MOJI = 'https://tianqi.moji.com/weather/china/'

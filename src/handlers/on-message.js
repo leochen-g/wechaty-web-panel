@@ -1,6 +1,6 @@
-import { contactSay, roomSay } from '../common'
+import { contactSay, roomSay } from '../common/index.js'
 import { getContactTextReply, getRoomTextReply } from '../common/reply.js'
-import { delay } from '../lib'
+import { delay } from '../lib/index.js'
 import { dispatchAsync } from '../service/room-async-service.js'
 import { allConfig } from '../db/configDb.js'
 import { getAibotConfig } from '../db/aiDb.js'

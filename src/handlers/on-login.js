@@ -1,7 +1,7 @@
-import { delay, MD5 } from '../lib'
+import { delay, MD5 } from '../lib/index.js'
 import { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
 import { addUser } from '../db/userDb.js'
-import { initAllSchedule } from '../task'
+import { initAllSchedule } from '../task/index.js'
 import { initMqtt } from '../proxy/mqtt.js'
 import { allConfig } from '../db/configDb.js'
 /**

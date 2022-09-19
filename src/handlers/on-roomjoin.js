@@ -1,4 +1,4 @@
-import { addRoomWelcomeSay } from '../common'
+import { addRoomWelcomeSay } from '../common/index.js'
 import { allConfig } from '../db/configDb.js'
 /**
  * 判断配置中是否存在此群

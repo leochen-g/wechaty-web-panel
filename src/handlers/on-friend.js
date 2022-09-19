@@ -1,7 +1,5 @@
-import * as wechaty from 'wechaty'
-import { delay } from '../lib'
+import { delay } from '../lib/index.js'
 import { allConfig } from '../db/configDb.js'
-const { Friendship } = wechaty
 /**
  * 好友添加
  */
