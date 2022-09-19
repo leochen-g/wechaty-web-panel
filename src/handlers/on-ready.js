@@ -1,4 +1,4 @@
-import common from '../common'
+import common from '../common/index.js'
 import { delay } from '../lib/index.js'
 import {  sendHeartBeat } from '../proxy/aibotk.js'
 import { getUser } from '../db/userDb.js'
