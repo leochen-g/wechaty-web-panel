@@ -25,6 +25,9 @@ jobs:
       - name: Set Publish Config
         run: ./scripts/package-publish-config-tag.sh
 
+      - name: Build Dist
+        run: npm run dist
+
       - name: Check Branch
         id: check-branch
         run: |
