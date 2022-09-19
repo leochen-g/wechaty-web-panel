@@ -1,9 +1,9 @@
-import { delay, MD5 } from '../lib/index.js'
+import { delay, MD5 } from '../lib'
 import { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
-import { addUser } from '../common/userDb.js'
-import { initAllSchedule } from '../task/index.js'
+import { addUser } from '../db/userDb.js'
+import { initAllSchedule } from '../task'
 import { initMqtt } from '../proxy/mqtt.js'
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户

@@ -1,6 +1,5 @@
-import path from 'path'
-import { addRoomWelcomeSay } from '../common/index.js'
-import { allConfig } from '../common/configDb.js'
+import { addRoomWelcomeSay } from '../common'
+import { allConfig } from '../db/configDb.js'
 /**
  * 判断配置中是否存在此群
  * @param {*} arr 配置的群组

@@ -1,7 +1,7 @@
 import Crypto from 'crypto'
 import * as schedule from 'node-schedule'
 import fs from 'fs'
-import { addRoom, getRoom } from '../common/roomAvatarDb.js'
+import { addRoom, getRoom } from '../db/roomAvatarDb.js'
 /**
  * 设置定时器
  * @param {*} date 日期
@@ -47,15 +47,7 @@ function cancelAllSchedule(type) {
     }
   }
 }
-/**
- * 获取所有定时任务的job名
- *
- */
-function getAllSchedule() {
-  for (let i in schedule.scheduledJobs) {
-    console.log(i)
-  }
-}
+
 /**
  * 延时函数
  * @param {*} ms 毫秒
@@ -63,26 +55,7 @@ function getAllSchedule() {
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
-/**
- * 读取文件
- */
-const loadFile = {
-  data: null,
-  mtime: '',
-  fetch(file) {
-    try {
-      let mtime = fs.statSync(file).mtime
-      if (!this.data || mtime - this.mtime !== 0) {
-        console.log('Reload task file: ' + mtime)
-        this.data = JSON.parse(fs.readFileSync(file))
-        this.mtime = +mtime
-      }
-    } catch (e) {
-      console.log(e)
-    }
-    return this.data
-  },
-}
+
 /**
  * 获取周几
  * @param {*} date 日期
@@ -605,7 +578,6 @@ export { throttle }
 export { formatContacts }
 export { filterContacts }
 export { cancelAllSchedule }
-export { getAllSchedule }
 export { groupArray }
 export { getRoomAvatarList }
 export { getRoomAvatar }
@@ -632,7 +604,6 @@ export default {
   formatContacts,
   filterContacts,
   cancelAllSchedule,
-  getAllSchedule,
   groupArray,
   getRoomAvatarList,
   getRoomAvatar,

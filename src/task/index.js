@@ -1,5 +1,5 @@
 import { setLocalSchedule, delay, cancelAllSchedule } from '../lib/index.js'
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 import { getScheduleList, updateSchedule } from '../proxy/aibotk.js'
 import { getEveryDayRoomContent, getEveryDayContent, roomSay } from '../common/index.js'
 /**
@@ -22,7 +22,7 @@ async function setRoomTask(that, item, name) {
           for (let reply of item.contents) {
             console.log('群定时任务开始发送，内容：', `${reply.type === 1 ? reply.content : reply.url}`)
             await delay(1000)
-            await roomSay(room, '', reply)
+            await roomSay.call(that, room, '', reply)
           }
         },
         name
@@ -83,7 +83,7 @@ async function sendRoomTaskMessage(that, info) {
         for (let reply of item.contents) {
           console.log(`群【${item.roomName}】定时任务开始发送，内容：`, `${reply.type === 1 ? reply.content : reply.url}`)
           await delay(1000)
-          await roomSay(room, '', reply)
+          await roomSay.call(that, room, '', reply)
         }
       }
     }

@@ -1,7 +1,7 @@
 import { req, txReq } from './superagent.js'
 import { EMOHOST, TULING, ONE, MEINV } from './config.js'
 import { randomRange, MD5 } from '../lib/index.js'
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 /**
  * 天行图灵聊天机器人
  * @param {*} word 发送内容

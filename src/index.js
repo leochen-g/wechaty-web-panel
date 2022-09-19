@@ -1,4 +1,4 @@
-import { addAibotConfig } from './common/aiDb.js'
+import { addAibotConfig } from './db/aiDb.js'
 import onScan from './handlers/on-scan.js'
 import onLogin from './handlers/on-login.js'
 import onLogout from './handlers/on-logout.js'

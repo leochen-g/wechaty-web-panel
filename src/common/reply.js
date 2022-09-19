@@ -2,7 +2,7 @@ import service from '../service/msg-filter-service.js'
 /**
  * 获取私聊返回内容
  */
-async function getContactTextReply(that, contact, msg) {
+export async function getContactTextReply(that, contact, msg) {
   let result = await service.filterFriendMsg(that, contact, msg)
   return result
 }
@@ -12,12 +12,11 @@ async function getContactTextReply(that, contact, msg) {
  * @param {*} name 发消息者昵称
  * @param {*} id 发消息者id
  */
-async function getRoomTextReply(that, content, name, id, avatar, room) {
+export async function getRoomTextReply(that, content, name, id, avatar, room) {
   let result = await service.filterRoomMsg(that, content, name, id, avatar, room)
   return result
 }
-export { getContactTextReply }
-export { getRoomTextReply }
+
 export default {
   getContactTextReply,
   getRoomTextReply,

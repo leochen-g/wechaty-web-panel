@@ -1,11 +1,9 @@
 import { getNews, getTXweather, getSweetWord } from '../proxy/api.js'
 import { sendFriend, sendRoom, asyncData, getOne, getMaterial } from '../proxy/aibotk.js'
-import { getUser } from './userDb.js'
+import { getUser } from '../db/userDb.js'
 import { formatDate, getDay, MD5, groupArray, delay } from '../lib/index.js'
-import * as wechaty from 'wechaty'
 import { FileBox } from 'file-box'
-import { allConfig } from './configDb.js'
-const { UrlLink, MiniProgram } = wechaty
+import { allConfig } from '../db/configDb.js'
 /**
  * 获取每日新闻内容
  * @param {*} sortId 新闻资讯分类Id
@@ -176,7 +174,7 @@ async function roomSay(room, contact, msg) {
       await delay(500)
       await room.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
-      let url = new UrlLink({
+      let url = new this.UrlLink({
         description: msg.description,
         thumbnailUrl: msg.thumbUrl,
         title: msg.title,
@@ -185,7 +183,7 @@ async function roomSay(room, contact, msg) {
       console.log(url)
       await room.say(url)
     } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey) {
-      let miniProgram = new MiniProgram({
+      let miniProgram = new this.MiniProgram({
         appid: msg.appid,
         title: msg.title,
         pagePath: msg.pagePath,
@@ -233,7 +231,7 @@ async function contactSay(contact, msg, isRoom = false) {
       let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
       await contact.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description && msg.thumbUrl) {
-      let url = new UrlLink({
+      let url = new this.UrlLink({
         description: msg.description,
         thumbnailUrl: msg.thumbUrl,
         title: msg.title,
@@ -241,7 +239,7 @@ async function contactSay(contact, msg, isRoom = false) {
       })
       await contact.say(url)
     } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey) {
-      let miniProgram = new MiniProgram({
+      let miniProgram = new this.MiniProgram({
         appid: msg.appid,
         title: msg.title,
         pagePath: msg.pagePath,
@@ -266,7 +264,7 @@ async function addRoom(that, contact, roomName, replys) {
     try {
       for (const item of replys) {
         await delay(2000)
-        await contactSay(contact, item)
+        await contactSay.call(that, contact, item)
       }
       await room.add(contact)
     } catch (e) {

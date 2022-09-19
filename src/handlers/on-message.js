@@ -1,9 +1,15 @@
-import { contactSay, roomSay } from '../common/index.js'
+import { contactSay, roomSay } from '../common'
 import { getContactTextReply, getRoomTextReply } from '../common/reply.js'
-import { delay } from '../lib/index.js'
+import { delay } from '../lib'
 import { dispatchAsync } from '../service/room-async-service.js'
-import { allConfig } from '../common/configDb.js'
-import { getAibotConfig } from '../common/aiDb.js'
+import { allConfig } from '../db/configDb.js'
+import { getAibotConfig } from '../db/aiDb.js'
+import { addRoomRecord } from '../db/roomDb.js'
+const ignoreRecord = [
+  { type: "include", word: "加入了群聊" },
+  { type: "include", word: "与群里其他人都不是朋友关系" },
+  { type: "include", word: "收到一条暂不支持的消息类型" },
+]
 /**
  * 检测是否属于忽略的消息
  * @param msg 用户信息
@@ -43,7 +49,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
             replys = await getContactTextReply(that, contact, content.trim())
             for (let reply of replys) {
               await delay(1000)
-              await contactSay(contact, reply)
+              await contactSay.call(that, contact, reply)
             }
           }
         } else {
@@ -80,6 +86,8 @@ async function dispatchFriendFilterByMsgType(that, msg) {
  */
 async function dispatchRoomFilterByMsgType(that, room, msg) {
   const aibotConfig = await getAibotConfig()
+  const config = await allConfig()
+  const { role } = config.userInfo
   try {
     const contact = msg.talker() // 发消息人
     const contactName = contact.name()
@@ -103,8 +111,14 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           replys = await getRoomTextReply(that, content, contactName, contactId, contactAvatar, room)
           for (let reply of replys) {
             await delay(1000)
-            await roomSay(room, contact, reply)
+            await roomSay.call(that, room, contact, reply)
           }
+        }
+        const cloudRoom = config.cloudRoom
+        if (role === 'vip' && cloudRoom.includes(roomName) && !checkIgnore(content, ignoreRecord)) {
+          const regex = /(<([^>]+)>)/ig
+          content = content.replace(regex, "");
+          addRoomRecord({ roomName, roomId: room.id, content, contact: contactName, wxid: contactId, time: new Date().getTime() })
         }
         break
       case that.Message.Type.Emoticon:

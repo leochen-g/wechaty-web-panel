@@ -1,4 +1,4 @@
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 import msgFilter from './msg-filters.js'
 const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '微信团队', 'recommendation message'] // 微信官方账户，针对此账户不做任何回复
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
@@ -72,7 +72,7 @@ async function filterRoomMsg(that, msg, name, id, avatar, room) {
     const config = await allConfig() // 获取配置信息
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
-      { bool: config.callbackEvents && config.callbackEvents.length > 0, method: 'callbackEvent' },
+      { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },

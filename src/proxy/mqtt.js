@@ -1,5 +1,5 @@
 import * as mqtt from 'mqtt'
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 import { contactSay, roomSay } from '../common/index.js'
 import { getConfig, getMqttConfig } from './aibotk.js'
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
@@ -48,7 +48,7 @@ async function initMqtt(that) {
                 console.log(`查找不到群：${content.roomName}，请检查群名是否正确`)
                 return
               } else {
-                await roomSay(room, '', content.message)
+                await roomSay.call(that,room, '', content.message)
               }
             } else if (content.target === 'Contact') {
               console.log(`收到联系人：${content.alias || content.name}发送消息请求： ${content.message.content || content.message.url}`)
@@ -57,7 +57,7 @@ async function initMqtt(that) {
                 console.log(`查找不到联系人：${content.name || content.alias}，请检查联系人名称是否正确`)
                 return
               } else {
-                await contactSay(contact, content.message)
+                await contactSay.call(that, contact, content.message)
               }
             }
           } else if (topic === `aibotk/${userId}/event`) {

@@ -1,4 +1,4 @@
-import nedb from '../lib/nedb.js'
+import nedb from './nedb.js'
 const cdb = nedb()
 /**
  * 添加配置文件

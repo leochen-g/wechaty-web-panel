@@ -1,4 +1,4 @@
-import nedb from '../lib/nedb.js'
+import nedb from './nedb.js'
 const rdb = nedb()
 async function addRoom(info) {
   try {

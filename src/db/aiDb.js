@@ -1,4 +1,4 @@
-import nedb from '../lib/nedb.js'
+import nedb from './nedb.js'
 const adb = nedb()
 async function addAibotConfig(info) {
   try {

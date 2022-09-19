@@ -1,4 +1,6 @@
 import Mustache from 'mustache'
+import * as PUPPET from 'wechaty-puppet'
+
 function roomTalker(options) {
   if (!options) {
     return () => undefined
@@ -195,7 +197,7 @@ const unidirectionalMapper = async (message, one) => {
          * then we add a sender information for the destination rooms.
          */
         if (topic === one) {
-          const type = Message[message.type()]
+          const type = PUPPET.types.Message[message.type()]
           messageList.unshift(`${prefix}: ${type}`)
         }
         break

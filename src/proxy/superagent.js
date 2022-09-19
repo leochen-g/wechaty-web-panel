@@ -1,8 +1,8 @@
 import superagent from 'superagent'
 import { getFormatQuery } from '../lib/index.js'
-import { getAibotConfig } from '../common/aiDb.js'
+import { getAibotConfig } from '../db/aiDb.js'
 import { AIBOTK, TXHOST } from './config.js'
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 import axios from 'axios'
 const service = axios.create({
   // 定义统一的请求头部

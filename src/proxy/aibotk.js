@@ -1,7 +1,6 @@
 import { aiBotReq, req } from './superagent.js'
-import { updateConfig } from '../common/configDb.js'
-import { readFile } from 'fs/promises'
-const packageJson = JSON.parse(await readFile(new URL('../../package.json')))
+import { updateConfig } from '../db/configDb.js'
+import { packageJson } from '../package-json.js'
 /**
  * 获取美女图片
  */
@@ -21,6 +20,64 @@ async function getMeiNv() {
   } catch (e) {
     console.log('获取美女图片失败', e)
     return 'https://tva2.sinaimg.cn/large/0072Vf1pgy1foxkcsx9rmj31hc0u0h9k.jpg'
+  }
+}
+
+
+/**
+ * 获取配置词云的所有群名
+ */
+export async function getWordCloudRoom() {
+  try {
+    let option = {
+      method: 'get',
+      url: '/wordcloudroom',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    const roomNames = content.data.map(item=> item.roomName)
+    return roomNames  || []
+  } catch (e) {
+    console.log('群词云配置拉取失败', e)
+    return []
+  }
+}
+/**
+ * 获取群合影配置
+ */
+export async function getWordCloudConfig(roomName) {
+  try {
+    let option = {
+      method: 'get',
+      url: '/roomCloud',
+      params: { name: roomName },
+    }
+    let content = await aiBotReq(option)
+    return content.data || ''
+  } catch (e) {
+    console.log('群词云配置拉取失败', e)
+  }
+}
+
+/**
+ * 获取词云图片
+ */
+export async function getWordCloud(wordcontent, background, border) {
+  try {
+    let option = {
+      method: 'POST',
+      url: '/wordcloud',
+      params: {
+        content: wordcontent,
+        background,
+        border
+      },
+    }
+    let content = await aiBotReq(option)
+    let pics = decodeURIComponent(content.data.img)
+    return pics
+  } catch (e) {
+    console.log('获取词云图片失败', e)
   }
 }
 /**
@@ -54,7 +111,8 @@ async function getConfig() {
     }
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
-    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', ...config })
+    const cloudRoom = await getWordCloudRoom()
+    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', ...config, cloudRoom })
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)

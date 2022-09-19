@@ -1,5 +1,5 @@
 import * as tencentcloud from 'tencentcloud-sdk-nodejs'
-import { allConfig } from '../common/configDb.js'
+import { allConfig } from '../db/configDb.js'
 const NlpClient = tencentcloud.nlp.v20190408.Client
 let client = ''
 async function initClient() {
