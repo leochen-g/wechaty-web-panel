@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { allConfig } from '../db/configDb.js'
-import * as axios from 'axios'
+import axios from 'axios'
 async function getSignature(id, encodingAESKey) {
   const token = jwt.sign(
     {
