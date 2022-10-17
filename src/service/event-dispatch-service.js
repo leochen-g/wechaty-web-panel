@@ -2,7 +2,7 @@ import api from '../proxy/api.js'
 import { getConfig, getRoomPhotoConfig, getMeiNv, getWordCloudConfig, getWordCloud } from '../proxy/aibotk.js'
 import { getConstellation, msgArr, getRoomAvatar, getNewsType } from '../lib/index.js'
 import { generateAvatar, generateRoomImg } from '../puppeteer-paint/lanuch.js'
-import { initTaskLocalSchedule } from '../task/index.js'
+import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { chatTencent } from '../proxy/tencent.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
@@ -162,6 +162,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       case 'updateConfig':
         await getConfig()
         await initTaskLocalSchedule(that)
+        await initTimeSchedule(that)
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:

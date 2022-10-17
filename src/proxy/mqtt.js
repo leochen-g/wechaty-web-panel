@@ -5,6 +5,7 @@ import { getConfig, getMqttConfig } from './aibotk.js'
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
 import { sendRoomTaskMessage, sendContactTaskMessage } from '../task/index.js'
 import { randomRange } from '../lib/index.js'
+let mqttclient = null
 async function initMqtt(that) {
   try {
     await getConfig() // 获取配置文件
@@ -13,13 +14,15 @@ async function initMqtt(that) {
     if (role === 'vip') {
       const config = await getMqttConfig()
       const { host, port, username, password, clientId } = config
-      let mqttclient = host
-        ? mqtt.connect(`${host}:${port}`, {
+      if(!mqttclient) {
+        mqttclient = host
+          ? mqtt.connect(`${host}:${port}`, {
             username: username,
             password: password,
             clientId: clientId + randomRange(1, 10000),
           })
-        : null
+          : null
+      }
       if (mqttclient) {
         mqttclient.on('connect', function () {
           console.debug('connect to Wechaty mqtt----------')
@@ -81,6 +84,12 @@ async function initMqtt(that) {
     }
   } catch (e) {
     console.log('mqtt 创建链接失败', e)
+  }
+}
+export function closeMqtt() {
+  if(mqttclient && mqttclient.connected) {
+    mqttclient.end()
+    mqttclient = null
   }
 }
 export { initMqtt }
