@@ -5,6 +5,8 @@
 
 Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面板
 
+本项目为面板源码，如需可直接运行的项目，请直接拉取 [https://github.com/leochen-g/wechat-assistant-pro](https://github.com/leochen-g/wechat-assistant-pro) 即可
+
 ## 面板主要功能
 
 - [x] 微信每日说,定时给女朋友发送每日天气提醒，以及每日一句
