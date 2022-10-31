@@ -171,9 +171,7 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
           const replys = []
           multiList.forEach((item) => {
             item = item.replace(/<\/?.+?\/?>/g, '')
-            console.log('item', item)
             const reply = getFormatReply(item, resData.options || [], userInfo, config.puppetType)
-            console.log('reply', reply)
             replys.push(...reply)
           })
           return replys
@@ -184,13 +182,14 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
       } else if (resData.answer_type === 'music') {
         // web 端协议以文字和图片的形式发送
         if (config.puppetType === 'wechaty-puppet-wechat') {
-          const music = resData.msg[0]
-          const musicContent = `【歌名】：《${music && music.song_name}》\n【歌手】：${music && music.singer_name}\n【听歌地址】：${music && music.music_url}`
-          const musicPic = music && music.pic_url
+          const res = JSON.parse(resData.answer)
+          const music = res.news.articles[0]
+          const musicContent = `【歌名】：《${music && music.title}》\n【听歌地址】：${music && music.url}`
+          const musicPic = music && music.picurl
           return [
             {
               type: 1,
-              content: resData.answer + '\n\n' + musicContent,
+              content: musicContent,
             },
             {
               type: 2,
@@ -201,11 +200,7 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
           // 其他协议可以发链接的用H5卡片发送
           const music = resData.msg[0]
           return [
-            {
-              type: 1,
-              content: resData.answer,
-            },
-            { type: 4, url: music.music_url, title: music.song_name, thumbnailUrl: music.pic_url, description: music.singer_name },
+            { type: 4, url: music.url, title: music.title, thumbnailUrl: music.picurl, description: music.description },
           ]
         }
       }
