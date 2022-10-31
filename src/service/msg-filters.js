@@ -4,7 +4,8 @@ import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.j
 import { generateAvatar } from '../puppeteer-paint/lanuch.js'
 import { addRoom } from '../common/index.js'
 import { service, callbackAibotApi } from '../proxy/superagent.js'
-function emptyMsg() {
+function emptyMsg({ room, isMention }) {
+  if(room && !isMention) return []
   let msgArr = [] // 返回的消息列表
   let obj = { type: 1, content: '我在呢', url: '' } // 消息主体
   msgArr.push(obj)
