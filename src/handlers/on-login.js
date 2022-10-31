@@ -24,10 +24,14 @@ async function onLogin(user) {
     }
     await addUser(userInfo) // 全局存储登录用户信息
     const file = await user.avatar()
-    const base = await file.toBase64()
-    const avatarUrl = await putqn(base, userId)
-    await sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
-    await delay(3000)
+    if(file) {
+      const base = await file.toBase64()
+      const avatarUrl = await putqn(base, userId)
+      await sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
+      await delay(1000)
+    } else {
+      console.log('头像未获取到，不影响项目正常使用')
+    }
     await initAllSchedule(this) // 初始化任务
     await initMqtt(this) // 初始化mqtt任务
   } catch (e) {

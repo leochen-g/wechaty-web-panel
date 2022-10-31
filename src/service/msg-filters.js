@@ -128,11 +128,15 @@ async function getEventReply(that, event, msg, name, id, avatar, room) {
  * @param room
  * @returns Promise
  */
-async function callbackEvent({ that, msg, name, id, config, room }) {
+async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
   try {
     for (let item of config.callBackEvents) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
+          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
+          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+            return []
+          }
           msg = msg.trim()
           const data = {
             uid: id,
@@ -159,11 +163,15 @@ async function callbackEvent({ that, msg, name, id, config, room }) {
     return []
   }
 }
-async function eventMsg({ that, msg, name, id, avatar, config, room }) {
+async function eventMsg({ that, msg, name, id, avatar, config, room, isMention }) {
   try {
     for (let item of config.eventKeywords) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
+          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
+          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+            return []
+          }
           msg = msg.replace(key, '')
           let res = await getEventReply(that, item.event, msg, name, id, avatar, room)
           return res
@@ -180,16 +188,24 @@ async function eventMsg({ that, msg, name, id, avatar, config, room }) {
  * 关键词回复
  * @returns {Promise<*>}
  */
-async function keywordsMsg({ msg, config }) {
+async function keywordsMsg({ msg, config, room, isMention }) {
   try {
     if (config.replyKeywords && config.replyKeywords.length > 0) {
       for (let item of config.replyKeywords) {
         if (item.reg === 2 && item.keywords.includes(msg)) {
+          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
+          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+            return []
+          }
           console.log(`精确匹配到关键词${msg},正在回复用户`)
           return item.replys
         } else if (item.reg === 1) {
           for (let key of item.keywords) {
             if (msg.includes(key)) {
+              // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
+              if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+                return []
+              }
               console.log(`模糊匹配到关键词${msg},正在回复用户`)
               return item.replys
             }
@@ -204,20 +220,25 @@ async function keywordsMsg({ msg, config }) {
     return []
   }
 }
-async function robotMsg({ msg, name, id, config }) {
-  try {
-    let msgArr = [] // 返回的消息列表
-    if (config.autoReply) {
-      console.log('开启了机器人自动回复功能')
-      msgArr = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
-    } else {
-      console.log('没有开启机器人自动回复功能')
-      msgArr = [{ type: 1, content: '', url: '' }]
-    }
-    return msgArr
-  } catch (e) {
-    console.log('robotMsg error:', e)
+async function robotMsg({ msg, name, id, config, isMention, room }) {
+  // 如果群里没有提及不开启机器人聊天
+  if(room && !isMention) {
     return []
+  } else {
+    try {
+      let msgArr = [] // 返回的消息列表
+      if (config.autoReply) {
+        console.log('开启了机器人自动回复功能')
+        msgArr = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
+      } else {
+        console.log('没有开启机器人自动回复功能')
+        msgArr = [{ type: 1, content: '', url: '' }]
+      }
+      return msgArr
+    } catch (e) {
+      console.log('robotMsg error:', e)
+      return []
+    }
   }
 }
 /**

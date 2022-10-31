@@ -12,8 +12,8 @@ export async function getContactTextReply(that, contact, msg) {
  * @param {*} name 发消息者昵称
  * @param {*} id 发消息者id
  */
-export async function getRoomTextReply(that, content, name, id, avatar, room) {
-  let result = await service.filterRoomMsg(that, content, name, id, avatar, room)
+export async function getRoomTextReply({ that, content, name, id, avatar, room, isMention}) {
+  let result = await service.filterRoomMsg({ that, msg: content, name, id, avatar, room, isMention })
   return result
 }
 

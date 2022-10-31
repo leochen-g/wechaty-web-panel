@@ -7,7 +7,7 @@ import { getUser } from '../db/userDb.js'
  */
 async function onReady() {
   try {
-    const userInfo = await getUser()
+    await getUser()
     console.log(`所有数据准备完毕`)
     await sendHeartBeat('live')
     await common.updateContactInfo(this)

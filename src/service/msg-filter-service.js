@@ -4,13 +4,13 @@ const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '�
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
 const REMINDKEY = '提醒'
 const NEWADDFRIEND = '你已添加'
-async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, id, room }) {
+async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, id, room, isMention }) {
   try {
     let msgArr = []
     for (let i = 0; i < resArray.length; i++) {
       const item = resArray[i]
       if (item.bool) {
-        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room })) || []
+        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room, isMention })) || []
       }
       if (msgArr.length > 0) {
         return msgArr
@@ -33,7 +33,6 @@ async function getMsgReply(resArray, { that, msg, name, contact, config, avatar,
 async function filterFriendMsg(that, contact, msg) {
   try {
     const config = await allConfig() // 获取配置信息
-    console.log('callback', config.callBackEvents)
     const name = contact.name()
     const id = contact.id
     const avatar = await contact.avatar()
@@ -67,7 +66,7 @@ async function filterFriendMsg(that, contact, msg) {
  * 1 开启了好友验证 || 朋友推荐消息 || 发送的文字消息过长,大于40个字符
  * 2 初次添加好友
  */
-async function filterRoomMsg(that, msg, name, id, avatar, room) {
+async function filterRoomMsg({that, msg, name, id, avatar, room, isMention}) {
   try {
     const config = await allConfig() // 获取配置信息
     const resArray = [
@@ -78,7 +77,7 @@ async function filterRoomMsg(that, msg, name, id, avatar, room) {
       { bool: true, method: 'keywordsMsg' },
       { bool: config.autoReply, method: 'robotMsg' },
     ]
-    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room })
+    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, isMention })
     return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
   } catch (e) {
     console.log('filterRoomMsg error', e)

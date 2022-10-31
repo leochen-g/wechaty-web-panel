@@ -99,7 +99,7 @@ async function sendRoomTaskMessage(that, info) {
 async function setEveryDayTask(that, item, name) {
   try {
     let time = item.date
-    let contact = (await that.Contact.find({ alias: item.alias })) || (await that.Contact.find({ name: item.name })) // 获取你要发送的联系人
+    let contact = item.name && (await that.Contact.find({ name: item.name })) || item.alias && (await that.Contact.find({ alias: item.alias }))  // 获取你要发送的联系人
     if (!contact) {
       console.log(`查找不到用户昵称为'${item.name}'或备注为'${item.alias}'的用户，请检查设置用户是否正确`)
       return
@@ -128,7 +128,7 @@ async function setEveryDayTask(that, item, name) {
 async function sendContactTaskMessage(that, info) {
   try {
     const item = info.message
-    let contact = (await that.Contact.find({ alias: item.alias })) || (await that.Contact.find({ name: item.name })) // 获取你要发送的联系人
+    let contact = item.name && (await that.Contact.find({ name: item.name }))  || item.alias && (await that.Contact.find({ alias: item.alias })) // 获取你要发送的联系人
     if (!contact) {
       console.log(`查找不到用户昵称为'${item.name}'或备注为'${item.alias}'的用户，请检查设置用户是否正确`)
       return
