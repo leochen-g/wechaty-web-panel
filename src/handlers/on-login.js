@@ -1,7 +1,6 @@
-import { delay, MD5 } from '../lib/index.js'
+import { MD5 } from '../lib/index.js'
 import { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
 import { addUser } from '../db/userDb.js'
-import { initAllSchedule } from '../task/index.js'
 import { initMqtt } from '../proxy/mqtt.js'
 import { allConfig } from '../db/configDb.js'
 /**
@@ -27,12 +26,10 @@ async function onLogin(user) {
     if(file) {
       const base = await file.toBase64()
       const avatarUrl = await putqn(base, userId)
-      await sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
-      await delay(1000)
+      sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
     } else {
       console.log('头像未获取到，不影响项目正常使用')
     }
-    await initAllSchedule(this) // 初始化任务
     await initMqtt(this) // 初始化mqtt任务
   } catch (e) {
     console.log('登录后初始化失败', e)

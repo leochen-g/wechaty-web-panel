@@ -275,7 +275,11 @@ async function manyToMany(that, config, msg) {
     if (!manyRoomList.length) {
       for (let i = 0; i < config.many.length; i++) {
         const room = await that.Room.find({ topic: config.many[i] })
-        manyRoomList.push(room)
+        if(room) {
+          manyRoomList.push(room)
+        }  else {
+          console.log(`没有查找到群:${config.many[i]}`)
+        }
       }
     }
     await matchAndForward(msg, manyRoomList)
@@ -350,7 +354,11 @@ async function oneToMany(that, config, msg) {
     if (!manyRoomList.length) {
       for (let i = 0; i < config.many.length; i++) {
         const room = await that.Room.find({ topic: config.many[i] })
-        manyRoomList.push(room)
+        if(room) {
+          manyRoomList.push(room)
+        } else {
+          console.log(`没有查找到群:${config.many[i]}`)
+        }
       }
     }
     await matchAndForward(msg, manyRoomList)
