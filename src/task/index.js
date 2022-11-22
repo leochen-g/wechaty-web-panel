@@ -155,8 +155,12 @@ async function setScheduleTask(that, item, name) {
       async () => {
         try {
           let contact = await that.Contact.find({ name: item.subscribe })
-          console.log(`${item.subscribe}的专属提醒开启啦！`)
-          await contact.say(item.content)
+          if(contact) {
+            console.log(`${item.subscribe}的专属提醒开启啦！`)
+            await contact.say(item.content)
+          } else {
+            console.log(`没有找到联系人：${item.subscribe}`)
+          }
           if (!item.isLoop) {
             await updateSchedule(item.id)
           }

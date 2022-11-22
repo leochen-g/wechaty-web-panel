@@ -1,5 +1,6 @@
 import { delay } from '../lib/index.js'
 import { allConfig } from '../db/configDb.js'
+import { contactSay } from "../common/index.js";
 /**
  * 好友添加
  */
@@ -28,7 +29,13 @@ async function onFriend(friendship) {
           break
         case 1:
           logMsg = '已确认添加好友：' + name
-          console.log(logMsg)
+          console.log(`新添加好友：${name}，默认回复`)
+          if(config.newFriendReplys && config.newFriendReplys.length) {
+            for (let reply of config.newFriendReplys) {
+              await delay(1000);
+              await contactSay.call(this, friendship.contact(), reply);
+            }
+          }
           break
         case 0:
           logMsg = '未知错误' + name

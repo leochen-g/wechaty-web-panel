@@ -11,6 +11,7 @@ async function getSignature(id, encodingAESKey) {
   )
   return token
 }
+
 function checkType(answer) {
   var i = ''
   i = '[object Object]' === Object.prototype.toString.call(answer) ? JSON.stringify(answer) : answer
@@ -165,21 +166,7 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
     const resData = res.data
     if (!resData.errcode) {
       let answer = resData.answer // 存放回答
-      if (resData.answer_type === 'text') {
-        if (isMultiple(answer)) {
-          const multiList = getMultiList(answer)
-          const replys = []
-          multiList.forEach((item) => {
-            item = item.replace(/<\/?.+?\/?>/g, '')
-            const reply = getFormatReply(item, resData.options || [], userInfo, config.puppetType)
-            replys.push(...reply)
-          })
-          return replys
-        } else {
-          const replys = getFormatReply(answer, resData.options, userInfo, config.puppetType)
-          return replys
-        }
-      } else if (resData.answer_type === 'music') {
+      if (resData.answer_type === 'music') {
         // web 端协议以文字和图片的形式发送
         if (config.puppetType === 'wechaty-puppet-wechat') {
           const res = JSON.parse(resData.answer)
@@ -202,6 +189,20 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
           return [
             { type: 4, url: music.url, title: music.title, thumbnailUrl: music.picurl, description: music.description },
           ]
+        }
+      } else {
+        if (isMultiple(answer)) {
+          const multiList = getMultiList(answer)
+          const replys = []
+          multiList.forEach((item) => {
+            item = item.replace(/<\/?.+?\/?>/g, '')
+            const reply = getFormatReply(item, resData.options || [], userInfo, config.puppetType)
+            replys.push(...reply)
+          })
+          return replys
+        } else {
+          const replys = getFormatReply(answer, resData.options, userInfo, config.puppetType)
+          return replys
         }
       }
     } else {
