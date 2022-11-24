@@ -4,7 +4,6 @@ import { getConstellation, msgArr, getRoomAvatar, getNewsType } from '../lib/ind
 import { generateAvatar, generateRoomImg } from '../puppeteer-paint/lanuch.js'
 import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
-import { chatTencent } from '../proxy/tencent.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
 
@@ -202,8 +201,7 @@ async function dispatchAiBot(bot, msg, name, id) {
         break
       case 3:
         // 微信闲聊
-        res = await chatTencent(msg, id)
-        replys = [{ type: 1, content: res }]
+        replys = [{ type: 1, content: '微信闲聊已下线，建议使用微信对话开放平台: https://openai.weixin.qq.com' }]
         break
       case 5:
         // 微信开放对话平台
