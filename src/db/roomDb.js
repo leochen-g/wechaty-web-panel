@@ -1,5 +1,15 @@
 import nedb from './nedb.js'
-const rdb = nedb('./room.db')
+import path from "path";
+import os from "os";
+const baseDir = path.join(
+  os.homedir(),
+  path.sep,
+  ".wechaty",
+  "wechaty-panel-cache",
+  path.sep,
+);
+const dbpath = baseDir + 'room.db'
+const rdb = nedb(dbpath)
 
 /**
  * 记录群聊天记录 记录格式
