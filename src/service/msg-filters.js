@@ -146,7 +146,9 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
           item.moreData &&
             item.moreData.length &&
             item.moreData.forEach((mItem) => {
-              data[mItem.key] = data[mItem.value]
+              if(mItem.key !== 'uid' && mItem.key !== 'word') {
+                data[mItem.key] = mItem.value
+              }
             })
           if (item.type === 100) {
             let res = await service.post(item.customUrl, data)
