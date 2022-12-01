@@ -5,6 +5,7 @@ import { dispatchAsync } from "../service/room-async-service.js";
 import { allConfig } from "../db/configDb.js";
 import { getAibotConfig } from "../db/aiDb.js";
 import { addRoomRecord } from "../db/roomDb.js";
+import { privateForward } from "../common/hook.js";
 
 const ignoreRecord = [
   { type: "include", word: "加入了群聊" },
@@ -37,16 +38,22 @@ function checkIgnore(msg, list) {
 async function dispatchFriendFilterByMsgType(that, msg) {
   try {
     const aibotConfig = await getAibotConfig();
+    const config = await allConfig();
     const type = msg.type();
     const contact = msg.talker(); // 发消息人
+    const name = await contact.name()
     const isOfficial = contact.type() === that.Contact.Type.Official;
     let content = "";
     let replys = [];
+    const res = await privateForward({ that, msg, name, config })
+    if(res) {
+        return
+    }
     switch (type) {
       case that.Message.Type.Text:
         content = msg.text();
         if (!isOfficial) {
-          console.log(`发消息人${await contact.name()}:${content}`);
+          console.log(`发消息人${name}:${content}`);
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages);
           if (content.trim() && !isIgnore) {
             replys = await getContactTextReply(that, contact, content.trim());

@@ -66,7 +66,7 @@ async function filterFriendMsg(that, contact, msg) {
  * 1 开启了好友验证 || 朋友推荐消息 || 发送的文字消息过长,大于40个字符
  * 2 初次添加好友
  */
-async function filterRoomMsg({that, msg, name, id, avatar, room, isMention}) {
+async function filterRoomMsg({that, msg, name, id, avatar, room, isMention }) {
   try {
     const config = await allConfig() // 获取配置信息
     const resArray = [
