@@ -34,7 +34,7 @@ export async function privateForward({ that, msg, name, config }) {
               console.log(`查找不到用户：${contactName}，请检查用户昵称是否正确`)
             }
             // 只转发文字
-            if(item.type === 1 && msg.type === 7) {
+            if(item.type === 1 && msg.type() === 7) {
                 contact && msg && msg.forward(contact)
             } else {
               contact && msg && msg.forward(contact)
