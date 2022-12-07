@@ -12,7 +12,7 @@ async function geGPTReply(content) {
 
   await api.ensureAuth()
 
-  const threeMinutesMs = 2 * 60 * 1000
+  const threeMinutesMs = 3 * 60 * 1000
 
   const response = await pTimeout(
     api.sendMessage(content),
@@ -21,7 +21,7 @@ async function geGPTReply(content) {
       message: 'ChatGPT返回超时了，用的人太多，太火爆了，等会再试吧'
     }
   )
-  let replys = response.match(/.{1,680}/g)
+  let replys = [response]
   replys = replys.map(item=> {
     return {
       type: 1,
