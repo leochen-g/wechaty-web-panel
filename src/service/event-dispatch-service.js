@@ -6,7 +6,7 @@ import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
-
+import { geGPTReply } from '../proxy/chatgpt.js'
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -206,6 +206,11 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 5:
         // 微信开放对话平台
         res = await getTencentOpenReply({ msg, id, userInfo: { name } })
+        replys = res
+        break
+      case 6:
+        // ChatGPT
+        res = await geGPTReply(msg)
         replys = res
         break
       default:
