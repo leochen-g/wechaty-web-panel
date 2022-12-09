@@ -104,7 +104,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     const contactName = contact.name();
     const roomName = await room.topic();
     const type = msg.type();
-    const userSelfName = that.currentUser?.name() || that.userSelf()?.name();
+    const receiver = msg.to();
     let content = "";
     let replys = "";
     let contactId = contact.id || "111";
@@ -114,8 +114,9 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         content = msg.text();
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
         const mentionSelf = await msg.mentionSelf();
+        const receiverName = receiver?.name();
 
-        content = content.replace(/@[^,，：:\s@]+/g, "").trim();
+        content = content.replace(receiverName, "").trim();
         // 检测是否需要这条消息
         const isIgnore = checkIgnore(content, aibotConfig.ignoreMessages);
         if (isIgnore) return;
