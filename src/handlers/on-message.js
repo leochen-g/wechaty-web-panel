@@ -113,7 +113,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
       case that.Message.Type.Text:
         content = msg.text();
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
-        const mentionSelf = content.includes(`@${userSelfName}`);
+        const mentionSelf = await msg.mentionSelf();
 
         content = content.replace(/@[^,，：:\s@]+/g, "").trim();
         // 检测是否需要这条消息
