@@ -113,10 +113,18 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         content = msg.text();
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
         const mentionSelf = await msg.mentionSelf();
+
+       // 群内@多人时，消息中去掉所有被@的人
         const contactList = await msg.mentionList()
-        content = contactList
-          ?.reduce((curr, prev) => curr.replace(`@${prev?.name()}`, ''), content)
-          .replace(/@[^,，：:\s@]+/g, "").trim();
+        content = contactList?.reduce(
+          (curr, prev) => curr.replace(`@${prev?.name()}`, ''),
+          content
+        )
+        // 群内@所有人时，消息中去掉'@所有人'关键词
+        const atAllTags = ['All', '所有人']
+        content = atAllTags
+          ?.reduce((curr, prev) => curr.replace(`@${prev}`, ''), content)
+          .trim()
         
 
         // 检测是否需要这条消息
