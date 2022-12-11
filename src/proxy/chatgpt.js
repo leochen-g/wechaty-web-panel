@@ -21,7 +21,13 @@ async function geGPTReply(content) {
       message: 'ChatGPT返回超时了，用的人太多，太火爆了，等会再试吧'
     }
   )
-  let replys = [response]
+  let replys = []
+  let message = response;
+  while (message.length > 500) {
+    replys.push(message.slice(0, 500));
+    message = message.slice(500);
+  }
+  replys.push(message);
   replys = replys.map(item=> {
     return {
       type: 1,
