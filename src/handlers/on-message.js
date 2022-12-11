@@ -115,8 +115,8 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
         const mentionSelf = await msg.mentionSelf();
         const receiverName = receiver?.name();
+        content = content.replace('@' + receiverName, "").replace(/@[^,，：:\s@]+/g, "").trim();
 
-        content = content.replace(receiverName, "").trim();
         // 检测是否需要这条消息
         const isIgnore = checkIgnore(content, aibotConfig.ignoreMessages);
         if (isIgnore) return;
