@@ -375,10 +375,8 @@ async function oneToMany(that, config, msg) {
  */
 async function dispatchAsync(that, msg, list) {
   try {
-    const userSelfName = that.currentUser?.name?.()
     const type = msg.type()
-    const content = msg.text()
-    const mentionSelf = content.includes(`@${userSelfName}`)
+    const mentionSelf = await msg.mentionSelf()
     if (7 === type && mentionSelf) {
       // 如果内容中有提及机器人的内容，不进行转发
       return
