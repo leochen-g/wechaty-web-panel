@@ -153,7 +153,10 @@ async function roomSay(room, contact, msg) {
   const config = await allConfig()
   const { role } = config.userInfo
   if (msg.id && role === 'vip') {
-    msg = await getMaterial(msg.id)
+    const res = await getMaterial(msg.id)
+    if(res.id) {
+      msg = res
+    }
   }
   try {
     if (msg.type === 1 && msg.content) {
@@ -209,7 +212,10 @@ async function contactSay(contact, msg, isRoom = false) {
   const config = await allConfig()
   const { role } = config.userInfo
   if (msg.id && role === 'vip') {
-    msg = await getMaterial(msg.id)
+    const res = await getMaterial(msg.id)
+    if(res.id) {
+      msg = res
+    }
   }
   try {
     if (msg.type === 1 && msg.content) {
