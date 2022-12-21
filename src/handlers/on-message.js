@@ -114,6 +114,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         content = msg.text();
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
         const mentionSelf = await msg.mentionSelf();
+        const metionList = await msg.mentionList();
         const receiverName = receiver?.name();
         content = content.replace('@' + receiverName, "").replace(/@[^,，：:\s@]+/g, "").trim();
 
