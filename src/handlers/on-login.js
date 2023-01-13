@@ -22,13 +22,15 @@ async function onLogin(user) {
       robotId: payload.weixin || MD5(user.name()),
     }
     await addUser(userInfo) // 全局存储登录用户信息
-    const file = await user.avatar()
-    if(file) {
-      const base = await file.toBase64()
-      const avatarUrl = await putqn(base, userId)
-      sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
-    } else {
-      console.log('头像未获取到，不影响项目正常使用')
+    if(payload.avatar) {
+      const file = await user.avatar()
+      if(file) {
+        const base = await file.toBase64()
+        const avatarUrl = await putqn(base, userId)
+        sendRobotInfo(avatarUrl, user.name(), userInfo.robotId) // 更新用户头像
+      } else {
+        console.log('头像未获取到，不影响项目正常使用')
+      }
     }
     await initMqtt(this) // 初始化mqtt任务
   } catch (e) {

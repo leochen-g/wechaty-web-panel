@@ -112,7 +112,7 @@ async function getConfig() {
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
     const cloudRoom = await getWordCloudRoom()
-    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', ...config, cloudRoom })
+    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', botScope: 'all', parseMini: false, parseMiniRooms: [], preventLength: 1000, ...config, cloudRoom })
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)

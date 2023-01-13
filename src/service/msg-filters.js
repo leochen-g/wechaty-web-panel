@@ -12,9 +12,15 @@ function emptyMsg({ room, isMention }) {
   return msgArr
 }
 function officialMsg() {
-  console.log('字符超200字符，无效或官方消息，不做回复')
+  console.log('官方消息，不做回复')
   return [{ type: 1, content: '', url: '' }]
 }
+
+function maxLengthMsg() {
+  console.log('字符超过设定值，不做回复')
+  return [{ type: 1, content: '', url: '' }]
+}
+
 function newFriendMsg({ config, name }) {
   console.log(`新添加好友：${name}，默认回复`)
   return config.newFriendReplys || [{ type: 1, content: '', url: '' }]
@@ -134,8 +140,8 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
     for (let item of config.callBackEvents) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
-          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
-          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
+          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
             return []
           }
           msg = msg.trim()
@@ -171,8 +177,8 @@ async function eventMsg({ that, msg, name, id, avatar, config, room, isMention }
     for (let item of config.eventKeywords) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
-          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
-          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
+          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
             return []
           }
           msg = msg.replace(key, '')
@@ -196,8 +202,8 @@ async function keywordsMsg({ msg, config, room, isMention }) {
     if (config.replyKeywords && config.replyKeywords.length > 0) {
       for (let item of config.replyKeywords) {
         if (item.reg === 2 && item.keywords.includes(msg)) {
-          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
-          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+          // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
+          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
             return []
           }
           console.log(`精确匹配到关键词${msg},正在回复用户`)
@@ -205,8 +211,8 @@ async function keywordsMsg({ msg, config, room, isMention }) {
         } else if (item.reg === 1) {
           for (let key of item.keywords) {
             if (msg.includes(key)) {
-              // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复
-              if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention) {
+              // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
+              if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
                 return []
               }
               console.log(`模糊匹配到关键词${msg},正在回复用户`)
@@ -309,6 +315,7 @@ export { scheduleJobMsg }
 export { eventMsg }
 export { keywordsMsg }
 export { robotMsg }
+export { maxLengthMsg }
 export default {
   callbackEvent,
   avatarCrop,
@@ -320,4 +327,5 @@ export default {
   eventMsg,
   keywordsMsg,
   robotMsg,
+  maxLengthMsg
 }

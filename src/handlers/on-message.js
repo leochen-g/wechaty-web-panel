@@ -72,14 +72,33 @@ async function dispatchFriendFilterByMsgType(that, msg) {
       case that.Message.Type.Image:
         console.log(`发消息人${await contact.name()}:发了一张图片`);
         break;
-      case that.Message.Type.Url:
-        console.log(`发消息人${await contact.name()}:发了一个链接`);
-        break;
       case that.Message.Type.Video:
         console.log(`发消息人${await contact.name()}:发了一个视频`);
         break;
       case that.Message.Type.Audio:
         console.log(`发消息人${await contact.name()}:发了一个视频`);
+        break;
+      case that.Message.Type.MiniProgram:
+        console.log(`发消息人${await contact.name()}:发了一个小程序`);
+        const miniProgram = await msg.toMiniProgram();
+        if(config.parseMini && miniProgram.payload) {
+          const miniParse = `【小程序解析】\n\nappid：${miniProgram.appid()}\nusername：${miniProgram.username()}\n标题：${miniProgram.title()}\n描述：${miniProgram.description()}\n路径：${miniProgram.pagePath()}`
+          contact.say(miniParse)
+        }
+        console.log('mini', miniProgram);
+        break;
+      case that.Message.Type.Url:
+        console.log(`发消息人${await contact.name()}:发了一个h5链接`);
+        const urlLink = await msg.toUrlLink();
+        if(config.parseMini && urlLink.payload) {
+          const urlParse = `【链接解析】\n\n标题：${urlLink.title()}\n描述：${urlLink.description()}\n链接：${urlLink.url()}\n缩略图：${urlLink.thumbnailUrl()}`
+          contact.say(urlParse)
+        }
+        console.log('urlLink', urlLink);
+        break;
+      case that.Message.Type.Transfer:
+        console.log(`发消息人${await contact.name()}: 发起一个转账，请在手机接收`);
+        console.log('内容', msg.payload);
         break;
       default:
         break;
@@ -107,14 +126,13 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     const receiver = msg.to();
     let content = "";
     let replys = "";
-    let contactId = contact.id || "111";
+    let contactId = contact.id;
     let contactAvatar = await contact.avatar();
     switch (type) {
       case that.Message.Type.Text:
         content = msg.text();
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
         const mentionSelf = await msg.mentionSelf();
-        const metionList = await msg.mentionList();
         const receiverName = receiver?.name();
         content = content.replace('@' + receiverName, "").replace(/@[^,，：:\s@]+/g, "").trim();
 
@@ -156,14 +174,33 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
       case that.Message.Type.Image:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一张图片`);
         break;
-      case that.Message.Type.Url:
-        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个链接`);
-        break;
       case that.Message.Type.Video:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个视频`);
         break;
       case that.Message.Type.Audio:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个语音`);
+        break;
+      case that.Message.Type.MiniProgram:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个小程序`);
+        const miniProgram = await msg.toMiniProgram();
+        if(config.parseMiniRooms.includes(roomName) && miniProgram.payload) {
+          const miniParse = `【小程序解析】\n\nappid:${miniProgram.appid()}\nusername：${miniProgram.username()}\n标题：${miniProgram.title()}\n描述：${miniProgram.description()}\n路径：${miniProgram.pagePath()}\n`
+          room.say(miniParse)
+        }
+        console.log('mini', miniProgram);
+        break;
+      case that.Message.Type.Url:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个h5链接`);
+        const urlLink = await msg.toUrlLink();
+        if(config.parseMiniRooms.includes(roomName) && urlLink.payload) {
+          const urlParse = `【链接解析】\n\n标题：${urlLink.title()}\n描述：${urlLink.description()}\n链接：${urlLink.url()}\n缩略图：${urlLink.thumbnailUrl()}`
+          room.say(urlParse)
+        }
+        console.log('urlLink', urlLink);
+        break;
+      case that.Message.Type.Transfer:
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 发起了转账，请在手机查看`);
+        console.log('内容', msg.payload);
         break;
       default:
         break;

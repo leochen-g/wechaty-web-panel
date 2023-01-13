@@ -38,7 +38,8 @@ async function filterFriendMsg(that, contact, msg) {
     const avatar = await contact.avatar()
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
-      { bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name) || msg.length > 1000, method: 'officialMsg' },
+      { bool: msg.includes(DELETEFRIEND) || WEIXINOFFICIAL.includes(name), method: 'officialMsg' },
+      { bool: config.preventLength && msg.length > config.preventLength, method: 'maxLengthMsg' },
       { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
       { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
       { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
@@ -46,7 +47,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },
-      { bool: config.autoReply, method: 'robotMsg' },
+      { bool: config.autoReply && config.botScope !== 'room', method: 'robotMsg' },
     ]
     const msgArr = await getMsgReply(resArray, { that, msg, contact, name, config, avatar, id })
     return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
@@ -75,7 +76,7 @@ async function filterRoomMsg({that, msg, name, id, avatar, room, isMention }) {
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },
-      { bool: config.autoReply, method: 'robotMsg' },
+      { bool: config.autoReply && config.botScope !== 'friend', method: 'robotMsg' },
     ]
     const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, isMention })
     return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]

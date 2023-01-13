@@ -30,6 +30,15 @@ async function getEveryDayContent(date, city, endWord) {
   let str = `${today}\n我们在一起的第${memorialDay}天\n\n元气满满的一天开始啦,要开心噢^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n情话对你说:\n${sweetWord}\n\n————————${endWord}`
   return str
 }
+
+async function getRoomEveryDayContent(date, city, endWord) {
+  let one = await getOne() //获取每日一句
+  let weather = await getTXweather(city) //获取天气信息
+  let today = formatDate(new Date()) //获取今天的日期
+  let memorialDay = getDay(date) //获取纪念日天数
+  let str = `${today}\n家人们相聚在一起的第${memorialDay}天\n\n元气满满的一天开始啦,家人们要努力保持活跃啊^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n————————${endWord}`
+  return str
+}
 /**
  * 更新用户信息
  */
@@ -149,7 +158,6 @@ async function addRoomWelcomeSay(room, roomName, contactName, msg) {
  * @param {*} isRoom
  */
 async function roomSay(room, contact, msg) {
-  console.log('msg', msg)
   const config = await allConfig()
   const { role } = config.userInfo
   if (msg.id && role === 'vip') {
@@ -183,9 +191,8 @@ async function roomSay(room, contact, msg) {
         title: msg.title,
         url: msg.url,
       })
-      console.log(url)
       await room.say(url)
-    } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey) {
+    } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl) {
       let miniProgram = new this.MiniProgram({
         appid: msg.appid,
         title: msg.title,
@@ -193,6 +200,7 @@ async function roomSay(room, contact, msg) {
         description: msg.description,
         thumbUrl: msg.thumbUrl,
         thumbKey: msg.thumbKey,
+        username: msg.username || ''
       })
       await room.say(miniProgram)
     }
@@ -208,7 +216,6 @@ async function roomSay(room, contact, msg) {
  *  type 1 文字 2 图片url 3 图片base64 4 url链接 5 小程序  6 名片
  */
 async function contactSay(contact, msg, isRoom = false) {
-  console.log('msg', msg)
   const config = await allConfig()
   const { role } = config.userInfo
   if (msg.id && role === 'vip') {
@@ -244,7 +251,7 @@ async function contactSay(contact, msg, isRoom = false) {
         url: msg.url,
       })
       await contact.say(url)
-    } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl && msg.thumbKey) {
+    } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl) {
       let miniProgram = new this.MiniProgram({
         appid: msg.appid,
         title: msg.title,
@@ -252,6 +259,7 @@ async function contactSay(contact, msg, isRoom = false) {
         description: msg.description,
         thumbUrl: msg.thumbUrl,
         thumbKey: msg.thumbKey,
+        username: msg.username || ''
       })
       await contact.say(miniProgram)
     }
@@ -328,6 +336,7 @@ export { contactSay }
 export { roomSay }
 export { addRoomWelcomeSay }
 export { updateContactAndRoom }
+export { getRoomEveryDayContent }
 export default {
   updateRoomOnly,
   updateContactOnly,
@@ -340,4 +349,5 @@ export default {
   roomSay,
   addRoomWelcomeSay,
   updateContactAndRoom,
+  getRoomEveryDayContent
 }

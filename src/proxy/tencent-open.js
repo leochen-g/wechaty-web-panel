@@ -142,7 +142,7 @@ function getFormatReply(answer, options = [], userInfo, puppetType) {
       if (puppetType === 'wechaty-puppet-wechat') {
         replys = [{ type: 1, content: '收到了一个小程序，但是小秘书还没学会展示😭，等等我回去再修炼五百年💪' }]
       } else {
-        replys = [{ type: 5, appid: answer.miniprogrampage.appid, title: answer.miniprogrampage.title, pagePath: answer.miniprogrampage.pagepath, description: answer.miniprogrampage.title, thumbUrl: answer.miniprogrampage.thumb_url, thumbKey: undefined, username: userInfo.name }]
+        replys = [{ type: 5, appid: answer.miniprogrampage.appid, title: answer.miniprogrampage.title, pagePath: answer.miniprogrampage.pagepath, description: answer.miniprogrampage.title, thumbUrl: answer.miniprogrampage.thumb_url, thumbKey: undefined, username: answer.miniprogrampage.appid }]
       }
       break
     default:
@@ -187,7 +187,7 @@ async function getTencentOpenReply({ msg, id, userInfo }) {
           // 其他协议可以发链接的用H5卡片发送
           const music = resData.msg[0]
           return [
-            { type: 4, url: music.url, title: music.title, thumbnailUrl: music.picurl, description: music.description },
+            { type: 4, url: music.url, title: music.title, thumbUrl: music.picurl, description: music.description },
           ]
         }
       } else {

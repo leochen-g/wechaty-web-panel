@@ -1,7 +1,12 @@
 import { setLocalSchedule, delay, cancelAllSchedule } from '../lib/index.js'
 import { allConfig } from '../db/configDb.js'
 import { getScheduleList, updateSchedule } from '../proxy/aibotk.js'
-import { getEveryDayRoomContent, getEveryDayContent, roomSay } from '../common/index.js'
+import { getEveryDayRoomContent, getEveryDayContent, roomSay, getRoomEveryDayContent, contactSay } from '../common/index.js'
+
+const typeMap = {
+  contact: '用户名',
+  room: '群名'
+}
 /**
  * 群定时任务，针对群
  * @param {*} that bot对象
@@ -10,19 +15,30 @@ import { getEveryDayRoomContent, getEveryDayContent, roomSay } from '../common/i
 async function setRoomTask(that, item, name) {
   try {
     let time = item.date
-    let room = await that.Room.find({ topic: item.roomName })
+    let room = ''
+    if(item.type && item.type === 'contact') {
+      room = item.roomName && (await that.Contact.find({ name: item.roomName })) // 获取你要发送的联系人
+    } else {
+      item.type = 'room'
+      room = item.roomName && (await that.Room.find({ topic: item.roomName }))
+    }
+
     if (!room) {
-      console.log(`查找不到群：${item.roomName}，请检查群名是否正确`)
+      console.log(`查找不到${typeMap[item.type]}：${item.roomName}`)
       return
     } else {
-      console.log(`群：“${item.roomName}”设置定时任务成功`)
+      console.log(`${typeMap[item.type]}：“${item.roomName}”设置定时任务成功`)
       setLocalSchedule(
         time,
         async () => {
           for (let reply of item.contents) {
-            console.log('群定时任务开始发送，内容：', `${reply.type === 1 ? reply.content : reply.url}`)
+            console.log('定时任务开始发送，内容：', `${reply.type === 1 ? reply.content : reply.url}`)
             await delay(1000)
-            await roomSay.call(that, room, '', reply)
+            if(item.type === 'room') {
+              await roomSay.call(that, room, '', reply)
+            }else {
+              await contactSay.call(that, room, reply)
+            }
           }
         },
         name
@@ -40,12 +56,18 @@ async function setRoomTask(that, item, name) {
 async function setEveryDayRoomSayTask(that, item, name) {
   try {
     let time = item.date
-    let room = await that.Room.find({ topic: item.roomName })
+    let room = ''
+    if(item.type && item.type === 'contact') {
+      room = item.roomName && (await that.Contact.find({ name: item.roomName })) // 获取你要发送的联系人
+    } else {
+      item.type = 'room'
+      room = item.roomName && (await that.Room.find({ topic: item.roomName }))
+    }
     if (!room) {
-      console.log(`查找不到群：${item.roomName}，请检查群名是否正确`)
+      console.log(`查找不到${typeMap[item.type]}：${item.roomName}`)
       return
     } else {
-      console.log(`群：“${item.roomName}”设置资讯任务成功`)
+      console.log(`${typeMap[item.type]}：“${item.roomName}”设置资讯任务成功`)
       setLocalSchedule(
         time,
         async () => {
@@ -69,9 +91,15 @@ async function setEveryDayRoomSayTask(that, item, name) {
 async function sendRoomTaskMessage(that, info) {
   try {
     const item = info.message
-    let room = await that.Room.find({ topic: item.roomName })
+    let room = ''
+    if(item.type && item.type === 'contact') {
+      room = item.roomName && (await that.Contact.find({ name: item.roomName })) // 获取你要发送的联系人
+    } else {
+      item.type = 'room'
+      room = item.roomName && (await that.Room.find({ topic: item.roomName }))
+    }
     if (!room) {
-      console.log(`查找不到群：${item.roomName}，请检查群名是否正确`)
+      console.log(`查找不到${typeMap[item.type]}：${item.roomName}`)
       return
     } else {
       if (info.event === 'roomNews') {
@@ -81,9 +109,13 @@ async function sendRoomTaskMessage(that, info) {
         await room.say(content)
       } else if (info.event === 'roomTask') {
         for (let reply of item.contents) {
-          console.log(`群【${item.roomName}】定时任务开始发送，内容：`, `${reply.type === 1 ? reply.content : reply.url}`)
+          console.log(`【${item.roomName}】定时任务开始发送，内容：`, `${reply.type === 1 ? reply.content : reply.url}`)
           await delay(1000)
-          await roomSay.call(that, room, '', reply)
+          if(item.type === 'room') {
+            await roomSay.call(that, room, '', reply)
+          }else {
+            await contactSay.call(that, room, reply)
+          }
         }
       }
     }
@@ -92,23 +124,36 @@ async function sendRoomTaskMessage(that, info) {
   }
 }
 /**
- * 每日说定时任务设定，针对好友
+ * 每日说定时任务设定，针对好友 和 群组
  * @param {*} that bot对象
  * @param {*} item 任务项
  */
 async function setEveryDayTask(that, item, name) {
   try {
     let time = item.date
-    let contact = item.name && (await that.Contact.find({ name: item.name })) || item.alias && (await that.Contact.find({ alias: item.alias }))  // 获取你要发送的联系人
+    let contact = ''
+
+    if(item.type && item.type === 'room') {
+      contact = item.name && (await that.Room.find({ topic: item.name }))
+    } else {
+      item.type = 'contact'
+      contact = item.name && (await that.Contact.find({ name: item.name })) || item.alias && (await that.Contact.find({ alias: item.alias }))  // 获取你要发送的联系人
+    }
+
     if (!contact) {
-      console.log(`查找不到用户昵称为'${item.name}'或备注为'${item.alias}'的用户，请检查设置用户是否正确`)
+      console.log(`查找不到${typeMap[item.type]}为'${item.name}'的信息`)
       return
     } else {
-      console.log(`设置用户：“${item.name}|${item.alias}”每日说任务成功`)
+      console.log(`设置${typeMap[item.type]}：“${item.name}|${item.alias}”每日说任务成功`)
       setLocalSchedule(
         time,
         async () => {
-          let content = await getEveryDayContent(item.memorialDay, item.city, item.endWord)
+          let content = ''
+          if(item.type === 'room') {
+            content = await getRoomEveryDayContent(item.memorialDay, item.city, item.endWord)
+          } else {
+            content = await getEveryDayContent(item.memorialDay, item.city, item.endWord)
+          }
           console.log('每日说任务开始工作,发送内容：', content)
           await delay(10000)
           await contact.say(content)
@@ -121,19 +166,31 @@ async function setEveryDayTask(that, item, name) {
   }
 }
 /**
- * 立即发送资讯
+ * 立即发送每日说
  * @param {*} that bot对象
  * @param {*} item 任务项  { target: 'Contact', event:'wechatEveryday', message: { roomName: '', type: 'news 新闻 ||task 定时任务', contents: [] } }
  */
 async function sendContactTaskMessage(that, info) {
   try {
     const item = info.message
-    let contact = item.name && (await that.Contact.find({ name: item.name }))  || item.alias && (await that.Contact.find({ alias: item.alias })) // 获取你要发送的联系人
+    let contact = ''
+
+    if(item.type && item.type === 'room') {
+      contact = item.name && (await that.Room.find({ topic: item.name }))
+    } else {
+      item.type = 'contact'
+      contact = item.name && (await that.Contact.find({ name: item.name })) || item.alias && (await that.Contact.find({ alias: item.alias }))  // 获取你要发送的联系人
+    }
     if (!contact) {
-      console.log(`查找不到用户昵称为'${item.name}'或备注为'${item.alias}'的用户，请检查设置用户是否正确`)
+      console.log(`查找不到${typeMap[item.type]}为'${item.name}'的信息`)
       return
     } else {
-      let content = await getEveryDayContent(item.memorialDay, item.city, item.endWord)
+      let content = ''
+      if(item.type === 'room') {
+        content = await getRoomEveryDayContent(item.memorialDay, item.city, item.endWord)
+      } else {
+        content = await getEveryDayContent(item.memorialDay, item.city, item.endWord)
+      }
       console.log('每日说任务开始工作,发送内容：', content)
       await delay(10000)
       await contact.say(content)
