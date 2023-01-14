@@ -45,8 +45,8 @@ async function getRoomEveryDayContent(date, city, endWord) {
 async function updateContactInfo(that) {
   try {
     const contactSelf = await getUser()
-    const hasWeixin = !!contactSelf.weixin
-    const contactList = await that.Contact.findAll()
+    const hasWeixin = contactSelf && !!contactSelf.weixin
+    const contactList = await that.Contact.findAll() || []
     let res = []
     const notids = ['filehelper', 'fmessage']
     let realContact = hasWeixin
@@ -98,8 +98,8 @@ async function updateFriendInfo(list, num) {
 async function updateRoomInfo(that) {
   try {
     const contactSelf = await getUser()
-    const hasWeixin = !!contactSelf.weixin
-    const roomList = await that.Room.findAll()
+    const hasWeixin = contactSelf && !!contactSelf.weixin
+    const roomList = await that.Room.findAll() || []
     let res = []
     for (let i of roomList) {
       let room = i.payload || i._payload
@@ -166,6 +166,7 @@ async function roomSay(room, contact, msg) {
       msg = res
     }
   }
+  console.log('回复内容：', JSON.stringify(msg))
   try {
     if (msg.type === 1 && msg.content) {
       // 文字
@@ -224,6 +225,7 @@ async function contactSay(contact, msg, isRoom = false) {
       msg = res
     }
   }
+  console.log('回复内容：', JSON.stringify(msg))
   try {
     if (msg.type === 1 && msg.content) {
       // 文字
@@ -243,7 +245,7 @@ async function contactSay(contact, msg, isRoom = false) {
       // bse64文件
       let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
       await contact.say(obj)
-    } else if (msg.type === 4 && msg.url && msg.title && msg.description && msg.thumbUrl) {
+    } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
       let url = new this.UrlLink({
         description: msg.description,
         thumbnailUrl: msg.thumbUrl,

@@ -117,7 +117,7 @@ function getFormatReply(answer, options = [], userInfo, puppetType) {
           { type: 2, url: answer.news.articles[0].picurl },
         ]
       } else {
-        replys = [{ type: 4, url: answer.news.articles[0].url, title: answer.news.articles[0].title, thumbnailUrl: answer.news.articles[0].picurl, description: answer.news.articles[0].description }]
+        replys = [{ type: 4, url: answer.news.articles[0].url, title: answer.news.articles[0].title, thumbUrl: answer.news.articles[0].picurl, description: answer.news.articles[0].description }]
       }
       break
     case 'mpnews':
