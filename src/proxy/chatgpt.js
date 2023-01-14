@@ -1,4 +1,4 @@
-import { remark } from 'remark'
+import remark from 'remark'
 import stripMarkdown from 'strip-markdown'
 import { Configuration, OpenAIApi } from 'openai'
 import { allConfig } from "../db/configDb.js";
