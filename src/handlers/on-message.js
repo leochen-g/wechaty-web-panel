@@ -212,6 +212,12 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
 
 async function onMessage(msg) {
   try {
+    // 为了解决 web 端会把历史聊天记录重新发送一遍，处理接收到的消息是5s 以前的就直接舍弃
+    if(msg.payload && (msg.payload.timestamp < parseInt(new Date().getTime()/1000) - 5)) {
+      console.log('历史消息记录');
+      return
+    }
+
     const config = await allConfig();
     const { role } = config.userInfo;
     const room = msg.room(); // 是否为群消息

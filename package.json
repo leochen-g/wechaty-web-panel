@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "",
   "exports": {
     ".": {
@@ -54,8 +54,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
     "wechaty": "^1.20.2",
-    "wechaty-puppet-wechat": "^1.18.4",
-    "wechaty-puppet-wechat4u": "^1.13.12"
+    "wechaty-puppet-wechat4u": "^1.13.13"
   },
   "readme": "README.md",
   "engines": {
