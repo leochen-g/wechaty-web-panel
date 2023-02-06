@@ -219,7 +219,7 @@ async function onMessage(msg) {
     }
 
     const config = await allConfig();
-    const { role } = config.userInfo;
+    const { role } = config && config.userInfo || {role: 'default'};
     const room = msg.room(); // 是否为群消息
     const msgSelf = msg.self(); // 是否自己发给自己的消息
     if (msgSelf) return;

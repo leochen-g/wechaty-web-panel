@@ -71,7 +71,7 @@ async function setEveryDayRoomSayTask(that, item, name) {
       setLocalSchedule(
         time,
         async () => {
-          let content = await getEveryDayRoomContent(item.sortId, item.endWord)
+          let content = await getEveryDayRoomContent(item.sortId, item.endWord, item.num || 10)
           console.log('新闻咨询开始发送，内容：', content)
           await delay(10000)
           await room.say(content)
@@ -103,7 +103,7 @@ async function sendRoomTaskMessage(that, info) {
       return
     } else {
       if (info.event === 'roomNews') {
-        let content = await getEveryDayRoomContent(item.sortId, item.endWord)
+        let content = await getEveryDayRoomContent(item.sortId, item.endWord, item.num || 10)
         console.log(`群【${item.roomName}】新闻咨询开始发送，内容：`, content)
         await delay(10000)
         await room.say(content)

@@ -21,7 +21,7 @@ async function onRoomjoin(room, inviteeList, inviter, date) {
     const config = await allConfig()
     const nameList = inviteeList.map((c) => c.name()).join(',')
     const roomName = await room.topic()
-    const roomIndex = roomHasConfig(config.roomJoinKeywords, roomName)
+    const roomIndex = config && roomHasConfig(config.roomJoinKeywords, roomName)
     console.log('进群', roomName, roomIndex, nameList)
     if (roomIndex > -1) {
       const { welcomes } = config.roomJoinKeywords[roomIndex]

@@ -15,7 +15,7 @@ async function onLogin(user) {
     await sendError('')
     await getConfig() // 获取配置文件
     const config = await allConfig()
-    const { userId } = config.userInfo
+    const { userId } = config && config.userInfo
     const payload = user.payload || user._payload
     const userInfo = {
       ...payload,

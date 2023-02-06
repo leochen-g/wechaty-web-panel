@@ -9,10 +9,10 @@ import { allConfig } from '../db/configDb.js'
  * @param {*} sortId 新闻资讯分类Id
  * @param {*} endWord 结尾备注
  */
-async function getEveryDayRoomContent(sortId, endWord = '微信小助手') {
+async function getEveryDayRoomContent(sortId, endWord = '微信小助手', num = 10) {
   let today = formatDate(new Date()) //获取今天的日期
-  let news = await getNews(sortId)
-  let content = `${today}\n${news}\n————————${endWord}`
+  let news = await getNews(sortId, num)
+  let content = `${today}\n${news}\n${endWord?'————————':''}${endWord}`
   return content
 }
 /**

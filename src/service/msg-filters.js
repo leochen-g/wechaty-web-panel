@@ -147,6 +147,7 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
           msg = msg.trim()
           const data = {
             uid: id,
+            uname: name,
             word: msg,
           }
           item.moreData &&

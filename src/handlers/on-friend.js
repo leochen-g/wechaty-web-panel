@@ -5,6 +5,10 @@ import { contactSay } from "../common/index.js";
  * 好友添加
  */
 async function onFriend(friendship) {
+  if(friendship.payload && (friendship.payload.timestamp < parseInt(new Date().getTime()/1000) - 5)) {
+    console.log('加好友历史消息记录');
+    return
+  }
   try {
     const config = await allConfig()
     let logMsg, hello
@@ -12,7 +16,7 @@ async function onFriend(friendship) {
     hello = friendship.hello()
     logMsg = name + '，发送了好友请求'
     console.log(logMsg)
-    if (config.autoAcceptFriend) {
+    if (config && config.autoAcceptFriend) {
       switch (friendship.type()) {
         case 2:
           if (config.acceptFriendKeyWords.length === 0) {

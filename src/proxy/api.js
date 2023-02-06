@@ -2,6 +2,7 @@ import { req, txReq } from './superagent.js'
 import { EMOHOST, TULING, ONE, MEINV } from './config.js'
 import { randomRange, MD5 } from '../lib/index.js'
 import { allConfig } from '../db/configDb.js'
+import { getFireNews } from "./aibotk.js";
 /**
  * 天行图灵聊天机器人
  * @param {*} word 发送内容
@@ -55,9 +56,9 @@ async function getResByTX(word, id) {
       } else {
         response = '你太厉害了，说的话把我难倒了，我要去学习了，不然没法回答你的问题'
       }
-      console.log('天行机器人回复：', response)
       return response
     } else {
+      console.log('天行机器人接口调用错误：', res.msg)
       return '我好像迷失在无边的网络中了，你能找回我么'
     }
   } catch (error) {
@@ -182,12 +183,15 @@ async function getTXweather(city) {
  * 获取每日新闻内容
  * @param {*} id 新闻频道对应的ID
  */
-async function getNews(id) {
+async function getNews(id, num = 10) {
+  if(id>1000) {
+    return getFireNews(id, num)
+  }
   try {
     let option = {
       method: 'GET',
       url: '/allnews/',
-      params: { num: 10, col: id },
+      params: { num: num, col: id },
     }
     let content = await txReq(option)
     if (content.code === 200) {
@@ -199,6 +203,8 @@ async function getNews(id) {
         news = `${news}\n${num}.${newList[i].title}`
       }
       return `${news}\n`
+    } else {
+      console.log('获取新闻接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行新闻失败', error)
@@ -219,6 +225,8 @@ async function getMingYan() {
       let newList = content.newslist
       let news = `${newList[0].content}\n——————————${newList[0].author}`
       return news
+    }  else {
+      console.log('获取名人名言接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行名人名言失败', error)
@@ -243,6 +251,8 @@ async function getStar(astro) {
         news = `${news}${item.type}:${item.content}\n`
       }
       return news
+    } else {
+      console.log('获取星座接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行星座运势失败', error)
@@ -264,6 +274,8 @@ async function getXing(name) {
       let newList = content.newslist
       let news = `${newList[0].content}`
       return news
+    } else {
+      console.log('获取姓氏接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行姓氏起源失败', error)
@@ -304,6 +316,8 @@ async function getLunar(date) {
       let item = content.newslist[0]
       let news = `\n阳历：${item.gregoriandate}\n阴历：${item.lunardate}\n节日：${item.lunar_festival}\n适宜：${item.fitness}\n不宜：${item.taboo}\n神位：${item.shenwei}\n胎神：${item.taishen}\n冲煞：${item.chongsha}\n岁煞：${item.suisha}`
       return news
+    } else {
+      console.log('获取老黄历接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行老黄历失败', error)
@@ -324,6 +338,8 @@ async function getGoldReply() {
       let item = content.newslist[0]
       let news = `标题："${item.title}"\n回复：${item.content}`
       return news
+    } else {
+      console.log("获取神回复接口失败", content.msg);
     }
   } catch (error) {
     console.log('获取天行神回复失败', error)
@@ -344,6 +360,8 @@ async function getXhy() {
       let item = content.newslist[0]
       let news = `${item.quest}————${item.result}`
       return news
+    } else {
+      console.log('获取歇后语接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行歇后语失败', error)
@@ -364,6 +382,8 @@ async function getRkl() {
       let item = content.newslist[0]
       let news = `${item.content}`
       return news
+    } else {
+      console.log('获取绕口令接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行绕口令失败', error)
@@ -384,6 +404,8 @@ async function getShortUrl(url) {
       let item = content.newslist[0]
       let shorturl = item.shorturl
       return shorturl
+    }  else {
+      console.log('获取短链接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行短连接失败', error)
@@ -408,6 +430,8 @@ async function getAvatar(base, type) {
     if (content.code === 200) {
       let item = content.newslist[0]
       return item.picurl
+    }  else {
+      console.log('获取自定义头像接口失败', content.msg)
     }
   } catch (e) {
     console.log('获取自定义头像失败', e)
@@ -493,6 +517,8 @@ async function getNcov() {
       //   news = `${news}<br>>>${newList[i].pubDateStr}: ${newList[i].title}<br><br>${newList[i].summary}----------------${newList[i].infoSource}<br><br>`
       // }
       return reply
+    }  else {
+      console.log('获取疫情接口失败', content.msg)
     }
   } catch (e) {
     console.log('获取疫情数据失败', e)
@@ -512,6 +538,8 @@ async function getCname() {
       let item = content.newslist[0]
       let cname = item.name
       return cname
+    }  else {
+      console.log('获取网络取名接口失败', content.msg)
     }
   } catch (error) {
     console.log('获取天行短连接失败', error)

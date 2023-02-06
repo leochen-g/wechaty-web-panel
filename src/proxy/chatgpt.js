@@ -47,12 +47,13 @@ async function geGPTReply(content) {
     replys = replys.map(item=> {
       return {
         type: 1,
-        content: item
+        content: item.trim()
       }
     })
     return replys
   } catch (e) {
-    return [{ type: 1, content: '现在询问我的人太多了，请稍后询问'}]
+    console.log('chat gpt报错：'+ e);
+    return [{ type: 1, content: ''}]
   }
 }
 

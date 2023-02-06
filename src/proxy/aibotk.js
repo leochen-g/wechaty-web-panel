@@ -99,6 +99,32 @@ async function getOne() {
   }
 }
 /**
+ * 获取火灾新闻
+ */
+async function getFireNews(id, num) {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/firenews',
+      params: {
+        id,
+        num
+      },
+    }
+    let content = await aiBotReq(option)
+    let newList = content.data || []
+    let news = ''
+    for (let i in newList) {
+      let num = parseInt(i) + 1
+      news = `${news}\n${num}.${newList[i].title}\n${newList[i].shortUrl?newList[i].shortUrl:newList[i].url}\n`
+    }
+    return `${news}…………………………\n\n您可以 @消防小助手+新闻标题，通过ChatGPT为您分析时事新闻！`
+  } catch (e) {
+    console.log('获取每日一句失败', e)
+    return '今日一句似乎已经消失'
+  }
+}
+/**
  * 获取配置文件
  * @returns {Promise<*>}
  */
@@ -458,6 +484,7 @@ export { getMqttConfig }
 export { getMeiNv }
 export { getOne }
 export { getMaterial }
+export { getFireNews }
 export default {
   getConfig,
   getScheduleList,
@@ -478,4 +505,5 @@ export default {
   getMeiNv,
   getOne,
   getMaterial,
+  getFireNews
 }
