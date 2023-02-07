@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "",
   "exports": {
     ".": {
@@ -63,11 +63,13 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "chatgpt": "^4.1.2",
     "ix": "^4.5.2",
     "jsonwebtoken": "^8.5.1",
     "mqtt": "^4.2.6",
     "mustache": "^4.2.0",
     "nedb": "^1.8.0",
+    "node-fetch": "^2.6.9",
     "node-schedule": "^1.3.2",
     "openai": "^3.1.0",
     "puppeteer": "^13.3.2",

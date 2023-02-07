@@ -1,3 +1,4 @@
+import 'isomorphic-fetch';
 import { addAibotConfig } from './db/aiDb.js'
 import onScan from './handlers/on-scan.js'
 import onLogin from './handlers/on-login.js'
