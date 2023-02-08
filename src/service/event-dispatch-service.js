@@ -211,12 +211,10 @@ async function dispatchAiBot(bot, msg, name, id) {
         break
       case 6:
         // ChatGPT3
-        res = await geGPT3Reply(msg, id)
-        replys = res
-        break
-      case 7:
-        // ChatGPT2
         res = await geGPTReply(msg, id)
+        if(res.length === 1 && !res[0].content) {
+          res = await geGPT3Reply(msg, id)
+        }
         replys = res
         break
       default:
