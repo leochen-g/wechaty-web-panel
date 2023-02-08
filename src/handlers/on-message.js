@@ -128,13 +128,14 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     let replys = "";
     let contactId = contact.id;
     let contactAvatar = await contact.avatar();
+    const userSelfName = that.currentUser?.name() || that.userSelf()?.name()
     switch (type) {
       case that.Message.Type.Text:
         content = msg.text();
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
-        const mentionSelf = await msg.mentionSelf();
+        const mentionSelf = await msg.mentionSelf() || content.includes(`@${userSelfName}`);
         const receiverName = receiver?.name();
-        content = content.replace('@' + receiverName, "").replace(/@[^,，：:\s@]+/g, "").trim();
+        content = content.replace('@' + receiverName, "").replace('@' + userSelfName, "").replace(/@[^,，：:\s@]+/g, "").trim();
 
         // 检测是否需要这条消息
         const isIgnore = checkIgnore(content, aibotConfig.ignoreMessages);
@@ -212,12 +213,6 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
 
 async function onMessage(msg) {
   try {
-    // 为了解决 web 端会把历史聊天记录重新发送一遍，处理接收到的消息是5s 以前的就直接舍弃
-    if(msg.payload && (msg.payload.timestamp < parseInt(new Date().getTime()/1000) - 5)) {
-      console.log('历史消息记录');
-      return
-    }
-
     const config = await allConfig();
     const { role } = config && config.userInfo || {role: 'default'};
     const room = msg.room(); // 是否为群消息

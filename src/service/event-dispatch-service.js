@@ -213,6 +213,7 @@ async function dispatchAiBot(bot, msg, name, id) {
         // ChatGPT3
         res = await geGPTReply(msg, id)
         if(res.length === 1 && !res[0].content) {
+          console.log('第一个gpt接口返回失败，开始请求第二个gpt接口')
           res = await geGPT3Reply(msg, id)
         }
         replys = res
