@@ -1,7 +1,7 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.4.8",
-  "description": "",
+  "version": "1.4.9",
+  "description": "智能微秘书插件",
   "exports": {
     ".": {
       "import": "./dist/esm/src/index.js",
@@ -53,8 +53,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
-    "wechaty": "^1.20.2",
-    "wechaty-puppet-wechat4u": "^1.13.14"
+    "wechaty": "^1.20.2"
   },
   "readme": "README.md",
   "engines": {
@@ -63,7 +62,8 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "chatgpt": "^4.1.2",
+    "chatgpt": "^4.4.0",
+    "dayjs": "^1.11.7",
     "isomorphic-fetch": "^3.0.0",
     "ix": "^4.5.2",
     "jsonwebtoken": "^8.5.1",

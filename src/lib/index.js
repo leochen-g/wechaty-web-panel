@@ -2,6 +2,7 @@ import Crypto from 'crypto'
 import * as schedule from 'node-schedule'
 import fs from 'fs'
 import { addRoom, getRoom } from '../db/roomAvatarDb.js'
+import dayjs from "dayjs";
 /**
  * 设置定时器
  * @param {*} date 日期
@@ -61,9 +62,9 @@ async function delay(ms) {
  * @param {*} date 日期
  */
 function getDay(date) {
-  var date2 = new Date()
-  var date1 = new Date(date)
-  var iDays = parseInt(Math.abs(date2.getTime() - date1.getTime()) / 1000 / 60 / 60 / 24)
+  var date2 = dayjs().startOf('day').valueOf()
+  var date1 = dayjs(date).endOf('day').valueOf()
+  var iDays = parseInt(Math.abs(date2 - date1) / 1000 / 60 / 60 / 24)
   return iDays
 }
 /**

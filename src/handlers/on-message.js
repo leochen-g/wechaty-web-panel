@@ -132,11 +132,10 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     switch (type) {
       case that.Message.Type.Text:
         content = msg.text();
-        console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content}`);
         const mentionSelf = await msg.mentionSelf() || content.includes(`@${userSelfName}`);
         const receiverName = receiver?.name();
         content = content.replace('@' + receiverName, "").replace('@' + userSelfName, "").replace(/@[^,，：:\s@]+/g, "").trim();
-
+        console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content} | 机器人被@：${mentionSelf?'是':'否'}`);
         // 检测是否需要这条消息
         const isIgnore = checkIgnore(content, aibotConfig.ignoreMessages);
         if (isIgnore) return;

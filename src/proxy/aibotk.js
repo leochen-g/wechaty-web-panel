@@ -116,9 +116,14 @@ async function getFireNews(id, num) {
     let news = ''
     for (let i in newList) {
       let num = parseInt(i) + 1
-      news = `${news}\n${num}.${newList[i].title}\n${newList[i].shortUrl?newList[i].shortUrl:newList[i].url}\n`
+      const url = newList[i].shortUrl?newList[i].shortUrl:newList[i].url
+      news = `${news}\r${num}.${newList[i].title}${url?`\r${url}\r`:`\r`}`
     }
-    return `${news}…………………………\n\n您可以 @消防小助手+新闻标题，通过ChatGPT为您分析时事新闻！`
+    const endMap = {
+      1001: '您可以 @消防小助手+新闻标题，通过ChatGPT为您分析时事新闻！',
+      1002: '您可以 @消防小助手+新闻标题，通过ChatGPT为您分析今日消防行业招标信息！',
+    }
+    return `${news}…………………………\r\r${endMap[id]}`
   } catch (e) {
     console.log('获取每日一句失败', e)
     return '今日一句似乎已经消失'
@@ -138,7 +143,7 @@ async function getConfig() {
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
     const cloudRoom = await getWordCloudRoom()
-    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', botScope: 'all', parseMini: false, parseMiniRooms: [], preventLength: 1000, ...config, cloudRoom })
+    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', botScope: 'all', parseMini: false, countDownTaskSchedule: [], parseMiniRooms: [], preventLength: 1000, ...config, cloudRoom })
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)

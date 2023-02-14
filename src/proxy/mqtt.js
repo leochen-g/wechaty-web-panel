@@ -3,7 +3,7 @@ import { allConfig } from '../db/configDb.js'
 import { contactSay, roomSay } from '../common/index.js'
 import { getConfig, getMqttConfig } from './aibotk.js'
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
-import { sendRoomTaskMessage, sendContactTaskMessage } from '../task/index.js'
+import { sendTaskMessage } from "../task/index.js";
 import { randomRange } from '../lib/index.js'
 let mqttclient = null
 async function initMqtt(that) {
@@ -71,10 +71,10 @@ async function initMqtt(that) {
               console.log('事件处理结果', res[0].content)
             } else if (content.target === 'Room') {
               console.log('触发了群事件')
-              await sendRoomTaskMessage(that, content)
+              await sendTaskMessage(that, content)
             } else if (content.target === 'Contact') {
               console.log('触发了好友事件')
-              await sendContactTaskMessage(that, content)
+              await sendTaskMessage(that, content)
             }
           }
         })

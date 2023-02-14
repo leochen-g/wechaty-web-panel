@@ -200,9 +200,9 @@ async function getNews(id, num = 10) {
       // let shortUrl = 'https://www.tianapi.com/weixin/news/?col=' + id
       for (let i in newList) {
         let num = parseInt(i) + 1
-        news = `${news}\n${num}.${newList[i].title}`
+        news = `${news}\r${num}.${newList[i].title}`
       }
-      return `${news}\n`
+      return `${news}\r`
     } else {
       console.log('获取新闻接口失败', content.msg)
     }
@@ -223,7 +223,7 @@ async function getMingYan() {
     let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
-      let news = `${newList[0].content}\n——————————${newList[0].author}`
+      let news = `${newList[0].content}\r——————————${newList[0].author}`
       return news
     }  else {
       console.log('获取名人名言接口失败', content.msg)

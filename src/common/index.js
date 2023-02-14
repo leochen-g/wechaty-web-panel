@@ -9,7 +9,7 @@ import { allConfig } from '../db/configDb.js'
  * @param {*} sortId 新闻资讯分类Id
  * @param {*} endWord 结尾备注
  */
-async function getEveryDayRoomContent(sortId, endWord = '微信小助手', num = 10) {
+async function getNewsContent(sortId, endWord = '', num = 10) {
   let today = formatDate(new Date()) //获取今天的日期
   let news = await getNews(sortId, num)
   let content = `${today}\n${news}\n${endWord?'————————':''}${endWord}`
@@ -38,6 +38,21 @@ async function getRoomEveryDayContent(date, city, endWord) {
   let memorialDay = getDay(date) //获取纪念日天数
   let str = `${today}\n家人们相聚在一起的第${memorialDay}天\n\n元气满满的一天开始啦,家人们要努力保持活跃啊^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n————————${endWord}`
   return str
+}
+
+/**
+ * 获取倒计时内容
+ * @param date
+ * @param prefix
+ * @param suffix
+ * @param endWord
+ * @return {string}
+ */
+function getCountDownContent(date, prefix, suffix, endWord) {
+  let countDownDay = getDay(date) //获取倒计时天数
+  let today = formatDate(new Date()) //获取今天的日期
+  let str = `${today}\r距离${prefix}还有\r\r✦✦✦✦ ${countDownDay}天 ✦✦✦✦\r\r${suffix}${endWord?`\r\r————————${endWord}`:''}`
+  return str;
 }
 /**
  * 更新用户信息
@@ -330,7 +345,7 @@ async function updateRoomOnly(that) {
 export { updateRoomOnly }
 export { updateContactOnly }
 export { getEveryDayContent }
-export { getEveryDayRoomContent }
+export { getNewsContent }
 export { updateContactInfo }
 export { updateRoomInfo }
 export { addRoom }
@@ -339,11 +354,12 @@ export { roomSay }
 export { addRoomWelcomeSay }
 export { updateContactAndRoom }
 export { getRoomEveryDayContent }
+export { getCountDownContent }
 export default {
   updateRoomOnly,
   updateContactOnly,
   getEveryDayContent,
-  getEveryDayRoomContent,
+  getNewsContent,
   updateContactInfo,
   updateRoomInfo,
   addRoom,
@@ -351,5 +367,5 @@ export default {
   roomSay,
   addRoomWelcomeSay,
   updateContactAndRoom,
-  getRoomEveryDayContent
+  getCountDownContent
 }

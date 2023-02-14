@@ -34,9 +34,11 @@ async function geGPTReply(content) {
       top_p: 1,
       frequency_penalty: 0.0,
       presence_penalty: 0.6,
-      stop: [' Human:', ' AI:'],
+      stop: ['Human:', 'AI:'],
     })
+    console.log('chat gpt返回原始数据：'+ response.data.choices[0].text);
     response = markdownToText(response.data.choices[0].text)
+
     let replys = []
     let message = response;
     while (message.length > 500) {
