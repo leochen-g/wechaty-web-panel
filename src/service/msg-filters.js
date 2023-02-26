@@ -145,15 +145,18 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
             return []
           }
           msg = msg.trim()
+          const topic = await room.topic();
           const data = {
             uid: id,
             uname: name,
+            roomId: room && room.id || '',
+            roomName: room && topic || '',
             word: msg,
           }
           item.moreData &&
             item.moreData.length &&
             item.moreData.forEach((mItem) => {
-              if(mItem.key !== 'uid' && mItem.key !== 'word') {
+              if(mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName') {
                 data[mItem.key] = mItem.value
               }
             })

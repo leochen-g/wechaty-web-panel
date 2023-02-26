@@ -383,62 +383,7 @@ function contentDistinguish(keywordArray, name) {
   }
   return scheduleObj
 }
-//过滤联系人
-/**
- * @param {*} param1
- * name：名字
- * alias：别名
- * friend : 1是朋友 2不是朋友
- * type : 1个人   2 公众号  3 未知
- * gender : 1 男  2  女
- * province : 省份
- * city ：城市
- * address：地址
- */
-function filterContacts(contacts, query) {
-  let { name, alias, friend, type, gender, province, city, address } = query
-  return contacts.filter((item) => {
-    let arr = []
-    let payload = item.payload || item._payload
-    if (friend) {
-      let bool = Number(friend) === 1 ? true : false
-      arr.push(bool === payload.friend)
-    }
-    name && arr.push(payload.name.indexOf(name) >= 0)
-    alias && arr.push(payload.alias.indexOf(alias) >= 0)
-    type && arr.push(Number(type) === payload.type)
-    gender && arr.push(Number(gender) === payload.gender)
-    province && arr.push(payload.province.indexOf(province) >= 0)
-    city && arr.push(payload.city.indexOf(city) >= 0)
-    address && arr.push(payload.address.indexOf(address) >= 0)
-    return arr.indexOf(false) < 0
-  })
-}
-/**
- * 格式化联系人
- * @param {*} data
- */
-function formatContacts(data) {
-  let arr = data.map(function (item) {
-    // const file = await item.avatar()
-    // let avatar = await file.toBase64(file.name, true);
-    let payload = item.payload || item._payload
-    return {
-      id: payload.id,
-      name: payload.name,
-      gender: payload.gender === 0 ? '无' : payload.gender === 1 ? '男' : '女',
-      alias: payload.alias,
-      friend: payload.friend ? '是' : '否',
-      star: payload.star ? '是' : '否',
-      type: payload.type === 1 ? '个人' : payload.type === 2 ? '公众号' : '未知',
-      signature: payload.signature,
-      province: payload.province,
-      city: payload.city,
-      address: payload.address,
-    }
-  })
-  return arr
-}
+
 /**
  * 函数节流
  * @param fn
@@ -576,8 +521,6 @@ export { getFormatQuery }
 export { contentDistinguish }
 export { msgArr }
 export { throttle }
-export { formatContacts }
-export { filterContacts }
 export { cancelAllSchedule }
 export { groupArray }
 export { getRoomAvatarList }
@@ -602,8 +545,6 @@ export default {
   contentDistinguish,
   msgArr,
   throttle,
-  formatContacts,
-  filterContacts,
   cancelAllSchedule,
   groupArray,
   getRoomAvatarList,

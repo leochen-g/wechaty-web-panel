@@ -51,7 +51,7 @@ async function getRoomEveryDayContent(date, city, endWord) {
 function getCountDownContent(date, prefix, suffix, endWord) {
   let countDownDay = getDay(date) //获取倒计时天数
   let today = formatDate(new Date()) //获取今天的日期
-  let str = `${today}\r距离${prefix}还有\r\r✦✦✦✦ ${countDownDay}天 ✦✦✦✦\r\r${suffix}${endWord?`\r\r————————${endWord}`:''}`
+  let str = `${today}\r距离${prefix}还有\r\r✦✦✦✦ ${countDownDay}天\r\r${suffix}${endWord?`\r\r————————${endWord}`:''}`
   return str;
 }
 /**
@@ -75,6 +75,7 @@ async function updateContactInfo(that) {
       let obj = {
         robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
         contactId: hasWeixin ? contact.id : MD5(contactSelf.name + contact.name + contact.alias + contact.province + contact.city + contact.gender),
+        wxid: contact.id,
         name: contact.name,
         alias: contact.alias,
         gender: contact.gender,
@@ -120,6 +121,7 @@ async function updateRoomInfo(that) {
       let room = i.payload || i._payload
       let obj = {
         robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
+        wxid: room.id,
         roomId: MD5(room.topic),
         topic: room.topic,
         avatar: room.avatar || '',
@@ -185,12 +187,10 @@ async function roomSay(room, contact, msg) {
   try {
     if (msg.type === 1 && msg.content) {
       // 文字
-      console.log('回复内容', msg.content)
       contact ? await room.say(msg.content, contact) : await room.say(msg.content)
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
-      console.log('回复内容', obj)
       contact ? await room.say('', contact) : ''
       await delay(500)
       await room.say(obj)
@@ -244,17 +244,11 @@ async function contactSay(contact, msg, isRoom = false) {
   try {
     if (msg.type === 1 && msg.content) {
       // 文字
-      console.log('回复内容', msg.content)
       await contact.say(msg.content)
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
       await obj.ready()
-      console.log('回复内容', obj)
-      if (isRoom) {
-        await contact.say(`@${contact.name()}`)
-        await delay(500)
-      }
       await contact.say(obj)
     } else if (msg.type === 3 && msg.url) {
       // bse64文件
