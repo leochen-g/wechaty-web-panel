@@ -23,9 +23,9 @@ async function geGPT3Reply(content, uid) {
       return [{ type: 1, content: '请到平台配置Openai apikey参数方可使用' }]
     }
     if(!chatGPT) {
+      console.log('看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
       await initChatGPT()
     }
-
     const { conversationId, text, id } = await chatGPT.sendMessage(content, chatOption[uid]);
     chatOption = {
       [uid]: {
