@@ -145,7 +145,7 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
             return []
           }
           msg = msg.trim()
-          const topic = await room.topic();
+          const topic = room ? await room.topic():'';
           const data = {
             uid: id,
             uname: name,
