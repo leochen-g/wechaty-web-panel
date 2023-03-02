@@ -15,6 +15,14 @@ export async function initChatGPT() {
   });
 }
 
+/**
+ * 重置apikey
+ * @return {Promise<void>}
+ */
+export function initGpt() {
+  chatGPT = null
+}
+
 async function geGPT3Reply(content, uid) {
   try {
     const config = await allConfig()

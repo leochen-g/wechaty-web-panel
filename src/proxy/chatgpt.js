@@ -12,6 +12,10 @@ function markdownToText(markdown) {
     .toString()
 }
 
+export function initOpenApi() {
+  openai = null
+}
+
 async function geGPTReply(content) {
   try {
     const config = await allConfig()
