@@ -1,5 +1,8 @@
 import { allConfig } from "../db/configDb.js";
 import { ChatGPTAPI } from 'chatgpt'
+import proxy from "https-proxy-agent";
+import nodeFetch from "node-fetch";
+
 let chatGPT = null
 let chatOption = {};
 
@@ -10,9 +13,29 @@ export async function initChatGPT() {
     return [{ type: 1, content: '请到平台配置Openai apikey参数方可使用' }]
   }
   console.log('config.gpttoken', config.gpttoken);
-  chatGPT = new ChatGPTAPI({
-    apiKey: config.gpttoken,
-  });
+  if(config.proxyUrl) {
+    console.log(`启用代理请求:${config.proxyUrl}`);
+    chatGPT = new ChatGPTAPI({
+      apiKey: config.gpttoken,
+      fetch: (url, options = {}) => {
+        const defaultOptions = {
+          agent: proxy(config.proxyUrl),
+        };
+
+        const mergedOptions = {
+          ...defaultOptions,
+          ...options,
+        };
+
+        return nodeFetch(url, mergedOptions);
+      },
+    });
+  } else {
+    console.log('未启用代理请求，可能会失败');
+    chatGPT = new ChatGPTAPI({
+      apiKey: config.gpttoken,
+    });
+  }
 }
 
 /**
