@@ -51,7 +51,7 @@ async function getRoomEveryDayContent(date, city, endWord) {
 function getCountDownContent(date, prefix, suffix, endWord) {
   let countDownDay = getDay(date) //获取倒计时天数
   let today = formatDate(new Date()) //获取今天的日期
-  let str = `${today}\r距离${prefix}还有\r\r✦✦✦✦ ${countDownDay}天\r\r${suffix}${endWord?`\r\r————————${endWord}`:''}`
+  let str = `${today}\r距离${prefix}还有\r\r${countDownDay}天\r\r${suffix}${endWord?`\r\r————————${endWord}`:''}`
   return str;
 }
 /**

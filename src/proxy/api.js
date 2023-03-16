@@ -62,7 +62,7 @@ async function getResByTX(word, id) {
       return '我好像迷失在无边的网络中了，你能找回我么'
     }
   } catch (error) {
-    console.log('天行聊天机器人请求失败：', error)
+    console.log('天行聊天机器人请求失败：参考 http://wechat.aibotk.com/docs/install 在天行申请必选接口', error)
   }
 }
 /**
@@ -129,7 +129,7 @@ async function getRubbishType(word) {
       return '暂时还没找到这个分类信息呢'
     }
   } catch (error) {
-    console.log('垃圾分类请求失败：', error)
+    console.log('垃圾分类请求失败：参考 http://wechat.aibotk.com/docs/install 在天行申请必选接口', error)
   }
 }
 /**
@@ -151,7 +151,7 @@ async function getSweetWord() {
       console.log('获取土情话接口失败', content.msg)
     }
   } catch (err) {
-    console.log('获取土情话接口失败', err)
+    console.log('获取土情话接口失败：参考 http://wechat.aibotk.com/docs/install 在天行申请必选接口', err)
   }
 }
 /**
@@ -176,7 +176,7 @@ async function getTXweather(city) {
       console.log('获取天气接口失败', content.msg)
     }
   } catch (err) {
-    console.log('获取天气接口失败', err)
+    console.log('获取天气接口失败：参考 http://wechat.aibotk.com/docs/install 在天行申请必选接口', err)
   }
 }
 /**
@@ -204,10 +204,10 @@ async function getNews(id, num = 10) {
       }
       return `${news}\r`
     } else {
-      console.log('获取新闻接口失败', content.msg)
+      console.log('获取新闻接口失败：请申请https://www.tianapi.com/apiview/51 这个接口', content.msg)
     }
   } catch (error) {
-    console.log('获取天行新闻失败', error)
+    console.log('获取天行新闻失败：请申请https://www.tianapi.com/apiview/51 这个接口', error)
   }
 }
 /**

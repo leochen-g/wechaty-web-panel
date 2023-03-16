@@ -30,7 +30,13 @@ export async function initChatGPT() {
         return nodeFetch(url, mergedOptions);
       },
     });
-  } else {
+  } else if(config.proxyPassUrl) {
+    console.log(`启用反向代理请求:${config.proxyPassUrl}`);
+    chatGPT = new ChatGPTAPI({
+      apiBaseUrl: config.proxyPassUrl,
+      apiKey: config.gpttoken
+    });
+   } else {
     console.log('未启用代理请求，可能会失败');
     chatGPT = new ChatGPTAPI({
       apiKey: config.gpttoken,
