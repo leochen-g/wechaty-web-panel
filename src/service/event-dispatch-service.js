@@ -6,7 +6,7 @@ import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
-import { geGPTReply, initOpenApi } from '../proxy/chatgpt.js'
+import { initOpenApi } from '../proxy/chatgpt.js'
 import { geGPT3Reply, initGpt } from '../proxy/openAi.js'
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
@@ -214,10 +214,6 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 6:
         // ChatGPT3
         res = await geGPT3Reply(msg, id)
-        if(res.length === 1 && !res[0].content) {
-          console.log('第一个gpt接口返回失败，开始请求第二个gpt接口')
-          res = await geGPTReply(msg, id)
-        }
         replys = res
         break
       default:
