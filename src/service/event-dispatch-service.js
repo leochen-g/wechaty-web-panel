@@ -6,7 +6,6 @@ import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
-import { initOpenApi } from '../proxy/chatgpt.js'
 import { geGPT3Reply, initGpt } from '../proxy/openAi.js'
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
@@ -164,7 +163,6 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         await initTaskLocalSchedule(that)
         await initTimeSchedule(that)
         initGpt();
-        initOpenApi();
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:

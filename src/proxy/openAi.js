@@ -71,7 +71,12 @@ async function geGPT3Reply(content, uid) {
       },
     };
     let replys = []
-    let message = `${content}\n-----------\n` + text;
+    let message;
+    if(config.showQuestion) {
+      message = `${content}\n-----------\n` + text;
+    } else {
+      message = text;
+    }
     while (message.length > 500) {
       replys.push(message.slice(0, 500));
       message = message.slice(500);
