@@ -1,7 +1,6 @@
 import dispatch from './event-dispatch-service.js'
 import { setSchedule, updateSchedule } from '../proxy/aibotk.js'
 import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.js'
-import { generateAvatar } from '../puppeteer-paint/lanuch.js'
 import { addRoom } from '../common/index.js'
 import { service, callbackAibotApi } from '../proxy/superagent.js'
 function emptyMsg({ room, isMention }) {
@@ -254,63 +253,7 @@ async function robotMsg({ msg, name, id, config, isMention, room }) {
     }
   }
 }
-/**
- * 绘制头像
- * @param avatar
- * @param coverImg
- * @returns {Promise<{type: number, content: string}|{type: number, url: (string|HTMLCanvasElement)}>}
- */
-async function drawAvatar(avatar, coverImg) {
-  try {
-    if (avatar.mimeType && coverImg) {
-      // 如果图片类型正确再进行头像处理
-      const base64Text = await avatar.toDataURL()
-      const url = await generateAvatar(base64Text, coverImg)
-      return { type: 3, url }
-    } else {
-      return { type: 1, content: '你的头像属于高维世界产物，小助手能力不足，无法解析，待我修炼真经后为你提供服务' }
-    }
-  } catch (e) {
-    console.log('drawAvatar error', e)
-    return { type: 1, content: '你的头像属于高维世界产物，小助手能力不足，无法解析，待我修炼真经后为你提供服务' }
-  }
-}
-/**
- * 头像处理
- * @param msg
- * @param name
- * @param config
- * @param avatar
- * @returns {Promise<*[]|*>}
- */
-async function avatarCrop({ msg, name, config, avatar }) {
-  try {
-    if (config.avatarList && config.avatarList.length > 0) {
-      for (let item of config.avatarList) {
-        if (item.reg === 2 && item.keywords.includes(msg)) {
-          console.log(`精确匹配到关键词${msg},正在处理用户头像`)
-          const reply = await drawAvatar(avatar, item.coverImg)
-          return [reply]
-        } else if (item.reg === 1) {
-          for (let key of item.keywords) {
-            if (msg.includes(key)) {
-              console.log(`模糊匹配到关键词${msg},正在处理用户头像`)
-              const reply = await drawAvatar(avatar, item.coverImg)
-              return [reply]
-            }
-          }
-        }
-      }
-    } else {
-      return []
-    }
-  } catch (e) {
-    console.log('avatarCrop error：', e)
-    return []
-  }
-}
 export { callbackEvent }
-export { avatarCrop }
 export { emptyMsg }
 export { officialMsg }
 export { newFriendMsg }
@@ -322,7 +265,6 @@ export { robotMsg }
 export { maxLengthMsg }
 export default {
   callbackEvent,
-  avatarCrop,
   emptyMsg,
   officialMsg,
   newFriendMsg,

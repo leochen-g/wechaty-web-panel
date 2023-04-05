@@ -1,7 +1,6 @@
 import Crypto from 'crypto'
 import * as schedule from 'node-schedule'
 import fs from 'fs'
-import { addRoom, getRoom } from '../db/roomAvatarDb.js'
 import dayjs from "dayjs";
 /**
  * 设置定时器
@@ -428,81 +427,7 @@ function groupArray(array, subGroupLength) {
   }
   return newArray
 }
-/**
- * 获取群用户列表
- * @param {*}} room
- * @param {*} name
- */
-async function getRoomAvatarList(room, name) {
-  try {
-    const members = await room.memberAll()
-    let res = []
-    console.log('正在努力获取群成员信息...')
-    for (let i of members) {
-      let member = i.payload || i._payload
-      try {
-        const avatar = await i.avatar()
-        if (avatar._mediaType && avatar._name) {
-          const base64 = member.weixin ? member.avatar : await avatar.toDataURL()
-          let obj = {
-            img: base64,
-            name: member.name,
-          }
-          res.push(obj)
-        }
-      } catch (error) {
-        console.log(`获取${member.name}头像失败， 头像文件格式错误，不影响群合影生成`)
-        continue
-      }
-    }
-    const say = res.splice(
-      res.findIndex((e) => e.name === name),
-      1
-    )
-    res.unshift(say[0])
-    console.log('获取群成员信息完成...')
-    return res
-  } catch (e) {
-    console.log('获取群成员头像列表失败', e)
-  }
-}
-/**
- * 设置中心位置
- */
-function setFirstAvatr(list, name) {
-  const temp = list
-  const say = temp.splice(
-    temp.findIndex((e) => e.name === name),
-    1
-  )
-  temp.unshift(say[0])
-  return temp
-}
-/**
- * 获取群头像列表
- * @param {*} roomObj
- * @param {*} roomName
- * @param {*} name
- */
-async function getRoomAvatar(roomObj, roomName, name) {
-  try {
-    let memberList = []
-    const room = await getRoom(roomName) // 先获取缓存中是否存在已经获取的头像
-    if (room && room.list) {
-      memberList = room.list
-    } else {
-      const list = await getRoomAvatarList(roomObj, name)
-      const obj = { name: roomName, list }
-      await addRoom(obj)
-      memberList = list
-    }
-    console.log('准备绘制...')
-    const list = setFirstAvatr(memberList, name)
-    return list
-  } catch (e) {
-    console.log('getRoomAvatar error', e)
-  }
-}
+
 export { Base64Encode }
 export { Base64Decode }
 export { setLocalSchedule }
@@ -523,8 +448,6 @@ export { msgArr }
 export { throttle }
 export { cancelAllSchedule }
 export { groupArray }
-export { getRoomAvatarList }
-export { getRoomAvatar }
 export { getNewsType }
 export default {
   Base64Encode,
@@ -547,7 +470,5 @@ export default {
   throttle,
   cancelAllSchedule,
   groupArray,
-  getRoomAvatarList,
-  getRoomAvatar,
   getNewsType,
 }

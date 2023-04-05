@@ -143,7 +143,7 @@ async function getConfig() {
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
     const cloudRoom = await getWordCloudRoom()
-    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', botScope: 'all', parseMini: false, showQuestion: true, proxyUrl: '', proxyPassUrl: '', countDownTaskSchedule: [], parseMiniRooms: [], preventLength: 1000, ...config, cloudRoom })
+    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', botScope: 'all', parseMini: false, showQuestion: true, openaiTimeout: 60, openaiAccessToken: '', openaiDebug: false, openaiModel:'gpt-3.5-turbo', proxyUrl: '', proxyPassUrl: '', countDownTaskSchedule: [], parseMiniRooms: [], preventLength: 1000, ...config, cloudRoom })
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)
@@ -354,41 +354,6 @@ async function getQiToken() {
   }
 }
 /**
- * 获取群合影配置
- */
-async function getRoomPhotoConfig(roomName) {
-  try {
-    let option = {
-      method: 'get',
-      url: '/roomPhoto',
-      params: { name: roomName },
-    }
-    let content = await aiBotReq(option)
-    return content.data || ''
-  } catch (e) {
-    console.log('群合影生成错误', e)
-  }
-}
-/**
- * 生成群合影
- * @param {*}} roomName 群名
- * @param {*} list 群成员列表
- * @param {*} contactName 触发用户
- */
-async function drawRoomPhoto(roomName, list, contactName) {
-  try {
-    let option = {
-      method: 'POST',
-      url: '/roomPhoto',
-      params: { name: roomName, user: contactName, list: list },
-    }
-    let content = await aiBotReq(option)
-    return content.data
-  } catch (e) {
-    console.log('群合影生成错误', e)
-  }
-}
-/**
  * 上传base64图片到七牛云
  * @param base
  * @param name
@@ -482,9 +447,7 @@ export { putqn }
 export { sendFriend }
 export { sendRoom }
 export { asyncData }
-export { drawRoomPhoto }
 export { updatePanelVersion }
-export { getRoomPhotoConfig }
 export { getMqttConfig }
 export { getMeiNv }
 export { getOne }
@@ -503,9 +466,7 @@ export default {
   sendFriend,
   sendRoom,
   asyncData,
-  drawRoomPhoto,
   updatePanelVersion,
-  getRoomPhotoConfig,
   getMqttConfig,
   getMeiNv,
   getOne,

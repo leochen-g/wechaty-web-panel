@@ -49,7 +49,7 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
   - [x] 获取美女图 例： "美女图"
   - [x] 群合影 例： "群合影"
   - [x] 牛年头像 例： "牛气冲天"
-  - [x] 国旗头像 例： "我要国旗"
+  - [x] 国旗头像 例： "我要国旗"(下线)
   - [ ] 更多待你发现
 - [x] 进群自动欢迎
 - [x] 加好友自动回复
@@ -62,7 +62,7 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 
 * 特色功能
 
-- [x] 群合影
+- [x] 群合影(下线)
 - [x] 主动发送消息
 - [x] 主动更新配置
 - [x] 主动同步好友和群列表
@@ -185,8 +185,3 @@ $ node mybot.js
 群消息同步
 
 <img src="./doc/img/async.png" width="300">
-
-群合影
-
-<img src="./doc/img/group.jpeg" width="300">
-

@@ -1,5 +1,4 @@
 import { allConfig } from "../db/configDb.js";
-import { ChatGPTAPI } from 'chatgpt'
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
 
@@ -7,16 +6,35 @@ let chatGPT = null
 let chatOption = {};
 
 export async function initChatGPT() {
+  const { ChatGPTAPI } = await import('chatgpt');
   const config = await allConfig()
   if (!config.gpttoken) {
     console.log('请到智能微秘书平台配置Openai apikey参数方可使用')
     return [{ type: 1, content: '请到平台配置Openai apikey参数方可使用' }]
   }
   console.log('config.gpttoken', config.gpttoken);
+  const baseOptions = {
+    apiKey: config.gpttoken,
+    completionParams: { model: config.openaiModel },
+    debug: config.openaiDebug,
+  }
+  // increase max token limit if use gpt-4
+  if (config.openaiModel.toLowerCase().includes('gpt-4')) {
+    // if use 32k model
+    if (config.openaiModel.toLowerCase().includes('32k')) {
+      baseOptions.maxModelTokens = 32768
+      baseOptions.maxResponseTokens = 8192
+    }
+    else {
+      baseOptions.maxModelTokens = 8192
+      baseOptions.maxResponseTokens = 2048
+    }
+  }
+
   if(config.proxyUrl) {
     console.log(`启用代理请求:${config.proxyUrl}`);
     chatGPT = new ChatGPTAPI({
-      apiKey: config.gpttoken,
+      ...baseOptions,
       fetch: (url, options = {}) => {
         const defaultOptions = {
           agent: proxy(config.proxyUrl),
@@ -26,20 +44,31 @@ export async function initChatGPT() {
           ...defaultOptions,
           ...options,
         };
-
         return nodeFetch(url, mergedOptions);
       },
     });
   } else if(config.proxyPassUrl) {
     console.log(`启用反向代理请求:${config.proxyPassUrl}`);
     chatGPT = new ChatGPTAPI({
+      ...baseOptions,
       apiBaseUrl: config.proxyPassUrl,
-      apiKey: config.gpttoken
+      fetch: (url, options = {}) => {
+        const mergedOptions = {
+          ...options,
+        };
+        return nodeFetch(url, mergedOptions);
+      },
     });
    } else {
     console.log('未启用代理请求，可能会失败');
     chatGPT = new ChatGPTAPI({
-      apiKey: config.gpttoken,
+      ...baseOptions,
+      fetch: (url, options = {}) => {
+        const mergedOptions = {
+          ...options,
+        };
+        return nodeFetch(url, mergedOptions);
+      },
     });
   }
 }
@@ -63,7 +92,7 @@ async function geGPT3Reply(content, uid) {
       console.log('看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
       await initChatGPT()
     }
-    const { conversationId, text, id } = await chatGPT.sendMessage(content, chatOption[uid]);
+    const { conversationId, text, id } = await chatGPT.sendMessage(content, { ...chatOption[uid],  timeoutMs: config.openaiTimeout * 1000 });
     chatOption = {
       [uid]: {
         conversationId,

@@ -1,12 +1,12 @@
 import api from '../proxy/api.js'
-import { getConfig, getRoomPhotoConfig, getMeiNv, getWordCloudConfig, getWordCloud } from '../proxy/aibotk.js'
-import { getConstellation, msgArr, getRoomAvatar, getNewsType } from '../lib/index.js'
-import { generateAvatar, generateRoomImg } from '../puppeteer-paint/lanuch.js'
+import { getConfig, getMeiNv, getWordCloudConfig, getWordCloud } from '../proxy/aibotk.js'
+import { getConstellation, msgArr, getNewsType } from '../lib/index.js'
 import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
 import { geGPT3Reply, initGpt } from '../proxy/openAi.js'
+import { geGPTHookReply, initGptHook } from "../proxy/openAiHook.js";
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -57,16 +57,6 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
       case 'rkl':
         content = await api.getRkl(msg)
         break
-      case 'avatar':
-        if (avatar.mimeType) {
-          // 如果图片类型正确再进行头像处理
-          let base64Text = await avatar.toDataURL()
-          url = await generateAvatar({ avatar: base64Text })
-          type = 3
-        } else {
-          content = '你的头像属于高维世界产物，小助手能力不足，无法解析，待我修炼后为你提供服务'
-        }
-        break
       case 'emo':
         url = await api.getEmo(msg)
         type = 2
@@ -80,28 +70,6 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         break
       case 'cname':
         content = await api.getCname()
-        break
-      case 'roomAvatar':
-        let memberList = []
-        const roomName = await room.topic() // 获取群名
-        const config = await getRoomPhotoConfig(roomName)
-        if (!config.authList) {
-          content = '本群暂未开通群合影功能，请联系群主或管理员开启'
-        } else if (config.authList.length) {
-          if (config.authList.includes(name)) {
-            memberList = await getRoomAvatar(room, roomName, name)
-            const baseImg = await generateRoomImg({ list: memberList, options: config })
-            type = 3
-            url = baseImg
-          } else {
-            content = '很抱歉，你没有生成群合影的权限，请联系管理员或群主开通'
-          }
-        } else {
-          memberList = await getRoomAvatar(room, roomName, name)
-          const baseImg = await generateRoomImg({ list: memberList, options: config })
-          type = 3
-          url = baseImg
-        }
         break
       case 'roomCloud': {
         let wordContent = ''
@@ -163,6 +131,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         await initTaskLocalSchedule(that)
         await initTimeSchedule(that)
         initGpt();
+        initGptHook();
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:
@@ -212,6 +181,11 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 6:
         // ChatGPT3
         res = await geGPT3Reply(msg, id)
+        replys = res
+        break
+      case 7:
+        // ChatGPT-hook
+        res = await geGPTHookReply(msg, id)
         replys = res
         break
       default:

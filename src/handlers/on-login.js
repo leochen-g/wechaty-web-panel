@@ -19,7 +19,7 @@ async function onLogin(user) {
     const payload = user.payload || user._payload
     const userInfo = {
       ...payload,
-      robotId: payload.weixin || MD5(user.name()),
+      robotId: payload.wxid || user.id,
     }
     await addUser(userInfo) // 全局存储登录用户信息
     let file = ''

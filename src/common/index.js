@@ -60,37 +60,30 @@ function getCountDownContent(date, prefix, suffix, endWord) {
 async function updateContactInfo(that) {
   try {
     const contactSelf = await getUser()
-    const hasWeixin = contactSelf && !!contactSelf.weixin
     const contactList = await that.Contact.findAll() || []
     let res = []
     const notids = ['filehelper', 'fmessage']
-    let realContact = hasWeixin
-      ? contactList.filter((item) => {
+    let realContact = contactList.filter((item) => {
           const payload = item.payload || item._payload
-          return payload.type === 1 && payload.friend && !notids.includes(payload.id)
+          return payload.friend && !notids.includes(payload.id) && !payload.id.includes('gh_')
         })
-      : contactList
     for (let i of realContact) {
       let contact = i.payload || i._payload
       let obj = {
-        robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
-        contactId: hasWeixin ? contact.id : MD5(contactSelf.name + contact.name + contact.alias + contact.province + contact.city + contact.gender),
+        robotId: contactSelf.robotId,
+        contactId: contact.id,
         wxid: contact.id,
-        name: contact.name,
-        alias: contact.alias,
+        name: contact.name || '',
+        alias: contact.alias || '',
         gender: contact.gender,
-        province: contact.province,
-        city: contact.city,
-        avatar: hasWeixin ? contact.avatar : '',
+        avatar: contact.avatar || '',
         friend: contact.friend,
-        signature: contact.signature,
-        star: contact.star,
-        type: hasWeixin ? contact.type : '',
-        weixin: hasWeixin ? contact.weixin : '',
+        type: contact.type || '',
+        weixin: contact.weixin || '',
       }
       res.push(obj)
     }
-    await updateFriendInfo(res, 50)
+    await updateFriendInfo(res, 80)
   } catch (e) {
     console.log('e', e)
   }
@@ -114,15 +107,14 @@ async function updateFriendInfo(list, num) {
 async function updateRoomInfo(that) {
   try {
     const contactSelf = await getUser()
-    const hasWeixin = contactSelf && !!contactSelf.weixin
     const roomList = await that.Room.findAll() || []
     let res = []
     for (let i of roomList) {
       let room = i.payload || i._payload
       let obj = {
-        robotId: hasWeixin ? contactSelf.weixin : MD5(contactSelf.name),
+        robotId: contactSelf.robotId,
         wxid: room.id,
-        roomId: MD5(room.topic),
+        roomId: room.id,
         topic: room.topic,
         avatar: room.avatar || '',
         ownerId: room.ownerId || '',
@@ -131,7 +123,7 @@ async function updateRoomInfo(that) {
       }
       res.push(obj)
     }
-    await updateRoomsInfo(res, 40)
+    await updateRoomsInfo(res, 80)
   } catch (e) {
     console.log('e', e)
   }

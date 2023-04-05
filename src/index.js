@@ -1,4 +1,3 @@
-import 'isomorphic-fetch';
 import { addAibotConfig } from './db/aiDb.js'
 import onScan from './handlers/on-scan.js'
 import onLogin from './handlers/on-login.js'
@@ -11,6 +10,19 @@ import onHeartbeat from './handlers/on-heartbeat.js'
 import onError from './handlers/on-error.js'
 import onRoomtopic from './handlers/on-roomtopic.js'
 import onRoomleave from './handlers/on-roomleave.js'
+import dayjs from "dayjs";
+const originalConsoleLog = console.log;
+
+// 重写 console.log 方法
+console.log = function() {
+  // 在原始方法上调用，确保与原始方法相同的行为
+  originalConsoleLog.apply(
+    console,
+    // 将类数组对象转换为数组，并在其开头添加一个时间戳
+    [`${dayjs().format('YYYY-MM-DD HH:mm:ss')} -`].concat(Array.from(arguments)).concat('\n')
+  );
+};
+
 let envKey = ''
 let envSecret = ''
 if (process.env['AIBOTK_KEY']) {
