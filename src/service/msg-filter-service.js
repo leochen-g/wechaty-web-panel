@@ -45,7 +45,6 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
-      { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },
       { bool: config.autoReply && config.botScope !== 'room', method: 'robotMsg' },
     ]
@@ -74,7 +73,6 @@ async function filterRoomMsg({that, msg, name, id, avatar, room, isMention }) {
       { bool: msg === '', method: 'emptyMsg' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
-      { bool: config.avatarList && config.avatarList.length > 0, method: 'avatarCrop' },
       { bool: true, method: 'keywordsMsg' },
       { bool: config.autoReply && config.botScope !== 'friend', method: 'robotMsg' },
     ]

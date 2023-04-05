@@ -29,12 +29,12 @@ service.interceptors.response.use(
         if (Array.isArray(res.data)) {
           return Promise.resolve(res.data)
         } else {
-          const res = [{ type: 1, content: '回调函数返回参数错误：' + JSON.stringify(res.data) }]
-          return Promise.resolve(res)
+          const result = [{ type: 1, content: '回调函数返回参数错误：' + JSON.stringify(res.data) }]
+          return Promise.resolve(result)
         }
       } else {
-        const res = [{ type: 1, content: res.msg }]
-        return Promise.resolve(res)
+        const result = [{ type: 1, content: res.msg }]
+        return Promise.resolve(result)
       }
     }
     const res = [{ type: 1, content: '回调接口网络错误：' + response.status }]

@@ -65,35 +65,9 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         url = await getMeiNv()
         type = 2
         break
-      case 'ncov':
-        content = await api.getNcov()
-        break
       case 'cname':
         content = await api.getCname()
         break
-      case 'roomCloud': {
-        let wordContent = ''
-        const roomName = await room.topic() // 获取群名
-        const config = await getWordCloudConfig(roomName)
-        if (!config.authList) {
-          content = '本群暂未开通群词云功能，请联系群主或管理员开启'
-        } else if (config.authList.length) {
-          if (config.authList.includes(name)) {
-            wordContent = await getRoomRecordContent(roomName, config.day)
-            const baseImg = await getWordCloud(wordContent, config.background, config.border)
-            type = 3
-            url = baseImg
-          } else {
-            content = '很抱歉，你没有生成群词云的权限，请联系管理员或群主开通'
-          }
-        } else {
-          wordContent = await getRoomRecordContent(roomName, config.day)
-          const baseImg = await getWordCloud(wordContent, config.background, config.border)
-          type = 3
-          url = baseImg
-        }
-        break
-      }
       case 'removeRecord': {
         const roomName = await room.topic() // 获取群名
         const config = await getWordCloudConfig(roomName)
