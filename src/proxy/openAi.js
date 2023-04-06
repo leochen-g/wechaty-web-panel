@@ -1,12 +1,12 @@
 import { allConfig } from "../db/configDb.js";
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
+import {ChatGPTAPI} from "../lib/chatGPT.js";
 
 let chatGPT = null
 let chatOption = {};
 
 export async function initChatGPT() {
-  const { ChatGPTAPI } = await import('chatgpt');
   const config = await allConfig()
   if (!config.gpttoken) {
     console.log('请到智能微秘书平台配置Openai apikey参数方可使用')

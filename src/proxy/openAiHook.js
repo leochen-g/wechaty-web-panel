@@ -1,12 +1,12 @@
 import { allConfig } from "../db/configDb.js";
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
+import { ChatGPTUnofficialProxyAPI }  from '../lib/chatGPT.js'
 
 let chatGPT = null
 let chatOption = {};
 
 export async function initChatGPTHook() {
-  const { ChatGPTUnofficialProxyAPI } = await import('chatgpt');
   const config = await allConfig()
   if (!config.openaiAccessToken) {
     console.log('请到智能微秘书平台配置Openai accessToken参数方可使用')
