@@ -1,6 +1,6 @@
 import Keyv from "keyv";
 import pTimeout from "./pTimeout.js";
-import QuickLRU from "quick-lru";
+import QuickLRU from "./quick-lru.js";
 import { v4 as uuidv4 } from "uuid";
 import { get_encoding } from "@dqbd/tiktoken";
 import { createParser } from "eventsource-parser";
