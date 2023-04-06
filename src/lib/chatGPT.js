@@ -1,5 +1,5 @@
 import Keyv from "keyv";
-import pTimeout from "p-timeout";
+import pTimeout from "./pTimeout.js";
 import QuickLRU from "quick-lru";
 import { v4 as uuidv4 } from "uuid";
 import { get_encoding } from "@dqbd/tiktoken";
