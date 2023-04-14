@@ -1,12 +1,12 @@
 import api from '../proxy/api.js'
-import { getConfig, getMeiNv, getWordCloudConfig, getWordCloud } from '../proxy/aibotk.js'
+import { getConfig, getMeiNv, getWordCloudConfig } from '../proxy/aibotk.js'
 import { getConstellation, msgArr, getNewsType } from '../lib/index.js'
 import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
-import { getRoomRecordContent, removeRecord } from "../db/roomDb.js";
-import { geGPT3Reply, initGpt } from '../proxy/openAi.js'
-import { geGPTHookReply, initGptHook } from "../proxy/openAiHook.js";
+import { removeRecord } from "../db/roomDb.js";
+import { getGptOfficialReply, reset as officialReset } from "../proxy/openAi.js";
+import { getGptUnOfficialReply, reset } from "../proxy/openAiHook.js";
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -104,8 +104,8 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         await getConfig()
         await initTaskLocalSchedule(that)
         await initTimeSchedule(that)
-        initGpt();
-        initGptHook();
+        reset();
+        officialReset();
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:
@@ -154,12 +154,12 @@ async function dispatchAiBot(bot, msg, name, id) {
         break
       case 6:
         // ChatGPT3
-        res = await geGPT3Reply(msg, id)
+        res = await getGptOfficialReply(msg, id)
         replys = res
         break
       case 7:
         // ChatGPT-hook
-        res = await geGPTHookReply(msg, id)
+        res = await getGptUnOfficialReply(msg, id)
         replys = res
         break
       default:

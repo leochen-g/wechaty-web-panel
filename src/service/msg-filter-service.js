@@ -4,13 +4,13 @@ const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '�
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
 const REMINDKEY = '提醒'
 const NEWADDFRIEND = '你已添加'
-async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, id, room, isMention }) {
+async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, id, room, isMention, roomName, roomId }) {
   try {
     let msgArr = []
     for (let i = 0; i < resArray.length; i++) {
       const item = resArray[i]
       if (item.bool) {
-        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room, isMention })) || []
+        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room, isMention, roomName, roomId })) || []
       }
       if (msgArr.length > 0) {
         return msgArr
@@ -46,6 +46,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: true, method: 'keywordsMsg' },
+      { bool: config.customBotConfig && config.customBotConfig.length > 0, method: 'customChat' },
       { bool: config.autoReply && config.botScope !== 'room', method: 'robotMsg' },
     ]
     const msgArr = await getMsgReply(resArray, { that, msg, contact, name, config, avatar, id })
@@ -66,7 +67,7 @@ async function filterFriendMsg(that, contact, msg) {
  * 1 开启了好友验证 || 朋友推荐消息 || 发送的文字消息过长,大于40个字符
  * 2 初次添加好友
  */
-async function filterRoomMsg({that, msg, name, id, avatar, room, isMention }) {
+async function filterRoomMsg({that, msg, name, id, avatar, room, isMention, roomName, roomId }) {
   try {
     const config = await allConfig() // 获取配置信息
     const resArray = [
@@ -74,9 +75,10 @@ async function filterRoomMsg({that, msg, name, id, avatar, room, isMention }) {
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: true, method: 'keywordsMsg' },
+      { bool: config.customBotConfig && config.customBotConfig.length > 0, method: 'customChat' },
       { bool: config.autoReply && config.botScope !== 'friend', method: 'robotMsg' },
     ]
-    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, isMention })
+    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, roomName, roomId, isMention })
     return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
   } catch (e) {
     console.log('filterRoomMsg error', e)
