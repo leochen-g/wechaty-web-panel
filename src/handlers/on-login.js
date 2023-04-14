@@ -1,5 +1,4 @@
-import { MD5 } from '../lib/index.js'
-import { getConfig, sendRobotInfo, sendError, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
+import { getConfig, sendRobotInfo, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
 import { addUser } from '../db/userDb.js'
 import { initMqtt } from '../proxy/mqtt.js'
 import { allConfig } from '../db/configDb.js'
@@ -12,7 +11,6 @@ async function onLogin(user) {
     console.log(`贴心助理${user}登录了`)
     await updatePanelVersion()
     await setQrCode('', 4)
-    await sendError('')
     await getConfig() // 获取配置文件
     const config = await allConfig()
     const { userId } = config && config.userInfo

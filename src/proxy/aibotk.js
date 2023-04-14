@@ -242,24 +242,7 @@ async function sendHeartBeat(heart) {
     console.log('推送心跳失败', error)
   }
 }
-/**
- * 推送错误
- * @param error
- * @returns {Promise<void>}
- */
-async function sendError(error) {
-  try {
-    let option = {
-      method: 'GET',
-      url: '/wechat/qrerror',
-      params: { qrError: error },
-    }
-    let content = await aiBotReq(option)
-    console.log('推送错误成功', error)
-  } catch (e) {
-    console.log('推送错误失败', e)
-  }
-}
+
 /**
  * 更新头像
  * @returns {Promise<void>}
@@ -441,7 +424,6 @@ export { setSchedule }
 export { updateSchedule }
 export { setQrCode }
 export { sendHeartBeat }
-export { sendError }
 export { sendRobotInfo }
 export { putqn }
 export { sendFriend }
@@ -460,7 +442,6 @@ export default {
   updateSchedule,
   setQrCode,
   sendHeartBeat,
-  sendError,
   sendRobotInfo,
   putqn,
   sendFriend,

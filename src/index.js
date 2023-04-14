@@ -33,7 +33,7 @@ if (process.env['AIBOTK_SECRET']) {
   console.log('使用环境变量中的 aibotkSecret')
   envSecret = process.env['AIBOTK_SECRET']
 }
-function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
+function WechatyWebPanelPlugin(config = { apiKey, apiSecret, scanTimes }) {
   const initConfig = {
     apiKey: envKey || config.apiKey,
     apiSecret: envSecret || config.apiSecret,
@@ -41,6 +41,7 @@ function WechatyWebPanelPlugin(config = { apiKey, apiSecret }) {
     ignoreMessages: config.ignoreMessages || [],
     // 需要忽略的事件 ['scan', 'login', 'logout', 'friendship', 'room-join', 'room-topic', 'room-leave', 'message', 'ready', 'heartbeat', 'error']
     ignoreEvents: config.ignoreEvents || [],
+    scanTimes: config.scanTimes || 50
   }
   addAibotConfig(initConfig)
   return function (bot) {
