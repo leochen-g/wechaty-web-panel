@@ -1,4 +1,4 @@
 async function onError(error) {
-    console.log('发生了一些错误，如果机器人正常运行，可以无需关心：', error)
+  console.log('捕捉到🐛，如果还能正常运行，可以忽略', error)
 }
 export default onError

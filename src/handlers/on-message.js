@@ -144,8 +144,10 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           content,
           name: contactName,
           id: contactId,
+          roomId: room.id,
           avatar: contactAvatar,
           room,
+          roomName,
           isMention: mentionSelf
         });
         for (let reply of replys) {
@@ -157,7 +159,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         if (role === "vip" && cloudRoom.includes(roomName) && !checkIgnore(content, ignoreRecord)) {
           const regex = /(<([^>]+)>)/ig;
           content = content.replace(regex, "");
-          addRoomRecord({
+          void addRoomRecord({
             roomName,
             roomId: room.id,
             content,

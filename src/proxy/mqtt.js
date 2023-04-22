@@ -1,10 +1,13 @@
 import * as mqtt from 'mqtt'
 import { allConfig } from '../db/configDb.js'
 import { contactSay, roomSay } from '../common/index.js'
-import { getConfig, getMqttConfig } from './aibotk.js'
+import { getConfig, getMqttConfig, getGptConfig } from './aibotk.js'
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
 import { sendTaskMessage } from "../task/index.js";
 import { randomRange } from '../lib/index.js'
+import { reset } from './bot/chatgpt.js'
+import { reset as webReset } from './bot/chatgpt-web.js'
+
 let mqttclient = null
 async function initMqtt(that) {
   try {
@@ -75,6 +78,13 @@ async function initMqtt(that) {
             } else if (content.target === 'Contact') {
               console.log('触发了好友事件')
               await sendTaskMessage(that, content)
+            }
+          } else if(topic === `aibotk/${userId}/gptconfig`) {
+            await getGptConfig()
+            if(content.event === 'update' || content.event === 'delete') {
+              console.log('更新gpt配置')
+              reset(content.updateId)
+              webReset(content.updateId)
             }
           }
         })

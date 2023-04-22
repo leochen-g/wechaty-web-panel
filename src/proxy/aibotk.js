@@ -1,6 +1,7 @@
 import { aiBotReq, req } from './superagent.js'
 import { updateConfig } from '../db/configDb.js'
 import { packageJson } from '../package-json.js'
+import { updateAllGptConfig } from "../db/gptConfig.js";
 /**
  * 获取美女图片
  */
@@ -143,12 +144,101 @@ async function getConfig() {
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
     const cloudRoom = await getWordCloudRoom()
-    let cres = await updateConfig({ puppetType: 'wechaty-puppet-wechat', botScope: 'all', parseMini: false, showQuestion: true, openaiTimeout: 60, openaiAccessToken: '', openaiDebug: false, openaiModel:'gpt-3.5-turbo', proxyUrl: '', proxyPassUrl: '', countDownTaskSchedule: [], parseMiniRooms: [], preventLength: 1000, ...config, cloudRoom })
+    await getGptConfig()
+    let cres = await updateConfig({
+      puppetType: 'wechaty-puppet-wechat',
+      botScope: 'all',
+      parseMini: false,
+      openaiSystemMessage: '',
+      showQuestion: true,
+      openaiTimeout: 60,
+      openaiAccessToken: '',
+      openaiDebug: false,
+      openaiModel:'gpt-3.5-turbo',
+      proxyUrl: '',
+      proxyPassUrl: '',
+      chatFilter: 0,
+      filterType: 1, // 过滤引擎类型 1 百度文本审核
+      filterAppid: '',
+      filterApiKey: '',
+      filterSecretKey: '',
+      countDownTaskSchedule: [],
+      parseMiniRooms: [],
+      preventLength: 1000,
+      ...config,
+      cloudRoom
+    })
     return cres
   } catch (e) {
     console.log('获取配置文件失败:' + e)
   }
 }
+
+/**
+ * 获取gpt配置
+ * @return {Promise<*>}
+ */
+export async function getGptConfig() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/gpt/config',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    if(content.data) {
+      const list = content.data.map(item=> ({...item, _id: item.id}))
+      await updateAllGptConfig(list)
+    }
+  } catch (error) {
+    console.log('获取gpt配置文件失败:' + error)
+  }
+}
+
+/**
+ * 更新对话次数
+ * @param id
+ * @param num
+ * @return {Promise<*>}
+ */
+async function updateChatRecord(id, num) {
+  try {
+    let option = {
+      method: 'POST',
+      url: '/gpt/config',
+      params: {
+        id,
+        usedNum: num
+      },
+    }
+    let content = await aiBotReq(option)
+    return content.data
+  } catch (error) {
+    console.log('更新对话次数' + error)
+  }
+}
+
+/**
+ * 获取promotion信息
+ * @param id
+ * @return {Promise<*>}
+ */
+async function getPromotInfo(id) {
+  try {
+    let option = {
+      method: 'get',
+      url: '/promot/info',
+      params: {
+        id
+      },
+    }
+    let content = await aiBotReq(option)
+    return content.data
+  } catch (e) {
+    console.log("catch error:" + e);
+  }
+}
+
 /**
  * 获取定时提醒任务列表
  */
@@ -242,7 +332,6 @@ async function sendHeartBeat(heart) {
     console.log('推送心跳失败', error)
   }
 }
-
 /**
  * 更新头像
  * @returns {Promise<void>}
@@ -257,7 +346,6 @@ async function sendRobotInfo(url, name, id) {
       params: { avatar: url, robotName: name, robotId: id },
     }
     let content = await aiBotReq(option)
-    console.log('推送头像成功')
   } catch (error) {
     console.log('推送头像失败', error)
   }
@@ -435,6 +523,8 @@ export { getMeiNv }
 export { getOne }
 export { getMaterial }
 export { getFireNews }
+export { updateChatRecord }
+export {  getPromotInfo }
 export default {
   getConfig,
   getScheduleList,

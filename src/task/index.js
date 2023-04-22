@@ -43,7 +43,7 @@ async function findTarget({ that, type, name, alias, wxid = '' }) {
 async function setTask(that, item, name, callback) {
   try {
     let time = item.date;
-    item.type = item.type ? item.type : "room";
+    item.type = item.type ? item.type : "contact";
     const target = await findTarget({ that, type: item.type, name: item.roomName || item.name, alias: item.alias || '', wxid: item.wxid || '' });
     if (!target) {
       console.log(`查找不到${typeMap[item.type]}：${item.roomName || item.name}`);
@@ -218,19 +218,19 @@ async function initTaskLocalSchedule(that) {
     // 每日说定时任务
     if (dayTaskSchedule && dayTaskSchedule.length > 0) {
       dayTaskSchedule.forEach((item, index) => {
-        setTask(that, item, `task_day_${index}`, sendEveryDay);
+        setTask(that, { type: 'contact', ...item }, `task_day_${index}`, sendEveryDay);
       });
     }
     // 新闻资讯定时任务
     if (roomNewsSchedule && roomNewsSchedule.length > 0) {
       roomNewsSchedule.forEach((item, index) => {
-        setTask(that, item, `task_news_${index}`, sendNews);
+        setTask(that, { type: 'room', ...item }, `task_news_${index}`, sendNews);
       });
     }
     // 自定义内容定时任务
     if (roomTaskSchedule && roomTaskSchedule.length > 0) {
       roomTaskSchedule.forEach((item, index) => {
-        setTask(that, item, `task_custom_${index}`, sendCustom);
+        setTask(that, { type: 'room', ...item }, `task_custom_${index}`, sendCustom);
       });
     }
     // 倒计时定时任务

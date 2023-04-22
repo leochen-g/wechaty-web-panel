@@ -52,7 +52,7 @@ service.interceptors.response.use(
  * @param {*} params 参数
  * @param {*} contentType 发送请求数据类型
  */
-function get({ url, params, contentType = 'application/x-www-form-urlencoded', platform = 'tx', authorization = '', spider = false }) {
+function get({ url, params, contentType = 'application/json', platform = 'tx', authorization = '', spider = false }) {
   return new Promise((resolve, reject) => {
     superagent
       .get(url)
@@ -87,7 +87,7 @@ function get({ url, params, contentType = 'application/x-www-form-urlencoded', p
  * @param {*} contentType 发送请求数据类型
  * @param authorization
  */
-function post({ url, params, contentType = 'application/x-www-form-urlencoded', authorization = '', platform = 'tx', spider = false, skipCheck = false }) {
+function post({ url, params, contentType = 'application/json', authorization = '', platform = 'tx', spider = false, skipCheck = false }) {
   return new Promise((resolve, reject) => {
     superagent
       .post(url)

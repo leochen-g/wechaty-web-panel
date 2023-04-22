@@ -57,8 +57,12 @@ function getCountDownContent(date, prefix, suffix, endWord) {
 /**
  * 更新用户信息
  */
-async function updateContactInfo(that) {
+async function updateContactInfo(that, noCache = false) {
   try {
+    if(noCache && that.puppet.syncContact) {
+      await that.puppet.syncContact()
+      await delay(5000)
+    }
     const contactSelf = await getUser()
     const contactList = await that.Contact.findAll() || []
     let res = []
@@ -104,8 +108,12 @@ async function updateFriendInfo(list, num) {
 /**
  * 更新群列表
  */
-async function updateRoomInfo(that) {
+async function updateRoomInfo(that, noCache = false) {
   try {
+    if(noCache && that.puppet.syncContact) {
+      await that.puppet.syncContact()
+      await delay(5000)
+    }
     const contactSelf = await getUser()
     const roomList = await that.Room.findAll() || []
     let res = []
@@ -302,7 +310,7 @@ async function updateContactAndRoom(that) {
   await delay(3000)
   await asyncData(contactSelf.robotId, 2)
   await delay(3000)
-  await updateRoomInfo(that)
+  await updateRoomInfo(that, true)
   await delay(3000)
   await updateContactInfo(that)
 }
@@ -315,7 +323,7 @@ async function updateContactOnly(that) {
   const contactSelf = await getUser()
   await asyncData(contactSelf.robotId, 1)
   await delay(3000)
-  await updateContactInfo(that)
+  await updateContactInfo(that, true)
 }
 /**
  * 重新同步群
@@ -326,7 +334,7 @@ async function updateRoomOnly(that) {
   const contactSelf = await getUser()
   await asyncData(contactSelf.robotId, 2)
   await delay(3000)
-  await updateRoomInfo(that)
+  await updateRoomInfo(that, true)
 }
 export { updateRoomOnly }
 export { updateContactOnly }

@@ -3,8 +3,11 @@ import { setSchedule, updateSchedule } from '../proxy/aibotk.js'
 import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.js'
 import { addRoom } from '../common/index.js'
 import { service, callbackAibotApi } from '../proxy/superagent.js'
+import { dispatchBot } from '../proxy/bot/dispatch.js'
+import { getAllGptConfig } from "../db/gptConfig.js";
+
 function emptyMsg({ room, isMention }) {
-  if(room && !isMention) return []
+  if (room && !isMention) return []
   let msgArr = [] // 返回的消息列表
   let obj = { type: 1, content: '我在呢', url: '' } // 消息主体
   msgArr.push(obj)
@@ -140,22 +143,22 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
           // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
-          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
+          if ((room && item.needAt === 1 && !isMention) || (room && item.needAt === undefined && !isMention) || (room && item.scope === 'friend') || (!room && item.scope === 'room')) {
             return []
           }
           msg = msg.trim()
-          const topic = room ? await room.topic():'';
+          const topic = room ? await room.topic() : ''
           const data = {
             uid: id,
             uname: name,
-            roomId: room && room.id || '',
-            roomName: room && topic || '',
+            roomId: (room && room.id) || '',
+            roomName: (room && topic) || '',
             word: msg,
           }
           item.moreData &&
             item.moreData.length &&
             item.moreData.forEach((mItem) => {
-              if(mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName') {
+              if (mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName') {
                 data[mItem.key] = mItem.value
               }
             })
@@ -181,7 +184,7 @@ async function eventMsg({ that, msg, name, id, avatar, config, room, isMention }
       for (let key of item.keywords) {
         if ((item.reg === 1 && msg.includes(key)) || (item.reg === 2 && msg === key)) {
           // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
-          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
+          if ((room && item.needAt === 1 && !isMention) || (room && item.needAt === undefined && !isMention) || (room && item.scope === 'friend') || (!room && item.scope === 'room')) {
             return []
           }
           msg = msg.replace(key, '')
@@ -206,7 +209,7 @@ async function keywordsMsg({ msg, config, room, isMention }) {
       for (let item of config.replyKeywords) {
         if (item.reg === 2 && item.keywords.includes(msg)) {
           // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
-          if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
+          if ((room && item.needAt === 1 && !isMention) || (room && item.needAt === undefined && !isMention) || (room && item.scope === 'friend') || (!room && item.scope === 'room')) {
             return []
           }
           console.log(`精确匹配到关键词${msg},正在回复用户`)
@@ -215,7 +218,7 @@ async function keywordsMsg({ msg, config, room, isMention }) {
           for (let key of item.keywords) {
             if (msg.includes(key)) {
               // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
-              if(room && item.needAt === 1 && !isMention || room && item.needAt === undefined && !isMention || room && item.scope === 'friend' || !room && item.scope === 'room') {
+              if ((room && item.needAt === 1 && !isMention) || (room && item.needAt === undefined && !isMention) || (room && item.scope === 'friend') || (!room && item.scope === 'room')) {
                 return []
               }
               console.log(`模糊匹配到关键词${msg},正在回复用户`)
@@ -234,7 +237,7 @@ async function keywordsMsg({ msg, config, room, isMention }) {
 }
 async function robotMsg({ msg, name, id, config, isMention, room }) {
   // 如果群里没有提及不开启机器人聊天
-  if(room && !isMention) {
+  if (room && !isMention) {
     return []
   } else {
     try {
@@ -253,6 +256,60 @@ async function robotMsg({ msg, name, id, config, isMention, room }) {
     }
   }
 }
+
+async function customChat({ msg, name, id, config, isMention, room, roomId, roomName }) {
+  try {
+    const gptConfigs = await getAllGptConfig()
+    if (gptConfigs && gptConfigs.length) {
+      let finalConfig = ''
+      if (room) {
+        finalConfig = room && gptConfigs.find((item) => {
+          const targetNames = [];
+          const targetIds = [];
+          item.targets.forEach(tItem=> {
+            targetNames.push(tItem.name)
+            targetIds.push(tItem.id)
+          })
+          return item.type === 'room' && (targetNames.includes(roomName) || targetIds.includes(roomId))
+        })
+      } else {
+        finalConfig = !room && gptConfigs.find((item) => {
+          const targetNames = [];
+          const targetIds = [];
+          item.targets.forEach(tItem=> {
+            targetNames.push(tItem.name)
+            targetIds.push(tItem.id)
+          })
+          return item.type === 'contact' && (targetNames.includes(name) || targetIds.includes(id))
+        })
+      }
+      if (finalConfig) {
+        if(finalConfig.limitNum>0 && finalConfig.limitNum <= finalConfig.usedNum) {
+          return [{ type: 1, content: '聊天次数已用完，请联系管理员充值' }]
+        }
+        const isRoom = finalConfig.type === 'room'
+        if (finalConfig.openChat) {
+          if ((isRoom && finalConfig.needAt === 1 && isMention) || isRoom & !finalConfig.needAt || !isRoom) {
+            const keyword = finalConfig?.keywords.find((item) => msg.includes(item))
+            if(keyword || !finalConfig?.keywords.length) {
+              msg = keyword ? msg.replace(keyword, ''): msg
+              const msgArr = await dispatchBot({ botType: finalConfig.robotType, content: msg, uid: id, adminId: finalConfig.id, config: finalConfig.botConfig })
+              return msgArr
+            }
+          }
+          return []
+        }
+        return finalConfig.defaultReply ? [{ type: 1, content: finalConfig.defaultReply }] : []
+      }
+      return []
+    }
+    return []
+  } catch (e) {
+    console.log('catch error:' + e)
+    return []
+  }
+}
+
 export { callbackEvent }
 export { emptyMsg }
 export { officialMsg }
@@ -263,6 +320,7 @@ export { eventMsg }
 export { keywordsMsg }
 export { robotMsg }
 export { maxLengthMsg }
+export { customChat }
 export default {
   callbackEvent,
   emptyMsg,
@@ -273,5 +331,6 @@ export default {
   eventMsg,
   keywordsMsg,
   robotMsg,
-  maxLengthMsg
+  maxLengthMsg,
+  customChat
 }
