@@ -26,10 +26,17 @@ export async function getGptOfficialReply(content, uid) {
       showQuestion: config.showQuestion, // 显示原文
       timeoutMs: config.openaiTimeout, // 超时时间 s
       model: config.openaiModel, // 模型
-      systemMessage: config.openaiSystemMsg, // 预设promotion
+      systemMessage: config.openaiSystemMessage, // 预设promotion
+      filter: config.chatFilter,
+      filterConfig: {
+        type: 1,
+        appId: config.filterAppid,
+        apiKey: config.filterApiKey,
+        secretKey: config.filterSecretKey
+      }
     }
     if(!chatGPT) {
       chatGPT = new OfficialOpenAi(chatConfig)
     }
-    return await chatGPT.reply(content, uid)
+    return await chatGPT.getReply(content, uid)
 }

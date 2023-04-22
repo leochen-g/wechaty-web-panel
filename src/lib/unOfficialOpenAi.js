@@ -1,6 +1,9 @@
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
 import { ChatGPTUnofficialProxyAPI }  from './chatGPT.js'
+import { addAichatRecord } from "../db/aichatDb.js";
+import dayjs from "dayjs";
+import { getPromotInfo } from "../proxy/aibotk.js";
 
 class UnOfficialOpenAi {
   constructor(config = {
@@ -18,6 +21,12 @@ class UnOfficialOpenAi {
   }
 
   async init() {
+    if(this.config.promotId) {
+      const promotInfo = await getPromotInfo(this.config.promotId)
+      if(promotInfo) {
+        this.config.systemMessage = promotInfo.promot
+      }
+    }
     const baseOptions = {
       accessToken: this.config.token,
       debug: this.config.debug,
@@ -65,7 +74,7 @@ class UnOfficialOpenAi {
     this.chatGPT = null
   }
 
-  async getReply(content, uid) {
+  async getReply(content, uid, adminId = '') {
     try {
       if(!this.chatGPT) {
         console.log('看到此消息说明已启用chatGPT 网页hook版');
@@ -73,6 +82,15 @@ class UnOfficialOpenAi {
       }
       const question = this.config.systemMessage ? this.config.systemMessage + content : content;
       const { conversationId, text, id } = await this.chatGPT.sendMessage(question, { ...this.chatOption[uid],  timeoutMs: this.config.timeoutMs * 1000 });
+      if(this.config.record) {
+        void addAichatRecord({
+          contactId: uid,
+          adminId,
+          input: content,
+          output: text,
+          time: dayjs().format('YYYY-MM-DD HH:mm:ss')
+        })
+      }
       this.chatOption = {
         [uid]: {
           conversationId,

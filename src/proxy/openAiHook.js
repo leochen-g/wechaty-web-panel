@@ -22,7 +22,15 @@ export async function getGptUnOfficialReply(content, uid) {
       proxyPass: config.proxyPassUrl, // 反向代理地址
       proxyUrl: config.proxyUrl, // 代理地址
       showQuestion: config.showQuestion, // 显示原文
-      timeoutMs: config.openaiTimeout // 超时时间 s
+      timeoutMs: config.openaiTimeout, // 超时时间 s
+      systemMessage: config.openaiSystemMessage,
+      filter: config.chatFilter,
+      filterConfig: {
+        type: 1,
+        appId: config.filterAppid,
+        apiKey: config.filterApiKey,
+        secretKey: config.filterSecretKey
+      }
     }
     if(!chatGPT) {
       chatGPT = new UnOfficialOpenAi(chatConfig)

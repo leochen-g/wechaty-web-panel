@@ -5,6 +5,7 @@ let chatGPT = {}
 export function reset(adminId) {
   if(!chatGPT[adminId]) return
   chatGPT[adminId].reset();
+  chatGPT[adminId] = null;
 }
 
 export function resetAll() {
@@ -26,5 +27,5 @@ export async function getChatGPTWebReply(content, uid, adminId, config={ token: 
       chatGPT[adminId] = new UnOfficialOpenAi(config)
     }
 
-    return await chatGPT[adminId].getReply(content, uid)
+    return await chatGPT[adminId].getReply(content, uid, adminId)
 }

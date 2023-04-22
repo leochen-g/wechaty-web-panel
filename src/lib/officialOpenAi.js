@@ -1,9 +1,11 @@
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
 import {ChatGPTAPI} from "./chatGPT.js";
-
+import { addAichatRecord } from "../db/aichatDb.js";
+import { getPromotInfo } from "../proxy/aibotk.js";
+import { ContentCensor } from "./contentCensor.js";
+import dayjs from "dayjs";
 let chatGPT = null
-let chatOption = {};
 
 
 class OfficialOpenAi {
@@ -15,15 +17,26 @@ class OfficialOpenAi {
     showQuestion: true, // 显示原文
     timeoutMs: 60, // 超时时间 s
     model: '', // 模型
+    promotId: '',
     systemMessage: '', // 预设promotion
   }) {
     this.chatGPT = null;
-    this.config = config
+    this.config = config;
+    this.contentCensor = null
     this.chatOption = {};
   }
 
 
   async init() {
+    if(this.config.promotId) {
+      const promotInfo = await getPromotInfo(this.config.promotId)
+      if(promotInfo) {
+        this.config.systemMessage = promotInfo.promot
+      }
+    }
+    if(this.config.filter) {
+        this.contentCensor = new ContentCensor(this.config.filterConfig)
+    }
     const baseOptions = {
       apiKey: this.config.token,
       completionParams: { model: this.config.model },
@@ -45,7 +58,7 @@ class OfficialOpenAi {
 
     if(this.config.proxyUrl) {
       console.log(`启用代理请求:${this.config.proxyUrl}`);
-      chatGPT = new ChatGPTAPI({
+      this.chatGPT = new ChatGPTAPI({
         ...baseOptions,
         fetch: (url, options = {}) => {
           const defaultOptions = {
@@ -61,7 +74,7 @@ class OfficialOpenAi {
       });
     } else if(this.config.proxyPass) {
       console.log(`启用反向代理请求:${this.config.proxyPass}`);
-      chatGPT = new ChatGPTAPI({
+      this.chatGPT = new ChatGPTAPI({
         ...baseOptions,
         apiBaseUrl: this.config.proxyPass,
         fetch: (url, options = {}) => {
@@ -73,7 +86,7 @@ class OfficialOpenAi {
       });
     } else {
       console.log('未启用代理请求，可能会失败');
-      chatGPT = new ChatGPTAPI({
+      this.chatGPT = new ChatGPTAPI({
         ...baseOptions,
         fetch: (url, options = {}) => {
           const mergedOptions = {
@@ -93,13 +106,31 @@ class OfficialOpenAi {
   }
 
 
-  async getReply(content, uid) {
+  async getReply(content, uid, adminId = '') {
     try {
-      if(!chatGPT) {
+      if(!this.chatGPT) {
         console.log('看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
         await this.init()
       }
+      console.log('this.config.filter', this.config.filter);
+      if(this.config.filter) {
+        const censor = await this.contentCensor.checkText(content)
+        if(!censor) {
+          console.log(`问题:${content},包含违规词，已拦截`);
+          return [{ type: 1, content: '' }]
+        }
+      }
       const { conversationId, text, id } = await this.chatGPT.sendMessage(content, { ...this.chatOption[uid],  timeoutMs: this.config.timeoutMs * 1000 });
+      if(this.config.filter) {
+        const censor = await this.contentCensor.checkText(text)
+        if(!censor) {
+          console.log(`回复: ${text},包含违规词，已拦截`);
+          return [{ type: 1, content: '' }]
+        }
+      }
+      if(this.config.record) {
+        void addAichatRecord({ contactId: uid, adminId, input: content, output: text, time: dayjs().format('YYYY-MM-DD HH:mm:ss') })
+      }
       this.chatOption = {
         [uid]: {
           conversationId,

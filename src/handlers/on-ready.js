@@ -13,6 +13,9 @@ async function onReady() {
     await getUser()
     console.log(`所有数据准备完毕`)
     sendHeartBeat('live')
+    if(this.puppet.syncContact) {
+      await this.puppet.syncContact()
+    }
     await delay(5000)
     common.updateContactInfo(this)
     await delay(5000)

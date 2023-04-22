@@ -4,7 +4,7 @@ import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.j
 import { addRoom } from '../common/index.js'
 import { service, callbackAibotApi } from '../proxy/superagent.js'
 import { dispatchBot } from '../proxy/bot/dispatch.js'
-import { log } from 'wechaty'
+import { getAllGptConfig } from "../db/gptConfig.js";
 
 function emptyMsg({ room, isMention }) {
   if (room && !isMention) return []
@@ -259,27 +259,47 @@ async function robotMsg({ msg, name, id, config, isMention, room }) {
 
 async function customChat({ msg, name, id, config, isMention, room, roomId, roomName }) {
   try {
-    if (config.customBotConfig && config.customBotConfig.length) {
+    const gptConfigs = await getAllGptConfig()
+    if (gptConfigs && gptConfigs.length) {
       let finalConfig = ''
       if (room) {
-        finalConfig = room && config.customBotConfig.find((item) => item.type === 'room' && (item.targetName === roomName || item.targetId === roomId))
+        finalConfig = room && gptConfigs.find((item) => {
+          const targetNames = [];
+          const targetIds = [];
+          item.targets.forEach(tItem=> {
+            targetNames.push(tItem.name)
+            targetIds.push(tItem.id)
+          })
+          return item.type === 'room' && (targetNames.includes(roomName) || targetIds.includes(roomId))
+        })
       } else {
-        finalConfig = !room && config.customBotConfig.find((item) => item.type === 'contact' && (item.targetName === name || item.targetId === id))
+        finalConfig = !room && gptConfigs.find((item) => {
+          const targetNames = [];
+          const targetIds = [];
+          item.targets.forEach(tItem=> {
+            targetNames.push(tItem.name)
+            targetIds.push(tItem.id)
+          })
+          return item.type === 'contact' && (targetNames.includes(name) || targetIds.includes(id))
+        })
       }
       if (finalConfig) {
+        if(finalConfig.limitNum>0 && finalConfig.limitNum <= finalConfig.usedNum) {
+          return [{ type: 1, content: '聊天次数已用完，请联系管理员充值' }]
+        }
         const isRoom = finalConfig.type === 'room'
         if (finalConfig.openChat) {
           if ((isRoom && finalConfig.needAt === 1 && isMention) || isRoom & !finalConfig.needAt || !isRoom) {
-            const keyword = finalConfig?.keywords.filter((item) => msg.includes(item))
+            const keyword = finalConfig?.keywords.find((item) => msg.includes(item))
             if(keyword || !finalConfig?.keywords.length) {
               msg = keyword ? msg.replace(keyword, ''): msg
-              const msgArr = await dispatchBot({ botType: finalConfig.robotType, content: msg, uid: id, adminId: finalConfig.targetId || finalConfig.targetName, updateId: finalConfig.id, config: finalConfig.botConfig })
+              const msgArr = await dispatchBot({ botType: finalConfig.robotType, content: msg, uid: id, adminId: finalConfig.id, config: finalConfig.botConfig })
               return msgArr
             }
           }
           return []
         }
-        return finalConfig.defaultReply ? [{ type: 1, content: finalConfig.defaultReply, url: '' }] : []
+        return finalConfig.defaultReply ? [{ type: 1, content: finalConfig.defaultReply }] : []
       }
       return []
     }

@@ -11,7 +11,7 @@ const baseDir = path.join(
 );
 const dbpath = baseDir + "aichat.db";
 const rdb = nedb(dbpath);
-
+console.log('聊天记录路径：如果开启了记录会存到此处，未开启不会记录，所有记录都是存在本地', dbpath)
 /**
  * 记录群聊天记录 记录格式
  * { contactName: '', contactId: '', roomName: '', roomId: '', input: '输入的问题', output: '输出内容', time: '时间' }
