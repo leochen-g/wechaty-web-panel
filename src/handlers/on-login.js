@@ -2,13 +2,21 @@ import { getConfig, sendRobotInfo, putqn, setQrCode, updatePanelVersion } from '
 import { addUser } from '../db/userDb.js'
 import { initMqtt } from '../proxy/mqtt.js'
 import { allConfig } from '../db/configDb.js'
+import { updatePuppetConfig } from "../db/puppetDb.js";
+import { PUPPET_MAP } from '../const/puppet-type.js'
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户
  */
 async function onLogin(user) {
   try {
-    console.log(`贴心助理${user}登录了`)
+    console.log(`
+      ==========================================================
+       贴心助理${user}登录了
+       你正在使用的是:${PUPPET_MAP[this.puppet.constructor.name]}!
+      ==========================================================
+    `)
+    await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
     await updatePanelVersion()
     await setQrCode('', 4)
     await getConfig() // 获取配置文件

@@ -4,6 +4,7 @@ import {ChatGPTAPI} from "./chatGPT.js";
 import { addAichatRecord } from "../db/aichatDb.js";
 import { getPromotInfo } from "../proxy/aibotk.js";
 import { ContentCensor } from "./contentCensor.js";
+import { getPuppetEol } from "../const/puppet-type.js";
 import dayjs from "dayjs";
 let chatGPT = null
 
@@ -24,10 +25,12 @@ class OfficialOpenAi {
     this.config = config;
     this.contentCensor = null
     this.chatOption = {};
+    this.eol = '\n'
   }
 
 
   async init() {
+    this.eol = await getPuppetEol();
     if(this.config.promotId) {
       const promotInfo = await getPromotInfo(this.config.promotId)
       if(promotInfo) {
@@ -140,9 +143,9 @@ class OfficialOpenAi {
       let replys = []
       let message;
       if(this.config.showQuestion) {
-        message = `${content}\r-----------\r` + text.replaceAll('\n', '\r');
+        message = `${content}${this.eol}-----------${this.eol}` + text.replaceAll('\n', this.eol);
       } else {
-        message = text.replaceAll('\n', '\r');
+        message = text.replaceAll('\n', this.eol);
       }
       while (message.length > 500) {
         replys.push(message.slice(0, 500));

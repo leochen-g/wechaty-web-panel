@@ -2,6 +2,8 @@ import { aiBotReq, req } from './superagent.js'
 import { updateConfig } from '../db/configDb.js'
 import { packageJson } from '../package-json.js'
 import { updateAllGptConfig } from "../db/gptConfig.js";
+import { getPuppetEol } from "../const/puppet-type.js";
+
 /**
  * 获取美女图片
  */
@@ -115,16 +117,17 @@ async function getFireNews(id, num) {
     let content = await aiBotReq(option)
     let newList = content.data || []
     let news = ''
+    const eol = await getPuppetEol();
     for (let i in newList) {
       let num = parseInt(i) + 1
       const url = newList[i].shortUrl?newList[i].shortUrl:newList[i].url
-      news = `${news}\r${num}.${newList[i].title}${url?`\r${url}\r`:`\r`}`
+      news = `${news}${eol}${num}.${newList[i].title}${url?`${eol}${url}${eol}`:`${eol}`}`
     }
     const endMap = {
       1001: '您可以 @消防小助手+新闻标题，通过ChatGPT为您分析时事新闻！',
       1002: '您可以 @消防小助手+新闻标题，通过ChatGPT为您分析今日消防行业招标信息！',
     }
-    return `${news}…………………………\r\r${endMap[id]}`
+    return `${news}…………………………${eol}${eol}${endMap[id]}`
   } catch (e) {
     console.log('获取每日一句失败', e)
     return '今日一句似乎已经消失'

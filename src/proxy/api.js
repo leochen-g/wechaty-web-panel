@@ -3,6 +3,8 @@ import { EMOHOST, TULING, ONE, MEINV } from './config.js'
 import { randomRange, MD5 } from '../lib/index.js'
 import { allConfig } from '../db/configDb.js'
 import { getFireNews } from "./aibotk.js";
+import { getPuppetEol } from "../const/puppet-type.js";
+
 /**
  * 天行图灵聊天机器人
  * @param {*} word 发送内容
@@ -10,6 +12,7 @@ import { getFireNews } from "./aibotk.js";
  */
 async function getResByTXTL(word, id) {
   try {
+    const eol = await getPuppetEol()
     let uniqueId = MD5(id)
     let option = {
       method: 'GET',
@@ -20,7 +23,7 @@ async function getResByTXTL(word, id) {
     if (content.code === 200) {
       let response = content.newslist[0].reply
       console.log('天行图灵机器人回复：', response)
-      return response
+      return response.replaceAll('\n', eol).replace(/<br>/g, eol)
     } else {
       return '我好像迷失在无边的网络中了，接口调用错误：' + content.msg
     }
@@ -35,6 +38,7 @@ async function getResByTXTL(word, id) {
  */
 async function getResByTX(word, id) {
   try {
+    const eol = await getPuppetEol()
     let uniqueId = MD5(id)
     let option = {
       method: 'GET',
@@ -46,11 +50,11 @@ async function getResByTX(word, id) {
       let response = ''
       let content = res.newslist[0]
       if (content.datatype === 'text') {
-        response = content.reply
+        response = content.reply.replaceAll('\n', eol).replace(/<br>/g, eol)
       } else if (content.datatype === 'view') {
         let reply = ''
         content.reply.forEach((item) => {
-          reply = reply + `《${item.title}》:${item.url}\n`
+          reply = reply + `《${item.title}》:${item.url}${eol}`
         })
         response = `虽然我不太懂你说的是什么，但是感觉很高级的样子，因此我也查找了类似的文章去学习，你觉得有用吗:\n${reply}`
       } else {
@@ -72,6 +76,7 @@ async function getResByTX(word, id) {
  */
 async function getResByTL(word, id) {
   const config = await allConfig()
+  const eol = await getPuppetEol()
   try {
     let uniqueId = MD5(id)
     let data = {
@@ -94,7 +99,7 @@ async function getResByTL(word, id) {
     }
     let content = await req(option)
     let reply = content.results[0].values.text
-    return reply
+    return reply.replaceAll('\n', eol).replace(/<br>/g, eol)
   } catch (error) {
     console.log('图灵聊天机器人请求失败：', error)
   }
@@ -104,6 +109,7 @@ async function getResByTL(word, id) {
  * @param {String} word 垃圾名称
  */
 async function getRubbishType(word) {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -122,7 +128,7 @@ async function getRubbishType(word) {
       } else if (content.newslist[0].type == 3) {
         type = '是其他(干)垃圾'
       }
-      let response = `${content.newslist[0].name}${type}\n解释：${content.newslist[0].explain}\n主要包括：${content.newslist[0].contain}\n投放提示：${content.newslist[0].tip}`
+      let response = `${content.newslist[0].name}${type}${eol}解释：${content.newslist[0].explain}${eol}主要包括：${content.newslist[0].contain}${eol}投放提示：${content.newslist[0].tip}`
       return response
     } else {
       console.log('查询失败提示：', content.msg)
@@ -136,6 +142,7 @@ async function getRubbishType(word) {
  * 土味情话获取
  */
 async function getSweetWord() {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -145,7 +152,7 @@ async function getSweetWord() {
     let content = await txReq(option)
     if (content.code === 200) {
       let sweet = content.newslist[0].content
-      let str = sweet.replace('\r\n', '\n')
+      let str = sweet.replaceAll('\r\n', eol).replace(/<br>/g, eol).replaceAll('\n', eol)
       return str
     } else {
       console.log('获取土情话接口失败', content.msg)
@@ -158,6 +165,7 @@ async function getSweetWord() {
  * 获取天行天气
  */
 async function getTXweather(city) {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -169,7 +177,7 @@ async function getTXweather(city) {
       let todayInfo = content.newslist[0]
       let obj = {
         weatherTips: todayInfo.tips,
-        todayWeather: `今天:${todayInfo.weather}\n温度:${todayInfo.lowest}/${todayInfo.highest}\n${todayInfo.wind} ${todayInfo.windspeed}\n\n`,
+        todayWeather: `今天:${todayInfo.weather}${eol}温度:${todayInfo.lowest}/${todayInfo.highest}${eol}${todayInfo.wind} ${todayInfo.windspeed}${eol}${eol}`,
       }
       return obj
     } else {
@@ -187,6 +195,7 @@ async function getNews(id, num = 10) {
   if(id>1000) {
     return getFireNews(id, num)
   }
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -200,9 +209,9 @@ async function getNews(id, num = 10) {
       // let shortUrl = 'https://www.tianapi.com/weixin/news/?col=' + id
       for (let i in newList) {
         let num = parseInt(i) + 1
-        news = `${news}\r${num}.${newList[i].title}`
+        news = `${news}${eol}${num}.${newList[i].title}`
       }
-      return `${news}\r`
+      return `${news}${eol}`
     } else {
       console.log('获取新闻接口失败：请申请https://www.tianapi.com/apiview/51 这个接口', content.msg)
     }
@@ -214,6 +223,7 @@ async function getNews(id, num = 10) {
  * 获取名人名言
  */
 async function getMingYan() {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -223,7 +233,7 @@ async function getMingYan() {
     let content = await txReq(option)
     if (content.code === 200) {
       let newList = content.newslist
-      let news = `${newList[0].content}\r——————————${newList[0].author}`
+      let news = `${newList[0].content}${eol}——————————${newList[0].author}`
       return news
     }  else {
       console.log('获取名人名言接口失败', content.msg)
@@ -237,6 +247,7 @@ async function getMingYan() {
  * @param {string} satro 星座
  */
 async function getStar(astro) {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -248,7 +259,7 @@ async function getStar(astro) {
       let newList = content.newslist
       let news = ''
       for (let item of newList) {
-        news = `${news}${item.type}:${item.content}\n`
+        news = `${news}${item.type}:${item.content}${eol}`
       }
       return news
     } else {
@@ -305,6 +316,7 @@ async function getSkl() {
  * 获取老黄历
  */
 async function getLunar(date) {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -314,7 +326,7 @@ async function getLunar(date) {
     let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
-      let news = `\n阳历：${item.gregoriandate}\n阴历：${item.lunardate}\n节日：${item.lunar_festival}\n适宜：${item.fitness}\n不宜：${item.taboo}\n神位：${item.shenwei}\n胎神：${item.taishen}\n冲煞：${item.chongsha}\n岁煞：${item.suisha}`
+      let news = `阳历：${item.gregoriandate}${eol}阴历：${item.lunardate}${eol}节日：${item.lunar_festival}${eol}适宜：${item.fitness}${eol}不宜：${item.taboo}${eol}神位：${item.shenwei}${eol}胎神：${item.taishen}${eol}冲煞：${item.chongsha}${eol}岁煞：${item.suisha}`
       return news
     } else {
       console.log('获取老黄历接口失败', content.msg)
@@ -327,6 +339,7 @@ async function getLunar(date) {
  * 天行神回复
  */
 async function getGoldReply() {
+  const eol = await getPuppetEol()
   try {
     let option = {
       method: 'GET',
@@ -336,7 +349,7 @@ async function getGoldReply() {
     let content = await txReq(option)
     if (content.code === 200) {
       let item = content.newslist[0]
-      let news = `标题："${item.title}"\n回复：${item.content}`
+      let news = `标题："${item.title}"${eol}回复：${item.content}`
       return news
     } else {
       console.log("获取神回复接口失败", content.msg);
@@ -495,36 +508,6 @@ async function getMeiNv() {
   }
 }
 /**
- * 获取疫情信息
- * @returns {Promise<string>}
- */
-async function getNcov() {
-  try {
-    let option = {
-      method: 'GET',
-      url: '/txapi/ncov/index',
-    }
-    let content = await txReq(option)
-    if (content.code === 200) {
-      let newList = content.newslist[0].news
-      const riskarea = content.newslist[0].riskarea
-      const reply = `【疫情新闻暂时下线，目前只返回风险地区】\n\n全国风险地区\n\n【高风险地区】:\n${(riskarea.high && riskarea.high.length && riskarea.high.join('\n')) || '暂无'}\n【中风险地区】:\n${
-        (riskarea.mid && riskarea.mid.length && riskarea.mid.join('\n')) || '暂无'
-      }\n\n——————————数据来源：天行数据`
-      // let news = ''
-      // for (let i in newList) {
-      //   let num = parseInt(i) + 1
-      //   news = `${news}<br>>>${newList[i].pubDateStr}: ${newList[i].title}<br><br>${newList[i].summary}----------------${newList[i].infoSource}<br><br>`
-      // }
-      return reply
-    }  else {
-      console.log('获取疫情接口失败', content.msg)
-    }
-  } catch (e) {
-    console.log('获取疫情数据失败', e)
-  }
-}
-/**
  * 天行网络取名
  */
 async function getCname() {
@@ -563,7 +546,6 @@ export { getRkl }
 export { getAvatar }
 export { getEmo }
 export { getMeiNv }
-export { getNcov }
 export { getCname }
 export default {
   getResByTXTL,
@@ -584,6 +566,5 @@ export default {
   getAvatar,
   getEmo,
   getMeiNv,
-  getNcov,
   getCname,
 }

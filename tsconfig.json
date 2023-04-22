@@ -1,8 +1,68 @@
 {
-  "extends": "@chatie/tsconfig",
   "compilerOptions": {
     "outDir": "dist/esm",
-    "allowJs": true
+    "allowJs": true,
+    /**
+     * ES Module support
+     */
+    "target": "esnext",
+
+    // ES Modules: https://www.typescriptlang.org/tsconfig#module
+    // https://devblogs.microsoft.com/typescript/announcing-typescript-4-5-beta/#esm-nodejs
+    // "module": "nodenext",
+    "module": "esnext",
+
+    // https://www.typescriptlang.org/tsconfig#moduleResolution
+    // "moduleResolution": "nodenext",
+    "moduleResolution": "node",
+
+    /**
+     * Type import/export checkings
+     */
+    // https://devblogs.microsoft.com/typescript/announcing-typescript-3-8/#type-only-imports-exports
+    "importsNotUsedAsValues": "error",
+    // https://www.typescriptlang.org/tsconfig#isolatedModules
+    "isolatedModules": true,
+
+    /**
+     * Other settings
+     */
+    "traceResolution"   : false,
+    "noLib"             : false,
+    "resolveJsonModule" : false,
+
+    "declaration"       : true,
+    "declarationMap"    : true,
+    "sourceMap"         : true,
+    "skipLibCheck"      : true,
+    "esModuleInterop"   : true,
+
+    "emitDecoratorMetadata"  : true,
+    "experimentalDecorators" : true,
+
+    "lib": [
+      "esnext",
+    ],
+
+    "strict"                     : true,
+    "noEmitOnError"              : true,
+    "noUnusedLocals"             : true,
+    "noImplicitReturns"          : true,
+    "noImplicitOverride"         : true,
+    "noUncheckedIndexedAccess"   : true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noFallthroughCasesInSwitch" : true,
+    "strictNullChecks"           : true,
+    "noImplicitAny"              : true,
+    "noUnusedParameters"         : true,
+    "noImplicitThis"             : true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "ts-node": {
+    // It is faster to skip typechecking.
+    // Remove if you want ts-node to do typechecking.
+    "transpileOnly": true,
+    "transpiler": "ts-node/transpilers/swc-experimental",
   },
   "exclude": [
     "node_modules/",

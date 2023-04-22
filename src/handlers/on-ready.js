@@ -3,11 +3,13 @@ import { delay } from '../lib/index.js'
 import { getConfig, sendHeartBeat } from "../proxy/aibotk.js";
 import { getUser } from '../db/userDb.js'
 import { initAllSchedule } from "../task/index.js";
+import { updatePuppetConfig } from "../db/puppetDb.js";
 /**
  * 准备好的事件
  */
 async function onReady() {
   try {
+    await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
     await getConfig() // 获取配置文件
     initAllSchedule(this) // 初始化任务
     await getUser()
@@ -16,9 +18,9 @@ async function onReady() {
     if(this.puppet.syncContact) {
       await this.puppet.syncContact()
     }
-    await delay(5000)
+    await delay(3000)
     common.updateContactInfo(this)
-    await delay(5000)
+    await delay(3000)
     common.updateRoomInfo(this)
   } catch (e) {
     console.log('on ready error:', e)

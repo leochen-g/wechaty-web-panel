@@ -1,18 +1,21 @@
 import { getNews, getTXweather, getSweetWord } from '../proxy/api.js'
 import { sendFriend, sendRoom, asyncData, getOne, getMaterial } from '../proxy/aibotk.js'
 import { getUser } from '../db/userDb.js'
-import { formatDate, getDay, MD5, groupArray, delay } from '../lib/index.js'
+import { formatDate, getDay, groupArray, delay } from '../lib/index.js'
 import { FileBox } from 'file-box'
 import { allConfig } from '../db/configDb.js'
+import { getPuppetEol } from "../const/puppet-type.js";
+
 /**
  * 获取每日新闻内容
  * @param {*} sortId 新闻资讯分类Id
  * @param {*} endWord 结尾备注
  */
 async function getNewsContent(sortId, endWord = '', num = 10) {
+  const eol = await getPuppetEol();
   let today = formatDate(new Date()) //获取今天的日期
   let news = await getNews(sortId, num)
-  let content = `${today}\n${news}\n${endWord?'————————':''}${endWord}`
+  let content = `${today}${eol}${news}${eol}${endWord?'————————':''}${endWord}`
   return content
 }
 /**
@@ -22,21 +25,23 @@ async function getNewsContent(sortId, endWord = '', num = 10) {
  * @param {*} endWord 结尾备注
  */
 async function getEveryDayContent(date, city, endWord) {
+  const eol = await getPuppetEol();
   let one = await getOne() //获取每日一句
   let weather = await getTXweather(city) //获取天气信息
   let today = formatDate(new Date()) //获取今天的日期
   let memorialDay = getDay(date) //获取纪念日天数
   let sweetWord = await getSweetWord() // 土味情话
-  let str = `${today}\n我们在一起的第${memorialDay}天\n\n元气满满的一天开始啦,要开心噢^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n情话对你说:\n${sweetWord}\n\n————————${endWord}`
+  let str = `${today}${eol}我们在一起的第${memorialDay}天${eol}${eol}元气满满的一天开始啦,要开心噢^_^${eol}${eol}今日天气${eol}${weather.weatherTips}${eol}${weather.todayWeather}${eol}每日一句:${eol}${one}${eol}${eol}情话对你说:${eol}${sweetWord}${eol}${eol}————————${endWord}`
   return str
 }
 
 async function getRoomEveryDayContent(date, city, endWord) {
+  const eol = await getPuppetEol();
   let one = await getOne() //获取每日一句
   let weather = await getTXweather(city) //获取天气信息
   let today = formatDate(new Date()) //获取今天的日期
   let memorialDay = getDay(date) //获取纪念日天数
-  let str = `${today}\n家人们相聚在一起的第${memorialDay}天\n\n元气满满的一天开始啦,家人们要努力保持活跃啊^_^\n\n今日天气\n${weather.weatherTips}\n${weather.todayWeather}\n每日一句:\n${one}\n\n————————${endWord}`
+  let str = `${today}${eol}家人们相聚在一起的第${memorialDay}天${eol}${eol}元气满满的一天开始啦,家人们要努力保持活跃啊^_^${eol}${eol}今日天气${eol}${weather.weatherTips}${eol}${weather.todayWeather}${eol}每日一句:${eol}${one}${eol}${eol}————————${endWord}`
   return str
 }
 
@@ -48,10 +53,11 @@ async function getRoomEveryDayContent(date, city, endWord) {
  * @param endWord
  * @return {string}
  */
-function getCountDownContent(date, prefix, suffix, endWord) {
+async function getCountDownContent(date, prefix, suffix, endWord) {
+  const eol = await getPuppetEol();
   let countDownDay = getDay(date) //获取倒计时天数
   let today = formatDate(new Date()) //获取今天的日期
-  let str = `${today}\r距离${prefix}还有\r\r${countDownDay}天\r\r${suffix}${endWord?`\r\r————————${endWord}`:''}`
+  let str = `${today}距离${prefix}还有${eol}${eol}${countDownDay}天${eol}${eol}${suffix}${endWord?`${eol}${eol}————————${endWord}`:''}`
   return str;
 }
 /**
@@ -61,7 +67,7 @@ async function updateContactInfo(that, noCache = false) {
   try {
     if(noCache && that.puppet.syncContact) {
       await that.puppet.syncContact()
-      await delay(5000)
+      await delay(3000)
     }
     const contactSelf = await getUser()
     const contactList = await that.Contact.findAll() || []
@@ -112,7 +118,7 @@ async function updateRoomInfo(that, noCache = false) {
   try {
     if(noCache && that.puppet.syncContact) {
       await that.puppet.syncContact()
-      await delay(5000)
+      await delay(3000)
     }
     const contactSelf = await getUser()
     const roomList = await that.Room.findAll() || []
@@ -307,11 +313,11 @@ async function addRoom(that, contact, roomName, replys) {
 async function updateContactAndRoom(that) {
   const contactSelf = await getUser()
   await asyncData(contactSelf.robotId, 1)
-  await delay(3000)
+  await delay(2000)
   await asyncData(contactSelf.robotId, 2)
-  await delay(3000)
+  await delay(2000)
   await updateRoomInfo(that, true)
-  await delay(3000)
+  await delay(2000)
   await updateContactInfo(that)
 }
 /**
@@ -322,7 +328,7 @@ async function updateContactAndRoom(that) {
 async function updateContactOnly(that) {
   const contactSelf = await getUser()
   await asyncData(contactSelf.robotId, 1)
-  await delay(3000)
+  await delay(2000)
   await updateContactInfo(that, true)
 }
 /**
@@ -333,7 +339,7 @@ async function updateContactOnly(that) {
 async function updateRoomOnly(that) {
   const contactSelf = await getUser()
   await asyncData(contactSelf.robotId, 2)
-  await delay(3000)
+  await delay(2000)
   await updateRoomInfo(that, true)
 }
 export { updateRoomOnly }

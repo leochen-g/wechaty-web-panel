@@ -121,7 +121,7 @@ const sendEveryDay = async ({ that, target, item }) => {
  * @return {Promise<void>}
  */
 const sendCountDown = async ({ that, target, item }) => {
-  let content = getCountDownContent(item.memorialDay, item.prefix, item.suffix, item.endWord);
+  let content = await getCountDownContent(item.memorialDay, item.prefix, item.suffix, item.endWord);
   console.log("倒计时任务开始工作,发送内容：", content);
   await delay(3000);
   await target.say(content);

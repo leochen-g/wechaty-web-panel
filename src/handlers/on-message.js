@@ -6,6 +6,7 @@ import { allConfig } from "../db/configDb.js";
 import { getAibotConfig } from "../db/aiDb.js";
 import { addRoomRecord } from "../db/roomDb.js";
 import { privateForward } from "../common/hook.js";
+import { getPuppetEol } from "../const/puppet-type.js";
 
 const ignoreRecord = [
   { type: "include", word: "加入了群聊" },
@@ -37,6 +38,7 @@ function checkIgnore(msg, list) {
  */
 async function dispatchFriendFilterByMsgType(that, msg) {
   try {
+    const eol = await getPuppetEol();
     const aibotConfig = await getAibotConfig();
     const config = await allConfig();
     const type = msg.type();
@@ -82,7 +84,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         console.log(`发消息人${await contact.name()}:发了一个小程序`);
         const miniProgram = await msg.toMiniProgram();
         if(config.parseMini && miniProgram.payload) {
-          const miniParse = `【小程序解析】\n\nappid：${miniProgram.appid()}\nusername：${miniProgram.username()}\n标题：${miniProgram.title()}\n描述：${miniProgram.description()}\n路径：${miniProgram.pagePath()}`
+          const miniParse = `【小程序解析】${eol}${eol}appid：${miniProgram.appid()}${eol}username：${miniProgram.username()}${eol}标题：${miniProgram.title()}${eol}描述：${miniProgram.description()}${eol}路径：${miniProgram.pagePath()}`
           contact.say(miniParse)
         }
         console.log('mini', miniProgram);
@@ -91,7 +93,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         console.log(`发消息人${await contact.name()}:发了一个h5链接`);
         const urlLink = await msg.toUrlLink();
         if(config.parseMini && urlLink.payload) {
-          const urlParse = `【链接解析】\n\n标题：${urlLink.title()}\n描述：${urlLink.description()}\n链接：${urlLink.url()}\n缩略图：${urlLink.thumbnailUrl()}`
+          const urlParse = `【链接解析】${eol}${eol}标题：${urlLink.title()}${eol}描述：${urlLink.description()}${eol}链接：${urlLink.url()}${eol}缩略图：${urlLink.thumbnailUrl()}`
           contact.say(urlParse)
         }
         console.log('urlLink', urlLink);
@@ -119,6 +121,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
   const config = await allConfig();
   const { role } = config.userInfo;
   try {
+    const eol = await getPuppetEol();
     const contact = msg.talker(); // 发消息人
     const contactName = contact.name();
     const roomName = await room.topic();
@@ -186,7 +189,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个小程序`);
         const miniProgram = await msg.toMiniProgram();
         if(config.parseMiniRooms.includes(roomName) && miniProgram.payload) {
-          const miniParse = `【小程序解析】\n\nappid:${miniProgram.appid()}\nusername：${miniProgram.username()}\n标题：${miniProgram.title()}\n描述：${miniProgram.description()}\n路径：${miniProgram.pagePath()}\n`
+          const miniParse = `【小程序解析】${eol}${eol}appid:${miniProgram.appid()}${eol}username：${miniProgram.username()}${eol}标题：${miniProgram.title()}${eol}描述：${miniProgram.description()}${eol}路径：${miniProgram.pagePath()}${eol}`
           room.say(miniParse)
         }
         console.log('mini', miniProgram);
@@ -195,7 +198,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个h5链接`);
         const urlLink = await msg.toUrlLink();
         if(config.parseMiniRooms.includes(roomName) && urlLink.payload) {
-          const urlParse = `【链接解析】\n\n标题：${urlLink.title()}\n描述：${urlLink.description()}\n链接：${urlLink.url()}\n缩略图：${urlLink.thumbnailUrl()}`
+          const urlParse = `【链接解析】${eol}${eol}标题：${urlLink.title()}${eol}描述：${urlLink.description()}${eol}链接：${urlLink.url()}${eol}缩略图：${urlLink.thumbnailUrl()}`
           room.say(urlParse)
         }
         console.log('urlLink', urlLink);
