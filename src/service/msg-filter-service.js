@@ -46,6 +46,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
       { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
+      { bool: config.preventWords, method: 'preventWordCheck' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: true, method: 'keywordsMsg' },
       { bool: gptConfig && gptConfig.length > 0, method: 'customChat' },
@@ -76,6 +77,7 @@ async function filterRoomMsg({that, msg, name, id, avatar, room, isMention, room
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
+      { bool: config.preventWords, method: 'preventWordCheck' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: true, method: 'keywordsMsg' },
       { bool: gptConfig && gptConfig.length > 0, method: 'customChat' },

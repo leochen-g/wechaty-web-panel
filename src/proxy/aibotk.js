@@ -168,6 +168,7 @@ async function getConfig() {
       countDownTaskSchedule: [],
       parseMiniRooms: [],
       preventLength: 1000,
+      preventWords: '',
       ...config,
       cloudRoom
     })

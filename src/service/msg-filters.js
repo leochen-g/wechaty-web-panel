@@ -310,6 +310,26 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
   }
 }
 
+/**
+ * 校验禁止词
+ * @param msg
+ * @param name
+ * @param config
+ * @return {*[]}
+ */
+function preventWordCheck({ msg, config }) {
+  const preventWords = config.preventWords.replaceAll('，', ',').split(',')
+  if (preventWords && preventWords.length) {
+    for (let item of preventWords) {
+      if (msg.includes(item)) {
+        console.log(`触发禁止词【${item}】，不回复用户`);
+        return [{ type: 1, content: '' }]
+      }
+    }
+  }
+  return []
+}
+
 export { callbackEvent }
 export { emptyMsg }
 export { officialMsg }
@@ -321,6 +341,7 @@ export { keywordsMsg }
 export { robotMsg }
 export { maxLengthMsg }
 export { customChat }
+export { preventWordCheck }
 export default {
   callbackEvent,
   emptyMsg,
@@ -332,5 +353,6 @@ export default {
   keywordsMsg,
   robotMsg,
   maxLengthMsg,
-  customChat
+  customChat,
+  preventWordCheck
 }
