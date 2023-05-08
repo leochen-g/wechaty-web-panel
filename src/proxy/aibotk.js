@@ -1,7 +1,7 @@
 import { aiBotReq, req } from './superagent.js'
 import { updateConfig } from '../db/configDb.js'
 import { packageJson } from '../package-json.js'
-import { updateAllGptConfig } from "../db/gptConfig.js";
+import { updateAllGptConfig, resetData } from "../db/gptConfig.js";
 import { getPuppetEol } from "../const/puppet-type.js";
 
 /**
@@ -192,6 +192,7 @@ export async function getGptConfig() {
     let content = await aiBotReq(option)
     if(content.data) {
       const list = content.data.map(item=> ({...item, _id: item.id}))
+      resetData()
       await updateAllGptConfig(list)
     }
   } catch (error) {

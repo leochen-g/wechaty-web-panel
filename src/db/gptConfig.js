@@ -1,6 +1,7 @@
 import nedb from "./nedb.js";
 import path from "path";
 import os from "os";
+import fs from 'fs'
 
 const baseDir = path.join(
   os.homedir(),
@@ -10,6 +11,11 @@ const baseDir = path.join(
   path.sep
 );
 const dbpath = baseDir + "gptconfig.db";
+
+if (fs.existsSync(dbpath)) {
+  fs.unlinkSync(dbpath);
+}
+
 const rdb = nedb(dbpath);
 /**
  * 存储gpt配置
@@ -65,5 +71,11 @@ export async function updateOneGptConfig(id, info) {
     return search;
   } catch (error) {
     console.log("查询数据错误", error);
+  }
+}
+
+export function resetData() {
+  if (fs.existsSync(dbpath)) {
+    fs.unlinkSync(dbpath);
   }
 }

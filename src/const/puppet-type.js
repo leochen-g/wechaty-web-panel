@@ -25,6 +25,7 @@ export const PUPPET_MAP = {
   'PuppetOICQ': '基于OICQ的qq协议',
   // https://github.com/wechaty/puppet-lark
   'PuppetLark': '飞书协议',
+  'PuppetService': '企微协议',
 }
 
 // 需要处理换行的puppet 主要是 windows 平台下需要把\n 换成\r\n

@@ -321,7 +321,7 @@ function preventWordCheck({ msg, config }) {
   const preventWords = config.preventWords.replaceAll('，', ',').split(',')
   if (preventWords && preventWords.length) {
     for (let item of preventWords) {
-      if (msg.includes(item)) {
+      if (item && item!=='' && msg.includes(item)) {
         console.log(`触发禁止词【${item}】，不回复用户`);
         return [{ type: 1, content: '' }]
       }
