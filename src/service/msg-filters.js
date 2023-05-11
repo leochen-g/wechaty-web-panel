@@ -162,11 +162,12 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
                 data[mItem.key] = mItem.value
               }
             })
+          const timeout = item.timeout || 60
           if (item.type === 100) {
-            let res = await service.post(item.customUrl, data)
+            let res = await service.post(item.customUrl, data, { timeout: timeout * 1000 })
             return res
           } else if (item.type === 1) {
-            let res = await callbackAibotApi(item.postUrl, data)
+            let res = await callbackAibotApi(item.postUrl, data, timeout)
             return res
           }
         }

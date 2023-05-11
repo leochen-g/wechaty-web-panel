@@ -151,7 +151,7 @@ async function aiBotReq(option) {
     return get({ url: AIBOTK + option.url, params, contentType: option.contentType, platform: option.platform || 'aibot' })
   }
 }
-async function callbackAibotApi(url, data) {
+async function callbackAibotApi(url, data, timeout = 60) {
   const env = await getAibotConfig()
   const { apiKey, apiSecret } = env
   if (!apiKey || !apiSecret) {
@@ -159,7 +159,7 @@ async function callbackAibotApi(url, data) {
     return []
   }
   data = getFormatQuery(apiKey, apiSecret, data)
-  let res = await service.post(url, data)
+  let res = await service.post(url, data, { timeout: timeout * 1000 })
   return res
 }
 export { req }
