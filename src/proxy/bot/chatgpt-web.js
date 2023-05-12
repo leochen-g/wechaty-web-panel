@@ -18,7 +18,7 @@ export function resetAll() {
   chatGPT = {}
 }
 
-export async function getChatGPTWebReply(content, uid, adminId, config={ token: "", debug: false, proxyPass: "", proxyUrl: "", systemMessage:'', showQuestion: false, timeoutMs: 0, keywordSystemMessages: [] }) {
+export async function getChatGPTWebReply(content, uid, adminId, config={ token: "", debug: false, proxyPass: "", proxyUrl: "", systemMessage:'', showQuestion: false, timeoutMs: 80, keywordSystemMessages: [] }) {
     if (!config.token) {
       console.log('请到智能微秘书平台配置openaiAccessToken参数方可使用')
       return [{ type: 1, content: '请到平台配置Openai openaiAccessToken参数方可使用' }]

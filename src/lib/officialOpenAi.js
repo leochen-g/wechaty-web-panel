@@ -123,7 +123,11 @@ class OfficialOpenAi {
           return [{ type: 1, content: '这个话题不适合讨论，换个话题吧。' }]
         }
       }
-      const { conversationId, text, id } = await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 });
+      if(systemMessage) {
+        console.log('带角色重新更新上下文对话');
+        this.chatOption[uid] = {}
+      }
+      const { conversationId, text, id } = await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {
