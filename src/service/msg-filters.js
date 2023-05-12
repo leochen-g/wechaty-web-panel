@@ -318,13 +318,17 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
  * @param config
  * @return {*[]}
  */
-function preventWordCheck({ msg, config }) {
+function preventWordCheck({ msg, config, isMention, room }) {
   const preventWords = config.preventWords.replaceAll('，', ',').split(',')
+  // 如果是群消息，但是没有提及机器人，则不需要返回任何消息 因为可能是正常交流而已
+  if(room && !isMention) {
+    return []
+  }
   if (preventWords && preventWords.length) {
     for (let item of preventWords) {
       if (item && item!=='' && msg.includes(item)) {
         console.log(`触发禁止词【${item}】，不回复用户`);
-        return [{ type: 1, content: '' }]
+        return [{ type: 1, content: '这个话题不适合讨论，换个话题吧。' }]
       }
     }
   }

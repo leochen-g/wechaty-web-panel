@@ -109,7 +109,7 @@ class OfficialOpenAi {
   }
 
 
-  async getReply(content, uid, adminId = '') {
+  async getReply(content, uid, adminId = '', systemMessage = '') {
     try {
       if(!this.chatGPT) {
         console.log('看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
@@ -120,15 +120,15 @@ class OfficialOpenAi {
         const censor = await this.contentCensor.checkText(content)
         if(!censor) {
           console.log(`问题:${content},包含违规词，已拦截`);
-          return [{ type: 1, content: '' }]
+          return [{ type: 1, content: '这个话题不适合讨论，换个话题吧。' }]
         }
       }
-      const { conversationId, text, id } = await this.chatGPT.sendMessage(content, { ...this.chatOption[uid],  timeoutMs: this.config.timeoutMs * 1000 });
+      const { conversationId, text, id } = await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 });
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {
           console.log(`回复: ${text},包含违规词，已拦截`);
-          return [{ type: 1, content: '' }]
+          return [{ type: 1, content: '这个话题不适合讨论，换个话题吧。' }]
         }
       }
       if(this.config.record) {

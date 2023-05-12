@@ -77,14 +77,18 @@ class UnOfficialOpenAi {
     this.chatGPT = null
   }
 
-  async getReply(content, uid, adminId = '') {
+  async getReply(content, uid, adminId = '', systemMessage =  '') {
     try {
       if(!this.chatGPT) {
         console.log('看到此消息说明已启用chatGPT 网页hook版');
         await this.init()
       }
-      const question = this.config.systemMessage ? this.config.systemMessage + content : content;
-      const { conversationId, text, id } = await this.chatGPT.sendMessage(question, { ...this.chatOption[uid],  timeoutMs: this.config.timeoutMs * 1000 });
+      let question = this.config.systemMessage ? this.config.systemMessage + content : content;
+      if(systemMessage) {
+        question = systemMessage + content
+      }
+
+      const { conversationId, text, id } = await this.chatGPT.sendMessage(question, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 });
       if(this.config.record) {
         void addAichatRecord({
           contactId: uid,
