@@ -115,7 +115,6 @@ class OfficialOpenAi {
         console.log('看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
         await this.init()
       }
-      console.log('this.config.filter', this.config.filter);
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(content)
         if(!censor) {
@@ -127,7 +126,7 @@ class OfficialOpenAi {
         console.log('带角色重新更新上下文对话');
         this.chatOption[uid] = {}
       }
-      const { conversationId, text, id } = await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
+      const { conversationId, text, id } = systemMessage ? await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }) : await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {

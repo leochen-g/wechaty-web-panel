@@ -90,7 +90,7 @@ class UnOfficialOpenAi {
         this.chatOption[uid] = {}
       }
 
-      const { conversationId, text, id } = await this.chatGPT.sendMessage(question, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
+      const { conversationId, text, id } = systemMessage ? await this.chatGPT.sendMessage(question, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }):await this.chatGPT.sendMessage(question, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
       if(this.config.record) {
         void addAichatRecord({
           contactId: uid,
