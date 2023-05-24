@@ -1,12 +1,13 @@
 import { getChatGPTReply } from "./chatgpt.js";
 import { getChatGPTWebReply } from "./chatgpt-web.js";
+import { getDifyAiReply } from "./dify.js";
 import { updateOneGptConfig, getGptConfigById } from "../../db/gptConfig.js";
 import { updateChatRecord } from "../aibotk.js";
 
 /**
  * 消息转发
  * @param {botType: 机器人类别, content: 消息内容, uid: 说话的用户id, updateId: 更新的用户id, adminId: 对话实例id，用于分割不同配置, config: 机器人配置}
- * @returns 
+ * @returns
  */
 export async function dispatchBot({botType, content, uid, adminId, config}) {
    console.log('进入定制机器人回复');
@@ -25,7 +26,14 @@ export async function dispatchBot({botType, content, uid, adminId, config}) {
           res = await getChatGPTWebReply(content, uid, adminId, config)
           replys = res
           break
+        case 8:
+          // dify ai
+          console.log('进入dify聊天');
+          res = await getDifyAiReply(content, uid, adminId, config)
+          replys = res
+          break
         default:
+
           replys = []
           break
       }

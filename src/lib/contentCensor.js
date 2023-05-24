@@ -1,5 +1,4 @@
 import baiduApi from "baidu-aip-sdk";
-import { log } from "wechaty";
 
 export class ContentCensor {
   constructor(config) {

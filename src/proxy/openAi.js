@@ -1,5 +1,5 @@
 import { allConfig } from "../db/configDb.js";
-import OfficialOpenAi from "../lib/officialOpenAi.js";
+import OfficialOpenAi from "../botInstance/officialOpenAi.js";
 
 let chatGPT = null;
 /**

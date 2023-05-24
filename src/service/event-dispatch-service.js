@@ -7,6 +7,8 @@ import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { removeRecord } from "../db/roomDb.js";
 import { getGptOfficialReply, reset as officialReset } from "../proxy/openAi.js";
 import { getGptUnOfficialReply, reset } from "../proxy/openAiHook.js";
+import { getDifyReply, reset as difyReset } from "../proxy/difyAi.js";
+
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
  * @param {string} eName 事件名称
@@ -106,6 +108,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         await initTimeSchedule(that)
         reset();
         officialReset();
+        difyReset();
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:
@@ -160,6 +163,11 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 7:
         // ChatGPT-hook
         res = await getGptUnOfficialReply(msg, id)
+        replys = res
+        break
+      case 8:
+        // dify ai
+        res = await getDifyReply(msg, id)
         replys = res
         break
       default:

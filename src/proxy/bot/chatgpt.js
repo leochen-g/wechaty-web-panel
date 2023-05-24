@@ -1,4 +1,4 @@
-import OfficialOpenAi from "../../lib/officialOpenAi.js";
+import OfficialOpenAi from "../../botInstance/officialOpenAi.js";
 import { getPromotInfo } from "../aibotk.js";
 
 let chatGPT = {}

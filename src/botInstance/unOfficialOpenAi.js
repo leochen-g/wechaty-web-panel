@@ -1,6 +1,6 @@
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
-import { ChatGPTUnofficialProxyAPI }  from './chatGPT.js'
+import { ChatGPTUnofficialProxyAPI }  from './sdk/chatGPT.js'
 import { addAichatRecord } from "../db/aichatDb.js";
 import dayjs from "dayjs";
 import { getPromotInfo } from "../proxy/aibotk.js";

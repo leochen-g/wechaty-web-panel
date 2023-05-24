@@ -1,9 +1,9 @@
 import proxy from "https-proxy-agent";
 import nodeFetch from "node-fetch";
-import {ChatGPTAPI} from "./chatGPT.js";
+import {ChatGPTAPI} from "./sdk/chatGPT.js";
 import { addAichatRecord } from "../db/aichatDb.js";
 import { getPromotInfo } from "../proxy/aibotk.js";
-import { ContentCensor } from "./contentCensor.js";
+import { ContentCensor } from "../lib/contentCensor.js";
 import { getPuppetEol } from "../const/puppet-type.js";
 import dayjs from "dayjs";
 let chatGPT = null
