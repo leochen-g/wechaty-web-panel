@@ -147,7 +147,11 @@ async function getConfig() {
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
     const cloudRoom = await getWordCloudRoom()
-    await getGptConfig()
+
+    if(config.role === 'vip') {
+      await getGptConfig()
+    }
+
     let cres = await updateConfig({
       puppetType: 'wechaty-puppet-wechat',
       botScope: 'all',
