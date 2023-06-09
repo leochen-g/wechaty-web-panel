@@ -7,6 +7,7 @@ import { sendTaskMessage } from "../task/index.js";
 import { randomRange } from '../lib/index.js'
 import { reset } from './bot/chatgpt.js'
 import { reset as webReset } from './bot/chatgpt-web.js'
+import { reset as difyReset } from './bot/dify.js'
 
 let mqttclient = null
 async function initMqtt(that) {
@@ -85,6 +86,7 @@ async function initMqtt(that) {
               console.log('更新gpt配置')
               reset(content.updateId)
               webReset(content.updateId)
+              difyReset(content.updateId)
             }
           }
         })

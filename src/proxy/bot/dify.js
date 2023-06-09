@@ -29,7 +29,7 @@ export async function getDifyAiReply(content, uid, adminId, config = { token: ""
   let systemMessage = ''
   if(config.keywordSystemMessages && config.keywordSystemMessages.length) {
     const finalSystemMsg = config.keywordSystemMessages.find(item=> content.startsWith(item.keyword))
-    if(finalSystemMsg) {
+    if(finalSystemMsg && finalSystemMsg.promotId) {
       const promotInfo = await getPromotInfo(finalSystemMsg.promotId)
       console.log(`触发关键词角色功能，使用对应预设角色:${promotInfo.name}`);
       systemMessage = promotInfo.promot
