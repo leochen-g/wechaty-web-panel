@@ -8,13 +8,8 @@ import dayjs from "dayjs";
 
 async function getRssContent(info) {
   try {
-    const parser = new rssParser({
-      xml2js: {
-        strict: false,
-        trim: true,
-        normalize: true,
-      }
-    });
+    const parser = new rssParser();
+    console.log('订阅源:' + info.rssUrl);
     const feed = await parser.parseURL(info.rssUrl);
     const lastItem = await getRssHistoryById(info.id);
     // 当存在文章的时候
