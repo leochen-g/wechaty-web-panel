@@ -1,13 +1,14 @@
 import * as mqtt from 'mqtt'
 import { allConfig } from '../db/configDb.js'
 import { contactSay, roomSay } from '../common/index.js'
-import { getConfig, getMqttConfig, getGptConfig } from './aibotk.js'
+import { getConfig, getMqttConfig, getGptConfig, getRssConfig } from "./aibotk.js";
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
 import { sendTaskMessage } from "../task/index.js";
 import { randomRange } from '../lib/index.js'
 import { reset } from './bot/chatgpt.js'
 import { reset as webReset } from './bot/chatgpt-web.js'
 import { reset as difyReset } from './bot/dify.js'
+import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
 
 let mqttclient = null
 async function initMqtt(that) {
@@ -79,6 +80,9 @@ async function initMqtt(that) {
             } else if (content.target === 'Contact') {
               console.log('触发了好友事件')
               await sendTaskMessage(that, content)
+            } else if (content.target === 'Rss') {
+              console.log('触发了rss立即更新事件')
+              await sendRssTaskMessage(that, content)
             }
           } else if(topic === `aibotk/${userId}/gptconfig`) {
             await getGptConfig()
@@ -88,6 +92,10 @@ async function initMqtt(that) {
               webReset(content.updateId)
               difyReset(content.updateId)
             }
+          } else if(topic === `aibotk/${userId}/rssconfig`) {
+            console.log('更新rss配置')
+            await getRssConfig()
+            void initRssTask(that)
           }
         })
       }

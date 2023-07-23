@@ -1,3 +1,4 @@
+import globalConfig from './db/global.js'
 import { addAibotConfig } from './db/aiDb.js'
 import onScan from './handlers/on-scan.js'
 import onLogin from './handlers/on-login.js'
@@ -34,6 +35,7 @@ if (process.env['AIBOTK_SECRET']) {
   envSecret = process.env['AIBOTK_SECRET']
 }
 function WechatyWebPanelPlugin(config = { apiKey, apiSecret, scanTimes }) {
+
   const initConfig = {
     apiKey: envKey || config.apiKey,
     apiSecret: envSecret || config.apiSecret,
@@ -43,6 +45,7 @@ function WechatyWebPanelPlugin(config = { apiKey, apiSecret, scanTimes }) {
     ignoreEvents: config.ignoreEvents || [],
     scanTimes: config.scanTimes || 50
   }
+  globalConfig.setApikey(initConfig.apiKey)
   addAibotConfig(initConfig)
   return function (bot) {
     const ignoreEvents = initConfig.ignoreEvents

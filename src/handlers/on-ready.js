@@ -4,6 +4,7 @@ import { getConfig, sendHeartBeat } from "../proxy/aibotk.js";
 import { getUser } from '../db/userDb.js'
 import { initAllSchedule } from "../task/index.js";
 import { updatePuppetConfig } from "../db/puppetDb.js";
+import { initRssTask } from "../task/rss.js";
 /**
  * 准备好的事件
  */
@@ -12,6 +13,7 @@ async function onReady() {
     await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
     await getConfig() // 获取配置文件
     initAllSchedule(this) // 初始化任务
+    initRssTask(this) // 初始化rss 任务
     await getUser()
     console.log(`所有数据准备完毕`)
     sendHeartBeat('live')

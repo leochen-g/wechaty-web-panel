@@ -2,7 +2,7 @@ import nedb from "./nedb.js";
 import path from "path";
 import os from "os";
 import fs from 'fs'
-import globalConfig from "./global.js";
+import globalConfig from './global.js'
 
 let rdb = null;
 
@@ -16,7 +16,8 @@ function initDb() {
       globalConfig.getApikey(),
       path.sep
     );
-    const dbpath = baseDir + "gptconfig.db";
+    const dbpath = baseDir + "rssconfig.db";
+
     if (fs.existsSync(dbpath)) {
       fs.unlinkSync(dbpath);
     }
@@ -25,14 +26,13 @@ function initDb() {
 }
 
 /**
- * 存储gpt配置
+ * 存储rss配置
  * { contactName: '', contactId: '', roomName: '', roomId: '', input: '输入的问题', output: '输出内容', time: '时间' }
  * @param info
  * @returns {Promise<unknown>}
  */
-export async function addGptConfig(info) {
+export async function addRssConfig(info) {
   try {
-    initDb()
     let doc = await rdb.insert(info);
     return doc;
   } catch (error) {
@@ -45,9 +45,8 @@ export async function addGptConfig(info) {
  * @param room
  * @returns {Promise<*>}
  */
-export async function getAllGptConfig() {
+export async function getAllRssConfig() {
   try {
-    initDb()
     let search = await rdb.find({});
     return search;
   } catch (error) {
@@ -55,9 +54,8 @@ export async function getAllGptConfig() {
   }
 }
 
-export async function getGptConfigById(id) {
+export async function getRssConfigById(id) {
   try {
-    initDb()
     let search = await rdb.find({ id });
     return search[0];
   } catch (error) {
@@ -65,9 +63,9 @@ export async function getGptConfigById(id) {
   }
 }
 
-export async function updateAllGptConfig(infos) {
+export async function updateAllRssConfig(infos) {
   try {
-    initDb()
+    initDb();
     for(const item of infos) {
       await rdb.update({_id: item._id}, item, {upsert: true })
     }
@@ -76,7 +74,7 @@ export async function updateAllGptConfig(infos) {
   }
 }
 
-export async function updateOneGptConfig(id, info) {
+export async function updateOneRssConfig(id, info) {
   try {
     let search = await rdb.update({id}, { ...info });
     return search;
@@ -85,7 +83,7 @@ export async function updateOneGptConfig(id, info) {
   }
 }
 
-export function resetData() {
+export function resetRssData() {
   const baseDir = path.join(
     os.homedir(),
     path.sep,
@@ -94,7 +92,7 @@ export function resetData() {
     globalConfig.getApikey(),
     path.sep
   );
-  const dbpath = baseDir + "gptconfig.db";
+  const dbpath = baseDir + "rssconfig.db";
 
   if (fs.existsSync(dbpath)) {
     fs.unlinkSync(dbpath);

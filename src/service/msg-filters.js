@@ -285,15 +285,15 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
         })
       }
       if (finalConfig) {
-        if(finalConfig.limitNum>0 && finalConfig.limitNum <= finalConfig.usedNum) {
-          return [{ type: 1, content: '聊天次数已用完，请联系管理员充值' }]
-        }
         const isRoom = finalConfig.type === 'room'
         if (finalConfig.openChat) {
           if ((isRoom && finalConfig.needAt === 1 && isMention) || isRoom & !finalConfig.needAt || !isRoom) {
             const keyword = finalConfig?.keywords.find((item) => msg.includes(item))
             if(keyword || !finalConfig?.keywords.length) {
               msg = keyword ? msg.replace(keyword, ''): msg
+              if(finalConfig.limitNum>0 && finalConfig.limitNum <= finalConfig.usedNum) {
+                return [{ type: 1, content: '聊天次数已用完，请联系管理员充值' }]
+              }
               const msgArr = await dispatchBot({ botType: finalConfig.robotType, content: msg, uid: id, adminId: finalConfig.id, config: finalConfig.botConfig })
               return msgArr
             }

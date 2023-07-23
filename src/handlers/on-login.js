@@ -12,7 +12,7 @@ async function onLogin(user) {
   try {
     console.log(`
       ==========================================================
-       贴心助理${user}登录了
+       贴心AI助理${user}登录了
        你正在使用的是:${PUPPET_MAP[this.puppet.constructor.name]}!
       ==========================================================
     `)

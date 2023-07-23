@@ -58,6 +58,10 @@ class OfficialOpenAi {
         baseOptions.maxResponseTokens = 2048
       }
     }
+    if (this.config.model.config.model.toLowerCase().includes('gpt-3.5-turbo-16k')) {
+      baseOptions.maxModelTokens = 16384
+      baseOptions.maxResponseTokens = 4096
+    }
 
     if(this.config.proxyUrl) {
       console.log(`启用代理请求:${this.config.proxyUrl}`);

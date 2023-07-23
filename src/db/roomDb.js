@@ -1,16 +1,30 @@
 import nedb from './nedb.js'
 import path from "path";
 import os from "os";
-const baseDir = path.join(
-  os.homedir(),
-  path.sep,
-  ".wechaty",
-  "wechaty-panel-cache",
-  path.sep,
-);
-const dbpath = baseDir + 'room.db'
-const rdb = nedb(dbpath)
+import globalConfig from "./global.js";
+import fs from "fs";
 
+let rdb = null;
+
+
+function initDb() {
+  if(!rdb) {
+    const baseDir = path.join(
+      os.homedir(),
+      path.sep,
+      ".wechaty",
+      "wechaty-panel-cache",
+      globalConfig.getApikey(),
+      path.sep
+    );
+    const dbpath = baseDir + "room.db";
+
+    if (fs.existsSync(dbpath)) {
+      fs.unlinkSync(dbpath);
+    }
+    rdb = nedb(dbpath)
+  }
+}
 /**
  * 记录群聊天记录 记录格式
  * { roomName: '群名', roomId: '', content: '内容', contact: '用户名', wxid: '', time: '时间' }
@@ -19,6 +33,7 @@ const rdb = nedb(dbpath)
  */
 export async function addRoomRecord(info) {
   try {
+    initDb()
     let doc = await rdb.insert(info)
     return doc
   } catch (error) {

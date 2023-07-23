@@ -244,6 +244,7 @@ async function initTaskLocalSchedule(that) {
   }
 }
 
+
 /**
  * 初始化小助手任务
  * @param {*} that bot对象

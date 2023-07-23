@@ -2,6 +2,7 @@ import { aiBotReq, req } from './superagent.js'
 import { updateConfig } from '../db/configDb.js'
 import { packageJson } from '../package-json.js'
 import { updateAllGptConfig, resetData } from "../db/gptConfig.js";
+import { updateAllRssConfig, resetRssData } from "../db/rssConfig.js";
 import { getPuppetEol } from "../const/puppet-type.js";
 
 /**
@@ -146,10 +147,11 @@ async function getConfig() {
     }
     let content = await aiBotReq(option)
     const config = JSON.parse(content.data.config)
-    const cloudRoom = await getWordCloudRoom()
-
-    if(config.role === 'vip') {
+    let cloudRoom = []
+    if(config.userInfo.role === 'vip') {
       await getGptConfig()
+      await getRssConfig()
+      cloudRoom = await getWordCloudRoom()
     }
 
     let cres = await updateConfig({
@@ -203,6 +205,28 @@ export async function getGptConfig() {
     }
   } catch (error) {
     console.log('获取gpt配置文件失败:' + error)
+  }
+}
+
+/**
+ * 获取rss配置
+ * @return {Promise<*>}
+ */
+export async function getRssConfig() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/rss/config',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    if(content.data) {
+      const list = content.data.map(item=> ({...item, _id: item.id}))
+      resetRssData()
+      await updateAllRssConfig(list)
+    }
+  } catch (error) {
+    console.log('获取rss配置文件失败:' + error)
   }
 }
 
@@ -338,7 +362,6 @@ async function sendHeartBeat(heart) {
       params: { heartBeat: heart },
     }
     let content = await aiBotReq(option)
-    console.log('推送心跳成功')
   } catch (error) {
     console.log('推送心跳失败', error)
   }

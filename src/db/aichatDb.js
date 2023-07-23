@@ -1,17 +1,32 @@
 import nedb from "./nedb.js";
 import path from "path";
 import os from "os";
+import globalConfig from "./global.js";
+import fs from "fs";
 
-const baseDir = path.join(
-  os.homedir(),
-  path.sep,
-  ".wechaty",
-  "wechaty-panel-cache",
-  path.sep
-);
-const dbpath = baseDir + "aichat.db";
-const rdb = nedb(dbpath);
-console.log('聊天记录路径：如果开启了记录会存到此处，未开启不会记录，所有记录都是存在本地', dbpath)
+
+let rdb = null;
+
+function initDb() {
+  if(!rdb) {
+    const baseDir = path.join(
+      os.homedir(),
+      path.sep,
+      ".wechaty",
+      "wechaty-panel-cache",
+      globalConfig.getApikey(),
+      path.sep
+    );
+    const dbpath = baseDir + "aichat.db";
+    console.log('聊天记录路径：如果开启了记录会存到此处，未开启不会记录，所有记录都是存在本地', dbpath)
+
+    if (fs.existsSync(dbpath)) {
+      fs.unlinkSync(dbpath);
+    }
+    rdb = nedb(dbpath)
+  }
+}
+
 /**
  * 记录群聊天记录 记录格式
  * { contactName: '', contactId: '', roomName: '', roomId: '', input: '输入的问题', output: '输出内容', time: '时间' }
@@ -20,6 +35,7 @@ console.log('聊天记录路径：如果开启了记录会存到此处，未开�
  */
 export async function addAichatRecord(info) {
   try {
+    initDb()
     let doc = await rdb.insert(info);
     return doc;
   } catch (error) {

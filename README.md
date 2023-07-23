@@ -24,6 +24,7 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 - [x] ChatGPT api (支持切换模型)
 - [x] ChatGPT 网页hook
 - [x] 微信对话开放平台
+- [x] dify 平台和fastgpt无缝适配
 - [ ] 更多
 
 * 定时任务
@@ -71,6 +72,7 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 - [x] 回调事件
 - [x] 群发助手
 - [x] openapi请求
+- [x] rss订阅推送
 
 更多详情介绍：[传送门](https://www.xkboke.com/web-inn/secretary/client.html#%E5%B0%8F%E5%8A%A9%E6%89%8B%E5%8A%9F%E8%83%BD%E4%B8%80%E8%A7%88)
 
