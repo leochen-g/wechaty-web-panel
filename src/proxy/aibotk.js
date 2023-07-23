@@ -494,11 +494,27 @@ async function updatePanelVersion() {
     let option = {
       method: 'POST',
       url: '/webPanel/version',
-      params: { version: packageJson.version || '0.2.11' },
+      params: { version: packageJson.version || '' },
     }
     console.log('更新插件版本号', packageJson.version)
     let content = await aiBotReq(option)
     return content.data
+  } catch (error) {
+    console.log('error', error)
+  }
+}
+/**
+ * 更新插件版本信息
+ * @param {*} version
+ */
+export async function getPanelVersion() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/webPanel/version',
+    }
+    let content = await aiBotReq(option)
+    return content.data.version
   } catch (error) {
     console.log('error', error)
   }

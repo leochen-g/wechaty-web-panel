@@ -1,19 +1,25 @@
-import { getConfig, sendRobotInfo, putqn, setQrCode, updatePanelVersion } from '../proxy/aibotk.js'
+import { getConfig, sendRobotInfo, putqn, setQrCode, updatePanelVersion, getPanelVersion } from '../proxy/aibotk.js'
 import { addUser } from '../db/userDb.js'
 import { initMqtt } from '../proxy/mqtt.js'
 import { allConfig } from '../db/configDb.js'
 import { updatePuppetConfig } from "../db/puppetDb.js";
 import { PUPPET_MAP } from '../const/puppet-type.js'
+import { packageJson } from '../package-json.js'
+
 /**
  * 登录成功监听事件
  * @param {*} user 登录用户
  */
 async function onLogin(user) {
   try {
+    const lastVersion = await getPanelVersion()
     console.log(`
       ==========================================================
        贴心AI助理${user}登录了
-       你正在使用的是:${PUPPET_MAP[this.puppet.constructor.name]}!
+       你正在使用的是: ${PUPPET_MAP[this.puppet.constructor.name]}!
+       最新插件版本: ${lastVersion}
+       你的插件版本: ${packageJson.version}
+       ${lastVersion !== packageJson.version ? '请及时更新插件，才能体验最新功能' : ''}
       ==========================================================
     `)
     await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
