@@ -73,6 +73,9 @@ class DifyAi {
       if(systemMessage || content === 'reset' || content === '重置') {
         console.log('重新更新上下文对话');
         this.chatOption[uid] = {}
+        if(content === 'reset' || content === '重置') {
+          return [{type: 1, content: '上下文已重置'}]
+        }
       }
       console.log('this.chatOption[uid]', this.chatOption[uid]);
       const { conversationId, text } = systemMessage ? await this.difyChat.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid }) : await this.difyChat.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid });

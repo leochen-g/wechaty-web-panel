@@ -88,6 +88,9 @@ class UnOfficialOpenAi {
         question = systemMessage + content
         console.log('重新更新上下文对话');
         this.chatOption[uid] = {}
+        if(content === 'reset' || content === '重置') {
+          return [{type: 1, content: '上下文已重置'}]
+        }
       }
 
       const { conversationId, text, id } = systemMessage ? await this.chatGPT.sendMessage(question, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }):await this.chatGPT.sendMessage(question, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
