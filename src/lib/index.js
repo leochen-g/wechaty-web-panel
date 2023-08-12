@@ -428,6 +428,10 @@ function groupArray(array, subGroupLength) {
   return newArray
 }
 
+export function delHtmlTag(str) {
+  return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
+}
+
 export { Base64Encode }
 export { Base64Decode }
 export { setLocalSchedule }

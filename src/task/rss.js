@@ -1,4 +1,4 @@
-import { setLocalSchedule, delay, cancelAllSchedule } from "../lib/index.js";
+import { setLocalSchedule, delay, cancelAllSchedule, delHtmlTag } from "../lib/index.js";
 import { getAllRssConfig } from '../db/rssConfig.js'
 import { addRssHistory, updateRssHistory, getRssHistoryById } from "../db/rssHistory.js";
 import { roomSay, contactSay } from "../common/index.js";
@@ -40,10 +40,10 @@ async function getRssContent(info) {
 async function setContent(feed, info) {
   const eol = await getPuppetEol();
   if(info.showLink) {
-    const res = { type: 4, url: feed.link, title: feed.title, description: feed.content.substring(0,30), thumbUrl: info.thumbUrl };
+    const res = { type: 4, url: feed.link, title: delHtmlTag(feed.title), description: delHtmlTag(feed.content.substring(0,80)), thumbUrl: info.thumbUrl };
     return [res];
   } else {
-    const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}《${feed.title}》${eol}【原链接】:${feed.link}${eol}【摘要】：${feed.content.substring(0,100)}...${eol}${eol}${info.suffixWord || ''}`;
+    const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}《${delHtmlTag(feed.title)}》${eol}【原链接】:${feed.link}${eol}【摘要】：${delHtmlTag(feed.content.substring(0,300))}...${eol}${eol}${info.suffixWord || ''}`;
     return [{ type: 1, content: content }]
   }
 }

@@ -54,6 +54,18 @@ export async function getPuppetEol() {
 }
 
 /**
+ * 判断是不是windows平台
+ * @return {Promise<boolean>}
+ */
+export async function isWindowsPlatform() {
+  const puppetInfo = await getPuppetInfo()
+  if(puppetInfo.puppetType === 'PuppetXp' || puppetInfo.puppetType === 'PuppetEngine') {
+    return true
+  }
+  return false;
+}
+
+/**
  * 判断是否是web 协议
  * @return {Promise<boolean>}
  */

@@ -126,8 +126,8 @@ class OfficialOpenAi {
           return [{ type: 1, content: '这个话题不适合讨论，换个话题吧。' }]
         }
       }
-      if(systemMessage) {
-        console.log('带角色重新更新上下文对话');
+      if(systemMessage || content === 'reset' || content === '重置') {
+        console.log('重新更新上下文对话');
         this.chatOption[uid] = {}
       }
       const { conversationId, text, id } = systemMessage ? await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }) : await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });

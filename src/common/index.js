@@ -4,7 +4,16 @@ import { getUser } from '../db/userDb.js'
 import { formatDate, getDay, groupArray, delay } from '../lib/index.js'
 import { FileBox } from 'file-box'
 import { allConfig } from '../db/configDb.js'
-import { getPuppetEol } from "../const/puppet-type.js";
+import { getPuppetEol, isWindowsPlatform } from "../const/puppet-type.js";
+
+
+async function formatContent(text) {
+  const isWin = isWindowsPlatform()
+  if(isWin) {
+    return text.replace(/\n/g, "\r");
+  }
+  return text;
+}
 
 /**
  * 获取每日新闻内容
@@ -192,8 +201,9 @@ async function roomSay(room, contact, msg) {
   console.log('回复内容：', JSON.stringify(msg))
   try {
     if (msg.type === 1 && msg.content) {
+      const content = await formatContent(msg.content)
       // 文字
-      contact ? await room.say(msg.content, contact) : await room.say(msg.content)
+      contact ? await room.say(content, contact) : await room.say(content)
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
@@ -207,9 +217,11 @@ async function roomSay(room, contact, msg) {
       await delay(500)
       await room.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
+      const description = await formatContent(msg.description)
+      const title = await formatContent(msg.title)
       let url = new this.UrlLink({
-        description: msg.description,
-        thumbnailUrl: msg.thumbUrl,
+        description: description,
+        thumbnailUrl: title,
         title: msg.title,
         url: msg.url,
       })
@@ -249,8 +261,9 @@ async function contactSay(contact, msg, isRoom = false) {
   console.log('回复内容：', JSON.stringify(msg))
   try {
     if (msg.type === 1 && msg.content) {
+      const content = await formatContent(msg.content)
       // 文字
-      await contact.say(msg.content)
+      await contact.say(content)
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
@@ -261,10 +274,12 @@ async function contactSay(contact, msg, isRoom = false) {
       let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
       await contact.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
+      const description = await formatContent(msg.description)
+      const title = await formatContent(msg.title)
       let url = new this.UrlLink({
-        description: msg.description,
+        description: description,
         thumbnailUrl: msg.thumbUrl,
-        title: msg.title,
+        title: title,
         url: msg.url,
       })
       await contact.say(url)

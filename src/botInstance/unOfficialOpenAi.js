@@ -84,9 +84,9 @@ class UnOfficialOpenAi {
         await this.init()
       }
       let question = this.config.systemMessage ? this.config.systemMessage + content : content;
-      if(systemMessage) {
+      if(systemMessage || content === 'reset' || content === '重置') {
         question = systemMessage + content
-        console.log('带角色重新更新上下文对话');
+        console.log('重新更新上下文对话');
         this.chatOption[uid] = {}
       }
 

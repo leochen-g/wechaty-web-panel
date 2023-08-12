@@ -84,7 +84,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         console.log(`发消息人${await contact.name()}:发了一个小程序`);
         const miniProgram = await msg.toMiniProgram();
         if(config.parseMini && miniProgram.payload) {
-          const miniParse = `【小程序解析】${eol}${eol}appid：${miniProgram.appid()}${eol}username：${miniProgram.username()}${eol}标题：${miniProgram.title()}${eol}描述：${miniProgram.description()}${eol}路径：${miniProgram.pagePath()}`
+          const miniParse = `【小程序解析】${eol}${eol}appid：${miniProgram.appid()}${eol}username：${miniProgram.username().replace('@app', '')}${eol}标题：${miniProgram.title()}${eol}描述：${miniProgram.description()}${eol}路径：${decodeURIComponent(miniProgram.pagePath())}`
           contact.say(miniParse)
         }
         console.log('mini', miniProgram);
@@ -189,7 +189,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个小程序`);
         const miniProgram = await msg.toMiniProgram();
         if(config.parseMiniRooms.includes(roomName) && miniProgram.payload) {
-          const miniParse = `【小程序解析】${eol}${eol}appid:${miniProgram.appid()}${eol}username：${miniProgram.username()}${eol}标题：${miniProgram.title()}${eol}描述：${miniProgram.description()}${eol}路径：${miniProgram.pagePath()}${eol}`
+          const miniParse = `【小程序解析】${eol}${eol}appid:${miniProgram.appid()}${eol}username：${miniProgram.username().replace('@app', '')}${eol}标题：${miniProgram.title()}${eol}描述：${miniProgram.description()}${eol}路径：${decodeURIComponent(miniProgram.pagePath())}${eol}`
           room.say(miniParse)
         }
         console.log('mini', miniProgram);
