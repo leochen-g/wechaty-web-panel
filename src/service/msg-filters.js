@@ -4,7 +4,7 @@ import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.j
 import { addRoom } from '../common/index.js'
 import { service, callbackAibotApi } from '../proxy/superagent.js'
 import { dispatchBot } from '../proxy/bot/dispatch.js'
-import { getAllGptConfig } from "../db/gptConfig.js";
+import globalConfig from "../db/global.js";
 
 function emptyMsg({ room, isMention }) {
   if (room && !isMention) return []
@@ -260,7 +260,7 @@ async function robotMsg({ msg, name, id, config, isMention, room }) {
 
 async function customChat({ msg, name, id, config, isMention, room, roomId, roomName }) {
   try {
-    const gptConfigs = await getAllGptConfig()
+    const gptConfigs = globalConfig.getAllGptConfig()
     if (gptConfigs && gptConfigs.length) {
       let finalConfig = ''
       if (room) {
@@ -292,15 +292,22 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
             if(keyword || !finalConfig?.keywords.length) {
               msg = keyword ? msg.replace(keyword, ''): msg
               if(finalConfig.limitNum>0 && finalConfig.limitNum <= finalConfig.usedNum) {
-                return [{ type: 1, content: '聊天次数已用完，请联系管理员充值' }]
+                return [{ type: 1, content: finalConfig.rechargeTip || '聊天次数已用完，请联系管理员充值' }]
               }
               const msgArr = await dispatchBot({ botType: finalConfig.robotType, content: msg, uid: id, adminId: finalConfig.id, config: finalConfig.botConfig })
-              return msgArr
+              if(msgArr.length) return msgArr;
+              console.log('自定义回复获取内容失败，启用全局配置');
+              return []
             }
           }
           return []
+        } else {
+          // 如果没有开启对话 也要检测一下是不是需要@ 才返回默认回复
+          if ((isRoom && finalConfig.needAt === 1 && isMention) || isRoom & !finalConfig.needAt || !isRoom) {
+            return finalConfig.defaultReply ? [{ type: 1, content: finalConfig.defaultReply }] : [{ type: 1, content: '' }]
+          }
+          return []
         }
-        return finalConfig.defaultReply ? [{ type: 1, content: finalConfig.defaultReply }] : []
       }
       return []
     }

@@ -1,5 +1,5 @@
 import { allConfig } from '../db/configDb.js'
-import { getAllGptConfig } from '../db/gptConfig.js'
+import globalConfig from '../db/global.js'
 import msgFilter from './msg-filters.js'
 const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '微信团队', 'recommendation message'] // 微信官方账户，针对此账户不做任何回复
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
@@ -34,7 +34,7 @@ async function getMsgReply(resArray, { that, msg, name, contact, config, avatar,
 async function filterFriendMsg(that, contact, msg) {
   try {
     const config = await allConfig() // 获取配置信息
-    const gptConfig = await getAllGptConfig() // 获取gpt配置信息
+    const gptConfig = globalConfig.getAllGptConfig() // 获取gpt配置信息
     const name = contact.name()
     const id = contact.id
     const avatar = await contact.avatar()
@@ -73,7 +73,7 @@ async function filterFriendMsg(that, contact, msg) {
 async function filterRoomMsg({that, msg, name, id, avatar, room, isMention, roomName, roomId }) {
   try {
     const config = await allConfig() // 获取配置信息
-    const gptConfig = await getAllGptConfig() // 获取gpt配置信息
+    const gptConfig = globalConfig.getAllGptConfig() // 获取gpt配置信息
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },

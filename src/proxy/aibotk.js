@@ -1,9 +1,9 @@
 import { aiBotReq, req } from './superagent.js'
 import { updateConfig } from '../db/configDb.js'
 import { packageJson } from '../package-json.js'
-import { updateAllGptConfig, resetData } from "../db/gptConfig.js";
 import { updateAllRssConfig, resetRssData } from "../db/rssConfig.js";
 import { getPuppetEol } from "../const/puppet-type.js";
+import globalConfig from "../db/global.js";
 
 /**
  * 获取美女图片
@@ -200,8 +200,7 @@ export async function getGptConfig() {
     let content = await aiBotReq(option)
     if(content.data) {
       const list = content.data.map(item=> ({...item, _id: item.id}))
-      resetData()
-      await updateAllGptConfig(list)
+      globalConfig.updateAllGptConfig(list)
     }
   } catch (error) {
     console.log('获取gpt配置文件失败:' + error)

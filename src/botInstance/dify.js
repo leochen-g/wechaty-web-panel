@@ -41,7 +41,6 @@ class DifyAi {
       systemMessage: this.config.systemMessage || '',
     }
 
-
       console.log(`api请求地址:${this.config.proxyPass}`);
       this.difyChat = new ChatClient({
         ...baseOptions,
@@ -60,7 +59,7 @@ class DifyAi {
   async getReply(content, uid, adminId = '', systemMessage = '') {
     try {
       if(!this.difyChat) {
-        console.log('看到此消息说明已启用dify 对话平台');
+        console.log('启用dify对话平台');
         await this.init()
       }
       if(this.config.filter) {

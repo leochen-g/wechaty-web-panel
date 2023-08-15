@@ -1,8 +1,8 @@
 import { getChatGPTReply } from "./chatgpt.js";
 import { getChatGPTWebReply } from "./chatgpt-web.js";
 import { getDifyAiReply } from "./dify.js";
-import { updateOneGptConfig, getGptConfigById } from "../../db/gptConfig.js";
 import { updateChatRecord } from "../aibotk.js";
+import globalConfig from '../../db/global.js'
 
 /**
  * 消息转发
@@ -12,7 +12,7 @@ import { updateChatRecord } from "../aibotk.js";
 export async function dispatchBot({botType, content, uid, adminId, config}) {
    console.log('进入定制机器人回复');
     try {
-      const gptConfig = await getGptConfigById(adminId);
+      const gptConfig = globalConfig.getGptConfigById(adminId);
       let res, replys
       switch (botType) {
         case 6:
@@ -39,7 +39,7 @@ export async function dispatchBot({botType, content, uid, adminId, config}) {
       }
       if(replys.length) {
         void updateChatRecord(adminId, gptConfig.usedNum + 1)
-        void updateOneGptConfig(adminId, { ...gptConfig, usedNum: gptConfig.usedNum + 1 })
+        globalConfig.updateOneGptConfig(adminId, { ...gptConfig, usedNum: gptConfig.usedNum + 1 })
       }
       return replys
     } catch (e) {

@@ -86,8 +86,9 @@ async function initMqtt(that) {
             }
           } else if(topic === `aibotk/${userId}/gptconfig`) {
             await getGptConfig()
+            console.log('更新最新自定义对话配置')
             if(content.event === 'update' || content.event === 'delete') {
-              console.log('更新gpt配置')
+              console.log('更新自定义对话配置，重置对话')
               reset(content.updateId)
               webReset(content.updateId)
               difyReset(content.updateId)
