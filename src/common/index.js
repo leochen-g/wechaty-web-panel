@@ -221,8 +221,8 @@ async function roomSay(room, contact, msg) {
       const title = await formatContent(msg.title)
       let url = new this.UrlLink({
         description: description,
-        thumbnailUrl: title,
-        title: msg.title,
+        thumbnailUrl: msg.thumbUrl,
+        title: title,
         url: msg.url,
       })
       await room.say(url)

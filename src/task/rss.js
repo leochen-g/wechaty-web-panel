@@ -16,7 +16,7 @@ async function getRssContent(info) {
     if(feed.items && feed.items.length) {
       // 当存在历史推送记录 需要判读是否推送过
       const last = feed.items[0];
-      const lastContent = last.guid || last.link;
+      const lastContent = last.link;
       if(lastItem) {
         if(lastContent !== lastItem.lastContent) {
           const content = await setContent(last, info);
