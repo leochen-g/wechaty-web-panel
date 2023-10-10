@@ -81,6 +81,7 @@ async function filterRoomMsg({that, msg, name, id, avatar, room, isMention, room
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
       { bool: true, method: 'keywordsMsg' },
       { bool: gptConfig && gptConfig.length > 0, method: 'customChat' },
+      { bool: config.customBot && config.customBot.open, method: 'customBot' },
       { bool: config.autoReply && config.botScope !== 'friend', method: 'robotMsg' },
     ]
     const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, roomName, roomId, isMention })

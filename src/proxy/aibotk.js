@@ -177,6 +177,7 @@ async function getConfig() {
       parseMiniRooms: [],
       preventLength: 1000,
       preventWords: '',
+      customBot: null,
       ...config,
       cloudRoom
     })
