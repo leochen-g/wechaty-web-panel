@@ -113,10 +113,10 @@ class OfficialOpenAi {
   }
 
 
-  async getReply(content, uid, adminId = '', systemMessage = '') {
+  async getReply(content, uid, adminId = '', systemMessage = '', isFastGPT) {
     try {
       if(!this.chatGPT) {
-        console.log('看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
+        console.log(isFastGPT ? '看到此消息说明启用了fastgpt' : '看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
         await this.init()
       }
       if(this.config.filter) {
@@ -133,7 +133,14 @@ class OfficialOpenAi {
           return [{type: 1, content: '上下文已重置'}]
         }
       }
-      const { conversationId, text, id } = systemMessage ? await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }) : await this.chatGPT.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 });
+      const sendParams = { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }
+      if(systemMessage) {
+        sendParams.systemMessage = systemMessage;
+      }
+      if(isFastGPT) {
+        sendParams.chatId = uid;
+      }
+      const { conversationId, text, id } = await this.chatGPT.sendMessage(content, sendParams);
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {

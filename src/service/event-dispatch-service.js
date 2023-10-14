@@ -156,8 +156,8 @@ async function dispatchAiBot(bot, msg, name, id) {
         replys = res
         break
       case 6:
-        // ChatGPT3
-        res = await getGptOfficialReply(msg, id)
+        // ChatGPT-api
+        res = await getGptOfficialReply(msg, id, false)
         replys = res
         break
       case 7:
@@ -168,6 +168,11 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 8:
         // dify ai
         res = await getDifyReply(msg, id)
+        replys = res
+        break
+      case 9:
+        // fast gpt
+        res = await getGptOfficialReply(msg, id, true)
         replys = res
         break
       default:

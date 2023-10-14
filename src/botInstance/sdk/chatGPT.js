@@ -158,7 +158,8 @@ Current date: ${currentDate}`;
       onProgress,
       stream = !!onProgress,
       completionParams,
-      conversationId
+      conversationId,
+      chatId
     } = opts;
     let { abortSignal } = opts;
     let abortController = null;
@@ -199,6 +200,9 @@ Current date: ${currentDate}`;
           messages,
           stream
         };
+        if(chatId) {
+          body.chatId = chatId
+        }
         if (this._apiOrg) {
           headers["OpenAI-Organization"] = this._apiOrg;
         }

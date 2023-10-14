@@ -17,7 +17,7 @@ export async function dispatchBot({botType, content, uid, adminId, config}) {
       switch (botType) {
         case 6:
           // ChatGPT api
-          res = await getChatGPTReply(content, uid, adminId, config)
+          res = await getChatGPTReply(content, uid, adminId, config, false)
           replys = res
           break
         case 7:
@@ -30,6 +30,11 @@ export async function dispatchBot({botType, content, uid, adminId, config}) {
           // dify ai
           console.log('进入dify聊天');
           res = await getDifyAiReply(content, uid, adminId, config)
+          replys = res
+          break
+        case 9:
+          // fastGPT api
+          res = await getChatGPTReply(content, uid, adminId, config, true)
           replys = res
           break
         default:

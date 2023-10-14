@@ -1,10 +1,10 @@
 import * as mqtt from 'mqtt'
 import { allConfig } from '../db/configDb.js'
-import { contactSay, roomSay } from '../common/index.js'
+import { contactSay, roomSay, sendRoomNotice } from '../common/index.js'
 import { getConfig, getMqttConfig, getGptConfig, getRssConfig } from "./aibotk.js";
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
 import { sendTaskMessage } from "../task/index.js";
-import { randomRange } from '../lib/index.js'
+import { delay, randomRange } from "../lib/index.js";
 import { reset } from './bot/chatgpt.js'
 import { reset as webReset } from './bot/chatgpt-web.js'
 import { reset as difyReset } from './bot/dify.js'
@@ -97,6 +97,18 @@ async function initMqtt(that) {
             console.log('更新rss配置')
             await getRssConfig()
             void initRssTask(that)
+          }  else if(topic === `aibotk/${userId}/roomnotice`) {
+            console.log('发送群公告请求')
+            const rooms = content.rooms;
+            for(let item of rooms) {
+              const room =  await that.Room.find({ id: item.wxid, topic: item.name })
+              if(room) {
+                await sendRoomNotice.call(that, room, content.content)
+                await delay(1000)
+              } else {
+                console.log(`没有找到群:【${item.name}】，无法发送群公告`);
+              }
+            }
           }
         })
       }

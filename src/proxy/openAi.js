@@ -12,7 +12,7 @@ export function reset() {
   }
 }
 
-export async function getGptOfficialReply(content, uid) {
+export async function getGptOfficialReply(content, uid, isFastGPT) {
     const config = await allConfig()
     if (!config.gpttoken) {
       console.log('请到智能微秘书平台配置Openai apikey参数方可使用')
@@ -38,5 +38,5 @@ export async function getGptOfficialReply(content, uid) {
     if(!chatGPT) {
       chatGPT = new OfficialOpenAi(chatConfig)
     }
-    return await chatGPT.getReply(content, uid)
+    return await chatGPT.getReply(content, uid, '', '', isFastGPT)
 }

@@ -242,6 +242,7 @@ async function roomSay(room, contact, msg) {
     console.log('群回复错误', e)
   }
 }
+
 /**
  * 私聊发送消息
  * @param contact
@@ -321,6 +322,19 @@ async function addRoom(that, contact, roomName, replys) {
   }
 }
 /**
+ * 发送群公告
+ * @param roomIds
+ * @param content
+ * @return {Promise<void>}
+ */
+async function sendRoomNotice(room, content) {
+  const config = await allConfig()
+  const { role } = config.userInfo
+  if(role === 'vip' && room && content) {
+    await room.announce(content)
+  }
+}
+/**
  * 重新同步好友和群组
  * @param that
  * @returns {Promise<void>}
@@ -370,6 +384,7 @@ export { addRoomWelcomeSay }
 export { updateContactAndRoom }
 export { getRoomEveryDayContent }
 export { getCountDownContent }
+export { sendRoomNotice }
 export default {
   updateRoomOnly,
   updateContactOnly,
