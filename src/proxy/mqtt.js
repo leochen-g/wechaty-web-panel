@@ -11,6 +11,53 @@ import { reset as difyReset } from './bot/dify.js'
 import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
 
 let mqttclient = null
+
+
+async function sendRoomSay(that, room, messages) {
+  console.log(`收到群：${room.name}批量发送消息请求， 消息数量【${messages.length}】`)
+  const finalRoom = await that.Room.find({ id: room.id, topic: room.name });
+
+  if (!finalRoom) {
+    console.log(`查找不到群：${room.name}，请检查群名是否正确`)
+    return
+  } else {
+    for (let message of messages) {
+      await roomSay.call(that,finalRoom, '', message)
+      await delay(500)
+    }
+  }
+}
+
+async function sendContactSay(that, contact, messages) {
+  console.log(`收到好友：${contact.name}批量发送消息请求， 消息数量【${messages.length}】`)
+  const finalContact = await that.Contact.find({ id: contact.id || '', name: contact.name, alias: contact.alias || '',   weixin: contact.weixin || '' })
+
+  if (!finalContact) {
+    console.log(`查找不到好友：${contact.name}，请检查好友名称是否正确`)
+    return
+  } else {
+    for (let message of messages) {
+      await contactSay.call(that, finalContact, message)
+      await delay(500)
+    }
+  }
+}
+
+async function sendRoomsNotice(that, room, messages) {
+  console.log(`收到群：${room.name}批量发送群公告请求， 公告数量【${messages.length}】`)
+  const finalRoom = await that.Room.find({ id: room.id, topic: room.name })
+
+  if (!finalRoom) {
+    console.log(`查找不到群：${room.name}，请检查群名是否正确`)
+    return
+  } else {
+    for (let message of messages) {
+      await sendRoomNotice.call(that, finalRoom, message.content)
+      await delay(500)
+    }
+  }
+}
+
 async function initMqtt(that) {
   try {
     await getConfig() // 获取配置文件
@@ -68,6 +115,24 @@ async function initMqtt(that) {
                 await contactSay.call(that, contact, content.message)
               }
             }
+          } if (topic === `aibotk/${userId}/multisay`) {
+            console.log('触发批量发送消息请求', content.target);
+            if (content.target === 'Room') {
+              for(let room of content.groups) {
+                await sendRoomSay(that, room, content.messages)
+                await delay(600)
+              }
+            } else if (content.target === 'Contact') {
+              for(let contact of content.groups) {
+                await sendContactSay(that, contact, content.messages)
+                await delay(600)
+              }
+            } else if(content.target === 'RoomNotice') {
+              for(let room of content.groups) {
+                await sendRoomsNotice(that, room, content.messages)
+                await delay(600)
+              }
+            }
           } else if (topic === `aibotk/${userId}/event`) {
             if (content.target === 'system') {
               console.log('触发了内置事件')
@@ -97,18 +162,6 @@ async function initMqtt(that) {
             console.log('更新rss配置')
             await getRssConfig()
             void initRssTask(that)
-          }  else if(topic === `aibotk/${userId}/roomnotice`) {
-            console.log('发送群公告请求')
-            const rooms = content.rooms;
-            for(let item of rooms) {
-              const room =  await that.Room.find({ id: item.wxid, topic: item.name })
-              if(room) {
-                await sendRoomNotice.call(that, room, content.content)
-                await delay(1000)
-              } else {
-                console.log(`没有找到群:【${item.name}】，无法发送群公告`);
-              }
-            }
           }
         })
       }
