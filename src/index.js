@@ -11,6 +11,7 @@ import onHeartbeat from './handlers/on-heartbeat.js'
 import onError from './handlers/on-error.js'
 import onRoomtopic from './handlers/on-roomtopic.js'
 import onRoomleave from './handlers/on-roomleave.js'
+import onVerifyCode from './handlers/on-verifycode.js'
 import dayjs from "dayjs";
 const originalConsoleLog = console.log;
 
@@ -60,6 +61,7 @@ function WechatyWebPanelPlugin(config = { apiKey, apiSecret, scanTimes }) {
     if (!ignoreEvents.includes('ready')) bot.on('ready', onReady)
     if (!ignoreEvents.includes('heartbeat')) bot.on('heartbeat', onHeartbeat)
     if (!ignoreEvents.includes('error')) bot.on('error', onError)
+    if (!ignoreEvents.includes('verify-code')) bot.on('verify-code', onVerifyCode)
   }
 }
 export {
