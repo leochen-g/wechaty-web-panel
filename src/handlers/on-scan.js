@@ -9,6 +9,7 @@ import globalConfig from '../db/global.js'
 let scanTime = 0
 
 function getQrcodeKey(qrcode) {
+  if(!qrcode || !qrcode.startsWith('http')) return
   let url = new URL(qrcode);
   let searchParams = new URLSearchParams(url.search.slice(1));
   if(searchParams.get('key')) {
@@ -25,7 +26,7 @@ async function onScan(qrcode, status) {
   await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
   const aibotConfig = await getAibotConfig();
   await getVerifyCode();
-  getQrcodeKey()
+  getQrcodeKey(qrcode)
   Qrterminal.generate(qrcode)
   console.log('扫描状态', status)
   if(scanTime >= aibotConfig.scanTimes) {
