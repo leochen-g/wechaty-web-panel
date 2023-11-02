@@ -125,6 +125,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     const contact = msg.talker(); // 发消息人
     const contactName = contact.name();
     const roomName = await room.topic();
+    const isFriend = contact.friend();
     const type = msg.type();
     const receiver = msg.to();
     let content = "";
@@ -145,6 +146,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         replys = await getRoomTextReply({
           that,
           content,
+          isFriend,
           name: contactName,
           id: contactId,
           roomId: room.id,

@@ -246,9 +246,9 @@ async function keywordsMsg({ msg, config, room, isMention }) {
   }
 }
 
-async function robotMsg({ msg, name, id, config, isMention, room }) {
+async function robotMsg({ msg, name, id, config, isMention, room, isFriend }) {
   // 如果群里没有提及不开启机器人聊天
-  if (room && !isMention) {
+  if (room && !isMention && config.roomAt || room && !isMention && !config.roomAt && isFriend && config.friendNoReplyInRoom) {
     return [];
   } else {
     try {

@@ -178,6 +178,9 @@ async function getConfig() {
       preventLength: 1000,
       preventWords: '',
       customBot: null,
+      roomAt: 1,
+      friendNoReplyInRoom: 0,
+      defaultReply: '',
       ...config,
       cloudRoom
     })
