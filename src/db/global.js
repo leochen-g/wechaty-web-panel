@@ -1,9 +1,31 @@
 import { getGptConfigById, updateAllGptConfig, updateOneGptConfig } from "./gptConfig.js";
+import onVerifyCode from "../handlers/on-verifycode.js";
 
 class Config {
     constructor(){
         this.apiKey = '';
+        this.qrcodeKey = ''; // 企微二维码key
+        this.verifyCode = ''; // 企微验证码
+        this.verifyId = ''; // 企微验证码id
         this.gptconfig = [];
+    }
+    getVerifyId() {
+        return this.verifyId;
+    }
+    setVerifyId(val) {
+        this.verifyId = val;
+    }
+    getVerifyCode() {
+        return this.verifyCode;
+    }
+    setVerifyCode(val) {
+        this.verifyCode = val;
+    }
+    getQrKey() {
+        return this.qrcodeKey;
+    }
+    setQrKey(val) {
+        this.qrcodeKey = val;
     }
     getApikey() {
         return this.apiKey

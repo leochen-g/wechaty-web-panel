@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.6.23",
+  "version": "1.6.26",
   "description": "智能微秘书插件",
   "exports": {
     ".": {
@@ -25,6 +25,9 @@
     "微信每日说",
     "每日说",
     "群消息同步",
+    "企微机器人",
+    "fastGPT",
+    "Dify",
     "Wechaty",
     "wechatEveryDay",
     "wechaty",

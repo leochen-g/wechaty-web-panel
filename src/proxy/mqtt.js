@@ -1,7 +1,7 @@
 import * as mqtt from 'mqtt'
 import { allConfig } from '../db/configDb.js'
 import { contactSay, roomSay, sendRoomNotice } from '../common/index.js'
-import { getConfig, getMqttConfig, getGptConfig, getRssConfig } from "./aibotk.js";
+import {getConfig, getMqttConfig, getGptConfig, getRssConfig, getVerifyCode} from "./aibotk.js";
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
 import { sendTaskMessage } from "../task/index.js";
 import { delay, randomRange } from "../lib/index.js";
@@ -9,6 +9,7 @@ import { reset } from './bot/chatgpt.js'
 import { reset as webReset } from './bot/chatgpt-web.js'
 import { reset as difyReset } from './bot/dify.js'
 import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
+import globalConfig from "../db/global.js";
 
 let mqttclient = null
 
@@ -148,6 +149,27 @@ async function initMqtt(that) {
             } else if (content.target === 'Rss') {
               console.log('触发了rss立即更新事件')
               await sendRssTaskMessage(that, content)
+            } else if (content.target === 'refreshCode') {
+              console.log('强制更新二维码')
+              await this.refreshQrCode()
+            } else if (content.target === 'verifyCode') {
+              console.log('触发了输入验证码事件')
+              if (globalConfig.getVerifyId() === globalConfig.getQrKey()) {
+                await getVerifyCode();
+                if(globalConfig.getVerifyCode()) {
+                  console.log(`获取到输入的验证码:${globalConfig.getVerifyCode()}，正在填入`)
+                  const verifyCode = globalConfig.getVerifyCode() // 通过一些途径输入验证码
+                  try {
+                    await that.enterVerifyCode(id, verifyCode) // 如果没抛错，则说明输入成功，会推送登录事件
+                  } catch (e) {
+                    console.log('验证码校验错误：', e.message)
+                    // 如果抛错，请根据 message 处理，目前发现可以输错3次，超过3次错误需要重新扫码。
+                    // 错误关键词: 验证码错误输入错误，请重新输入
+                    // 错误关键词：验证码错误次数超过阈值，请重新扫码'
+                    // 目前不会推送 EXPIRED 事件，需要根据错误内容判断
+                  }
+                }
+              }
             }
           } else if(topic === `aibotk/${userId}/gptconfig`) {
             await getGptConfig()

@@ -278,6 +278,44 @@ async function getPromotInfo(id) {
 }
 
 /**
+ * 获取输入的验证码
+ * @param id
+ * @return {Promise<*>}
+ */
+async function getVerifyCode() {
+  try {
+    let option = {
+      method: 'get',
+      url: '/worker/verifycode',
+    }
+    let content = await aiBotReq(option)
+    console.log('获取微秘书平台输入的验证码', JSON.stringify(content.data))
+    if(content.data.code) {
+      globalConfig.setVerifyCode(content.data.code)
+    }
+  } catch (e) {
+    console.log("catch error:" + e);
+  }
+}
+
+/**
+ * 清除使用过的验证码
+ * @returns {Promise<*>}
+ */
+async function clearVerifyCode() {
+  try {
+    let option = {
+      method: 'get',
+      url: '/worker/clearverifycode',
+    }
+    await aiBotReq(option)
+    globalConfig.setVerifyCode('')
+  } catch (e) {
+    console.log("catch error:" + e);
+  }
+}
+
+/**
  * 获取定时提醒任务列表
  */
 async function getScheduleList() {
@@ -559,6 +597,8 @@ async function getMaterial(id) {
     console.log('获取mqtt配置错误', error)
   }
 }
+export { getVerifyCode }
+export { clearVerifyCode }
 export { getConfig }
 export { getScheduleList }
 export { setSchedule }
@@ -595,5 +635,7 @@ export default {
   getMeiNv,
   getOne,
   getMaterial,
-  getFireNews
+  getFireNews,
+  clearVerifyCode,
+  getVerifyCode
 }

@@ -1,5 +1,4 @@
 import Mustache from 'mustache'
-import * as PUPPET from 'wechaty-puppet'
 
 function roomTalker(options) {
   if (!options) {
@@ -197,7 +196,30 @@ const unidirectionalMapper = async (message, one) => {
          * then we add a sender information for the destination rooms.
          */
         if (topic === one) {
-          const type = PUPPET.types.Message[message.type()]
+          const typeMap = {
+            0:'Unknown',
+            1:'Attachment',      // Attach(6),
+            2:'Audio',         // Audio(1), Voice(34)
+            3:'Contact',         // ShareCard(42)
+            4:'ChatHistory',   // ChatHistory(19)
+            5:'Emoticon',       // Sticker: Emoticon(15), Emoticon(47)
+            6:'Image',        // Img(2), Image(3)
+            7:'Text',         // Text(1)
+            8:'Location',    // Location(48)
+            9:'MiniProgram',  // MiniProgram(33)
+            10:'GroupNote',   // GroupNote(53)
+            11:'Transfer',   // Transfers(2000)
+            12:'RedEnvelope',   // RedEnvelopes(2001)
+            13:'Recalled',   // Recalled(10002)
+            14:'Url',   // Url(5)
+            15:'Video',   // Video(4), Video(43)
+            16:'Post',   // Moment, Channel, Tweet, etc
+            17:'Channel',   // Channel
+            18:'System',   // System Message
+            19:'Markdown',   // Markdown Message
+            20:'CallRecord',   // Call Record (voice and video, maybe group?)
+          }
+          const type = typeMap[message.type()]
           messageList.unshift(`${prefix}: ${type}`)
         }
         break
