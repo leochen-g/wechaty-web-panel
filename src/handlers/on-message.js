@@ -119,7 +119,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
 async function dispatchRoomFilterByMsgType(that, room, msg) {
   const aibotConfig = await getAibotConfig();
   const config = await allConfig();
-  const { role } = config.userInfo;
+  const { role } = config && config.userInfo || {role: 'default'};
   try {
     const eol = await getPuppetEol();
     const contact = msg.talker(); // 发消息人
