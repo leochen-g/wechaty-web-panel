@@ -151,6 +151,7 @@ async function getConfig() {
     if(config.userInfo.role === 'vip') {
       await getGptConfig()
       await getRssConfig()
+      await getTasks()
       cloudRoom = await getWordCloudRoom()
     }
 
@@ -208,6 +209,27 @@ export async function getGptConfig() {
     }
   } catch (error) {
     console.log('获取gpt配置文件失败:' + error)
+  }
+}
+
+/**
+ * 获取批量任务
+ * @return {Promise<*>}
+ */
+export async function getTasks() {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/user/task',
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    if(content.data) {
+      const list = content.data.map(item=> ({...item, _id: item.id}))
+      globalConfig.updateAllTasks(list)
+    }
+  } catch (error) {
+    console.log('获取批量任务失败:' + error)
   }
 }
 

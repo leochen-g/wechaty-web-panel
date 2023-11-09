@@ -8,6 +8,13 @@ class Config {
         this.verifyCode = ''; // 企微验证码
         this.verifyId = ''; // 企微验证码id
         this.gptconfig = [];
+        this.allTasks = [];
+    }
+    getAllTasks() {
+        return this.allTasks
+    }
+    updateAllTasks(list) {
+        this.allTasks = list
     }
     getVerifyId() {
         return this.verifyId;

@@ -1,9 +1,9 @@
 import * as mqtt from 'mqtt'
 import { allConfig } from '../db/configDb.js'
 import { contactSay, roomSay, sendRoomNotice } from '../common/index.js'
-import {getConfig, getMqttConfig, getGptConfig, getRssConfig, getVerifyCode} from "./aibotk.js";
+import {getConfig, getMqttConfig, getGptConfig, getRssConfig, getVerifyCode, getTasks } from "./aibotk.js";
 import { dispatchEventContent } from '../service/event-dispatch-service.js'
-import { sendTaskMessage } from "../task/index.js";
+import { sendTaskMessage, initMultiTask, sendMultiTaskMessage } from "../task/index.js";
 import { delay, randomRange } from "../lib/index.js";
 import { reset } from './bot/chatgpt.js'
 import { reset as webReset } from './bot/chatgpt-web.js'
@@ -149,6 +149,9 @@ async function initMqtt(that) {
             } else if (content.target === 'Rss') {
               console.log('触发了rss立即更新事件')
               await sendRssTaskMessage(that, content)
+            }  else if (content.target === 'Tasks') {
+              console.log('触发了批量任务立即发送')
+              await sendMultiTaskMessage(that, content.task)
             } else if (content.target === 'refreshCode') {
               console.log('强制更新二维码')
               await this.refreshQrCode()
@@ -184,6 +187,10 @@ async function initMqtt(that) {
             console.log('更新rss配置')
             await getRssConfig()
             void initRssTask(that)
+          } else if(topic === `aibotk/${userId}/tasks`) {
+            console.log('更新批量定时任务')
+            await getTasks()
+            void initMultiTask(that)
           }
         })
       }
