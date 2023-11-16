@@ -348,33 +348,52 @@ async function sendMultiTaskMessage(that, task) {
   }
 }
 
+
+async function startSendMultiTask({ that, task }) {
+  const targets = await getMultiTargets(that, task.type, task);
+  if (!targets.length) {
+    return;
+  }
+  if (task.taskType === "news") {
+   await sendNews({
+      that,
+      isMulti: true,
+      targets,
+      item: task.taskInfo
+    })
+  } else if (task.taskType === "custom") {
+    await sendCustom({
+      that,
+      isMulti: true,
+      targets,
+      item: { ...task.taskInfo, type: task.type }
+    })
+  } else if (task.taskType === "countDown") {
+    await sendCountDown({
+      that,
+      isMulti: true,
+      targets,
+      item: task.taskInfo
+    });
+  }
+}
+
 async function setMultiTask(that, task) {
   try {
-    // 获取要发送的目标
-    const targets = await getMultiTargets(that, task.type, task);
-    if (!targets.length) {
-      return;
-    }
     if (task.taskType === "news") {
-      setLocalSchedule(task.cron, sendNews.bind(null, {
+      setLocalSchedule(task.cron, startSendMultiTask.bind(null, {
         that,
-        isMulti: true,
-        targets,
-        item: task.taskInfo
+        task
       }), `schedule_news_${task.id}`);
     } else if (task.taskType === "custom") {
-      setLocalSchedule(task.cron, sendCustom.bind(null, {
+      setLocalSchedule(task.cron, startSendMultiTask.bind(null, {
         that,
-        isMulti: true,
-        targets,
-        item: { ...task.taskInfo, type: task.type }
+        task
       }), `schedule_custom_${task.id}`);
     } else if (task.taskType === "countDown") {
-      setLocalSchedule(task.cron, sendCountDown.bind(null,{
+      setLocalSchedule(task.cron, startSendMultiTask.bind(null, {
         that,
-        isMulti: true,
-        targets,
-        item: task.taskInfo
+        task
       }), `schedule_countdown_${task.id}`);
     }
   } catch (e) {
