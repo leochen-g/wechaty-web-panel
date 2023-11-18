@@ -71,11 +71,15 @@ const sendCustom = async ({ that, target, item, isMulti, targets }) => {
         await roomSay.call(that, target, "", reply);
       } else {
         for (let single of targets) {
-          await roomSay.call(that, single, "", reply);
-          if (item.delay) {
-            await delay(item.delay);
-          } else {
-            await delay(1000);
+          try {
+            await roomSay.call(that, single, "", reply);
+            if (item.delay) {
+              await delay(item.delay);
+            } else {
+              await delay(1000);
+            }
+          } catch (e) {
+            console.log(`定时任务失败，可能群已经解散或者好友不存在: ${e}`);
           }
         }
       }
@@ -84,11 +88,15 @@ const sendCustom = async ({ that, target, item, isMulti, targets }) => {
         await contactSay.call(that, target, reply);
       } else {
         for (let single of targets) {
-          await contactSay.call(that, single, reply);
-          if (item.delay) {
-            await delay(item.delay);
-          } else {
-            await delay(1000);
+          try {
+            await contactSay.call(that, single, reply);
+            if (item.delay) {
+              await delay(item.delay);
+            } else {
+              await delay(1000);
+            }
+          } catch (e) {
+            console.log(`定时任务失败，可能群已经解散或者好友不存在: ${e}`);
           }
         }
       }
@@ -113,11 +121,15 @@ const sendNews = async ({ that, target, item, isMulti, targets }) => {
     await target.say(content);
   } else {
     for (let single of targets) {
-      await single.say(content);
-      if (item.delay) {
-        await delay(item.delay);
-      } else {
-        await delay(1000);
+      try {
+        await single.say(content);
+        if (item.delay) {
+          await delay(item.delay);
+        } else {
+          await delay(1000);
+        }
+      } catch (e) {
+        console.log(`定时任务失败，可能群已经解散或者好友不存在: ${e}`);
       }
     }
   }
@@ -160,11 +172,15 @@ const sendCountDown = async ({ that, target, item, isMulti, targets }) => {
     await target.say(content);
   } else {
     for (let single of targets) {
-      await single.say(content);
-      if (item.delay) {
-        await delay(item.delay);
-      } else {
-        await delay(1000);
+      try {
+        await single.say(content);
+        if (item.delay) {
+          await delay(item.delay);
+        } else {
+          await delay(1000);
+        }
+      } catch (e) {
+        console.log(`定时任务失败，可能群已经解散或者好友不存在，不影响其他群发消息: ${e}`);
       }
     }
   }
@@ -306,6 +322,7 @@ async function getMultiTargets(that, type, task) {
         }
       });
     }
+    console.log(`查询到全部${type === 'room' ? '群聊':'好友'}数量为：${targets.length}`);
   } else {
     for (let target of task.targets) {
       const finalTarget = type === "room" ? await that.Room.find({
