@@ -103,9 +103,9 @@ class DifyAi {
       } else {
         message = text.replaceAll('\n', this.eol);
       }
-      while (message.length > 500) {
-        replys.push(message.slice(0, 500));
-        message = message.slice(500);
+      while (message.length > 1000) {
+        replys.push(message.slice(0, 1000));
+        message = message.slice(1000);
       }
       replys.push(message);
       replys = replys.map(item=> {
