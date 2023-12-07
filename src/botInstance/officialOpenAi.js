@@ -5,6 +5,7 @@ import { addAichatRecord } from "../db/aichatDb.js";
 import { getPromotInfo } from "../proxy/aibotk.js";
 import { ContentCensor } from "../lib/contentCensor.js";
 import { getPuppetEol } from "../const/puppet-type.js";
+import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 let chatGPT = null
 
@@ -126,21 +127,28 @@ class OfficialOpenAi {
           return [{ type: 1, content: '这个话题不适合讨论，换个话题吧。' }]
         }
       }
-      if(systemMessage || content === 'reset' || content === '重置') {
+      const resetWord = ['reset', '重置', '重置对话', '忽略上下文', '重置上下文', '重新开始', '清除对话', '清除上下文']
+      if(systemMessage || resetWord.includes(content)) {
         console.log('重新更新上下文对话');
-        this.chatOption[uid] = {}
+        this.chatOption[uid] = null
         if(content === 'reset' || content === '重置') {
           return [{type: 1, content: '上下文已重置'}]
         }
       }
+
+      if(isFastGPT && !this.chatOption[uid]) {
+        this.chatOption[uid] = {
+          chatId: uuidv4()
+        }
+      }
+
       const sendParams = { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }
       if(systemMessage) {
         sendParams.systemMessage = systemMessage;
       }
-      if(isFastGPT) {
-        sendParams.chatId = uid;
-      }
+
       const { conversationId, text, id } = await this.chatGPT.sendMessage(content, sendParams);
+
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {
@@ -151,12 +159,19 @@ class OfficialOpenAi {
       if(this.config.record) {
         void addAichatRecord({ contactId: uid, adminId, input: content, output: text, time: dayjs().format('YYYY-MM-DD HH:mm:ss') })
       }
-      this.chatOption = {
-        [uid]: {
-          conversationId,
-          parentMessageId: id,
-        },
-      };
+      if(isFastGPT) {
+        this.chatOption[uid] = {
+          chatId: this.chatOption[uid].chatId
+        }
+      } else {
+        this.chatOption = {
+          [uid]: {
+            conversationId,
+            parentMessageId: id,
+          },
+        };
+      }
+
       let replys = []
       let message;
       if(this.config.showQuestion) {
@@ -164,9 +179,9 @@ class OfficialOpenAi {
       } else {
         message = text.replaceAll('\n', this.eol);
       }
-      while (message.length > 500) {
-        replys.push(message.slice(0, 500));
-        message = message.slice(500);
+      while (message.length > 1000) {
+        replys.push(message.slice(0, 1000));
+        message = message.slice(1000);
       }
       replys.push(message);
       replys = replys.map(item=> {

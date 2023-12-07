@@ -7,6 +7,7 @@ import { getAibotConfig } from "../db/aiDb.js";
 import { addRoomRecord } from "../db/roomDb.js";
 import { privateForward } from "../common/hook.js";
 import { getPuppetEol } from "../const/puppet-type.js";
+import { getGpt4vChat } from "../service/gpt4vService.js";
 
 const ignoreRecord = [
   { type: "include", word: "加入了群聊" },
@@ -58,6 +59,23 @@ async function dispatchFriendFilterByMsgType(that, msg) {
           console.log(`发消息人${name}:${content}`);
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages);
           if (content.trim() && !isIgnore) {
+            const gpt4vReplys = await getGpt4vChat({
+              that,
+              room: false,
+              roomId: '',
+              uniqueId: contact.id,
+              id: contact.id,
+              roomName: '',
+              isMention: false,
+              name,
+              msgContent: { type: 1, content }
+            })
+            if(gpt4vReplys.length) {
+              for (let reply of gpt4vReplys) {
+                await contactSay.call(that, contact, reply);
+              }
+              return;
+            }
             replys = await getContactTextReply(that, contact, content.trim());
             for (let reply of replys) {
               await delay(1000);
@@ -73,6 +91,23 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         break;
       case that.Message.Type.Image:
         console.log(`发消息人${await contact.name()}:发了一张图片`);
+        const imgGpt4vReplys = await getGpt4vChat({
+          that,
+          room: false,
+          roomId: '',
+          id: contact.id,
+          uniqueId: contact.id,
+          roomName: '',
+          isMention: false,
+          name,
+          msgContent: { type: 3, id: msg.id }
+        })
+        if(imgGpt4vReplys.length) {
+          for (let reply of imgGpt4vReplys) {
+            await contactSay.call(that, contact, reply);
+          }
+          return;
+        }
         break;
       case that.Message.Type.Video:
         console.log(`发消息人${await contact.name()}:发了一个视频`);
@@ -143,6 +178,24 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         // 检测是否需要这条消息
         const isIgnore = checkIgnore(content, aibotConfig.ignoreMessages);
         if (isIgnore) return;
+        const gpt4vReplys = await getGpt4vChat({
+          that,
+          room,
+          roomId: room.id,
+          id: contactId,
+          uniqueId: `${room.id}-${contactId}`,
+          roomName,
+          isMention: mentionSelf,
+          name: contactName,
+          msgContent: { type: 1, content }
+        })
+        if(gpt4vReplys.length) {
+          for (let reply of gpt4vReplys) {
+            await delay(1000);
+            await roomSay.call(that, room, contact, reply);
+          }
+          return;
+        }
         replys = await getRoomTextReply({
           that,
           content,
@@ -180,6 +233,23 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         break;
       case that.Message.Type.Image:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一张图片`);
+        const imgGpt4vReplys = await getGpt4vChat({
+          that,
+          room,
+          roomId: room.id,
+          id: contactId,
+          uniqueId: `${room.id}-${contactId}`,
+          roomName,
+          isMention: false,
+          name: contactName,
+          msgContent: { type: 3, id: msg.id }
+        })
+        if(imgGpt4vReplys.length) {
+          for (let reply of imgGpt4vReplys) {
+            await roomSay.call(that, room, contact, reply);
+          }
+          return;
+        }
         break;
       case that.Message.Type.Video:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个视频`);
