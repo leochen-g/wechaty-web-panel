@@ -164,11 +164,9 @@ class OfficialOpenAi {
           chatId: this.chatOption[uid].chatId
         }
       } else {
-        this.chatOption = {
-          [uid]: {
+        this.chatOption[uid] = {
             conversationId,
             parentMessageId: id,
-          },
         };
       }
 
@@ -196,7 +194,6 @@ class OfficialOpenAi {
       return []
     }
   }
-
 }
 
 export default OfficialOpenAi;

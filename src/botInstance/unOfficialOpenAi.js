@@ -103,11 +103,9 @@ class UnOfficialOpenAi {
           time: dayjs().format('YYYY-MM-DD HH:mm:ss')
         })
       }
-      this.chatOption = {
-        [uid]: {
+      this.chatOption[uid] = {
           conversationId,
           parentMessageId: id,
-        },
       };
       let replys = []
       let message;

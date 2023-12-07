@@ -90,10 +90,8 @@ class DifyAi {
       }
       // 保存对话id 对于同一个用户的对话不更新conversationId
       if(!this.chatOption[uid]?.conversationId) {
-        this.chatOption = {
-          [uid]: {
+        this.chatOption[uid] = {
             conversationId
-          },
         };
       }
       let replys = []
