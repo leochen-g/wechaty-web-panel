@@ -2,6 +2,8 @@ import Crypto from 'crypto'
 import * as schedule from 'node-schedule'
 import fs from 'fs'
 import dayjs from "dayjs";
+import { marked } from 'marked';
+
 /**
  * 设置定时器
  * @param {*} date 日期
@@ -431,6 +433,41 @@ function groupArray(array, subGroupLength) {
 export function delHtmlTag(str) {
   return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
 }
+
+/**
+ * 提取文字中的图片链接
+ * @param text
+ * @returns {*[]}
+ */
+export function extractImageLinks(text) {
+  const httpRegex = /(http:\/\/\S+\.(?:jpg|png|gif|webp|jpeg))/g;
+  const httpsRegex = /(https:\/\/\S+\.(?:jpg|png|gif|webp|jpeg))/g;
+  const mdRegexHttps = /!\[[^\]]*\]\((https?:\/\/\S+)\)/g;
+  const mdRegexHttp = /!\[[^\]]*\]\((http?:\/\/\S+)\)/g;
+
+  let imageLinks = [];
+  let match;
+
+  while ((match = httpRegex.exec(text)) !== null) {
+    imageLinks.push(match[0]);
+  }
+
+  while ((match = httpsRegex.exec(text)) !== null) {
+    imageLinks.push(match[0]);
+  }
+
+  while ((match = mdRegexHttp.exec(text)) !== null || (match = mdRegexHttps.exec(text)) !== null) {
+    imageLinks.push(match[1]);
+  }
+
+  return imageLinks.map(item=>({ type: 2, url: item }));
+}
+export function convertMdToText(mdContent) {
+  // 使用 marked 库将 md 格式的内容转换成文本格式
+  const textContent = marked(mdContent, { gfm: true });
+
+  return textContent;
+};
 
 export { Base64Encode }
 export { Base64Decode }

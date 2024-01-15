@@ -4,6 +4,7 @@ import { getPromotInfo } from "../proxy/aibotk.js";
 import { ContentCensor } from "../lib/contentCensor.js";
 import { getPuppetEol } from "../const/puppet-type.js";
 import dayjs from "dayjs";
+import { extractImageLinks } from '../lib/index.js'
 
 
 class DifyAi {
@@ -101,9 +102,11 @@ class DifyAi {
       } else {
         message = text.replaceAll('\n', this.eol);
       }
-      while (message.length > 1000) {
-        replys.push(message.slice(0, 1000));
-        message = message.slice(1000);
+      const imgs = extractImageLinks(message)
+
+      while (message.length > 1500) {
+        replys.push(message.slice(0, 1500));
+        message = message.slice(1500);
       }
       replys.push(message);
       replys = replys.map(item=> {
@@ -112,6 +115,10 @@ class DifyAi {
           content: item.trim()
         }
       })
+      if(imgs.length) {
+        console.log('提取到内容中的图片', imgs)
+        replys = replys.concat(imgs)
+      }
       return replys
     } catch (e) {
       console.log('dify 请求报错：'+ e);

@@ -7,6 +7,7 @@ import { ContentCensor } from "../lib/contentCensor.js";
 import { getPuppetEol } from "../const/puppet-type.js";
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
+import { extractImageLinks } from '../lib/index.js'
 let chatGPT = null
 
 
@@ -53,15 +54,23 @@ class OfficialOpenAi {
       if (this.config.model.toLowerCase().includes('32k')) {
         baseOptions.maxModelTokens = 32768
         baseOptions.maxResponseTokens = 8192
+      }// if use GPT-4 Turbo
+      else if (this.config.model.toLowerCase().includes('1106-preview')) {
+        baseOptions.maxModelTokens = 128000
+        baseOptions.maxResponseTokens = 4096
       }
       else {
         baseOptions.maxModelTokens = 8192
         baseOptions.maxResponseTokens = 2048
       }
     }
-    if (this.config.model.toLowerCase().includes('gpt-3.5-turbo-16k')) {
-      baseOptions.maxModelTokens = 16384
-      baseOptions.maxResponseTokens = 4096
+    if (this.config.model.toLowerCase().includes('gpt-3.5')) {
+      if (this.config.model.toLowerCase().includes('16k') || this.config.model.toLowerCase().includes('turbo-1106')) {
+        baseOptions.maxModelTokens = 16385
+        baseOptions.maxResponseTokens = 4096
+      } else {
+        baseOptions.maxResponseTokens = 1000
+      }
     }
 
     if(this.config.proxyUrl) {
@@ -117,7 +126,7 @@ class OfficialOpenAi {
   async getReply(content, uid, adminId = '', systemMessage = '', isFastGPT) {
     try {
       if(!this.chatGPT) {
-        console.log(isFastGPT ? '看到此消息说明启用了fastgpt' : '看到此消息说明已启用最新版chat gpt 3.5 turbo模型');
+        console.log(isFastGPT ? '看到此消息说明启用了FastGPT' : '看到此消息说明已启用ChatGPT');
         await this.init()
       }
       if(this.config.filter) {
@@ -177,9 +186,11 @@ class OfficialOpenAi {
       } else {
         message = text.replaceAll('\n', this.eol);
       }
-      while (message.length > 1000) {
-        replys.push(message.slice(0, 1000));
-        message = message.slice(1000);
+      const imgs = extractImageLinks(message)
+      console.log('imgs', imgs)
+      while (message.length > 1500) {
+        replys.push(message.slice(0, 1500));
+        message = message.slice(1500);
       }
       replys.push(message);
       replys = replys.map(item=> {
@@ -188,6 +199,10 @@ class OfficialOpenAi {
           content: item.trim()
         }
       })
+      if(imgs.length) {
+        console.log('提取到内容中的图片', imgs)
+        replys = replys.concat(imgs)
+      }
       return replys
     } catch (e) {
       console.log('chat gpt报错：'+ e);

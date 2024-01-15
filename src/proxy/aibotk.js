@@ -128,10 +128,56 @@ async function getFireNews(id, num) {
       1001: '您可以 @消防小助手+新闻标题，通过ChatGPT为您分析时事新闻！',
       1002: '您可以 @消防小助手+新闻标题，通过ChatGPT为您分析今日消防行业招标信息！',
     }
-    return `${news}…………………………${eol}${eol}${endMap[id]}`
+    return `${news}…………………………${eol}${eol}${endMap[id] || ''}`
   } catch (e) {
     console.log('获取每日一句失败', e)
     return '今日一句似乎已经消失'
+  }
+}
+
+/**
+ * 获取自定义内容
+ * @param id
+ * @returns {Promise<[{type: number, content: string}]|*[]>}
+ */
+export async function getCustomNews(id) {
+  try {
+    let option = {
+      method: 'GET',
+      url: '/customnews',
+      params: {
+        id
+      },
+    }
+    let content = await aiBotReq(option)
+    let newContent = content.data || []
+
+    return newContent
+  } catch (e) {
+    console.log('定制内容获取失败', e)
+    return [{ type: 1, content: '定制内容获取失败' }]
+  }
+}
+
+/**
+ * 获取自定义技能
+ * @param params
+ * @returns {Promise<[{type: number, content: string}]|*[]>}
+ */
+export async function getCustomEvents(params) {
+  try {
+    let option = {
+      method: 'POST',
+      url: '/customevent',
+      params,
+    }
+    let content = await aiBotReq(option)
+    let newContent = content.data || []
+
+    return newContent
+  } catch (e) {
+    console.log('自定义技能获取失败', e)
+    return [{ type: 1, content: '自定义技能获取失败' }]
   }
 }
 /**

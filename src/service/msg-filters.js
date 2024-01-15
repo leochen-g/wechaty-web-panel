@@ -1,16 +1,18 @@
 import dispatch from "./event-dispatch-service.js";
-import { setSchedule, updateSchedule } from "../proxy/aibotk.js";
+import { getConfig, setSchedule, updateSchedule } from '../proxy/aibotk.js'
 import { contentDistinguish, setLocalSchedule, isRealDate } from "../lib/index.js";
 import { addRoom } from "../common/index.js";
 import { service, callbackAibotApi } from "../proxy/superagent.js";
 import { dispatchBot } from "../proxy/bot/dispatch.js";
 import globalConfig from "../db/global.js";
 import { getUser } from "../db/userDb.js";
+import { allConfig } from '../db/configDb.js'
 
-function emptyMsg({ room, isMention }) {
+async function emptyMsg({ room, isMention }) {
+  const config = await allConfig()
   if (room && !isMention) return [];
   let msgArr = []; // 返回的消息列表
-  let obj = { type: 1, content: "我在呢", url: "" }; // 消息主体
+  let obj = { type: 1, content: config.defaultReply, url: "" }; // 消息主体
   msgArr.push(obj);
   return msgArr;
 }
@@ -124,9 +126,9 @@ async function scheduleJobMsg({ that, msg, name }) {
  * @param avatar 用户头像
  * @returns {String}
  */
-async function getEventReply(that, event, msg, name, id, avatar, room) {
+async function getEventReply(that, event, msg, name, id, avatar, room, roomName, sourceMsg) {
   try {
-    let reply = await dispatch.dispatchEventContent(that, event, msg, name, id, avatar, room);
+    let reply = await dispatch.dispatchEventContent(that, event, msg, name, id, avatar, room, roomName, sourceMsg);
     return reply;
   } catch (e) {
     console.log("getEventReply error", e);
@@ -187,7 +189,7 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
   }
 }
 
-async function eventMsg({ that, msg, name, id, avatar, config, room, isMention }) {
+async function eventMsg({ that, msg, name, id, avatar, config, room, isMention, roomName }) {
   try {
     for (let item of config.eventKeywords) {
       for (let key of item.keywords) {
@@ -196,8 +198,8 @@ async function eventMsg({ that, msg, name, id, avatar, config, room, isMention }
           if ((room && item.needAt === 1 && !isMention) || (room && item.needAt === undefined && !isMention) || (room && item.scope === "friend") || (!room && item.scope === "room")) {
             return [];
           }
-          msg = msg.replace(key, "");
-          let res = await getEventReply(that, item.event, msg, name, id, avatar, room);
+          const replaceMsg = msg.replace(key, "");
+          let res = await getEventReply(that, item.event, replaceMsg, name, id, avatar, room, roomName, msg);
           return res;
         }
       }

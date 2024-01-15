@@ -8,6 +8,10 @@ import globalConfig from '../db/global.js'
 // 限制推送二维码的次数，防止掉线后，无限推送二维码到服务器
 let scanTime = 0
 
+export function resetScanTime () {
+  scanTime = 0
+}
+
 function getQrcodeKey(qrcode) {
   if(!qrcode || !qrcode.startsWith('http')) return
   let url = new URL(qrcode);

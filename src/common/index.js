@@ -1,5 +1,5 @@
 import { getNews, getTXweather, getSweetWord } from '../proxy/api.js'
-import { sendFriend, sendRoom, asyncData, getOne, getMaterial } from '../proxy/aibotk.js'
+import { sendFriend, sendRoom, asyncData, getOne, getMaterial, getCustomNews } from '../proxy/aibotk.js'
 import { getUser } from '../db/userDb.js'
 import { formatDate, getDay, groupArray, delay } from '../lib/index.js'
 import { FileBox } from 'file-box'
@@ -26,6 +26,15 @@ async function getNewsContent(sortId, endWord = '', num = 10) {
   let news = await getNews(sortId, num)
   let content = `${today}${eol}${news}${eol}${endWord?'————————':''}${endWord}`
   return content
+}
+
+/**
+ * 获取自定义定制内容
+ * @param {*} sortId 定制Id
+ */
+export async function getCustomContent(sortId) {
+  let news = await getCustomNews(sortId)
+  return news
 }
 /**
  * 获取每日说内容

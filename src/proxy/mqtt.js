@@ -10,6 +10,7 @@ import { reset as webReset } from './bot/chatgpt-web.js'
 import { reset as difyReset } from './bot/dify.js'
 import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
 import globalConfig from "../db/global.js";
+import { resetScanTime } from '../handlers/on-scan.js'
 
 let mqttclient = null
 
@@ -155,6 +156,9 @@ async function initMqtt(that) {
             } else if (content.target === 'refreshCode') {
               console.log('强制更新二维码')
               await this.refreshQrCode()
+            } else if (content.target === 'getNewQrCode') {
+              console.log('获取最新二维码')
+              resetScanTime()
             } else if (content.target === 'verifyCode') {
               console.log('触发了输入验证码事件')
               if (globalConfig.getVerifyId() === globalConfig.getQrKey()) {

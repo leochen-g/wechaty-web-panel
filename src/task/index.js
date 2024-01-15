@@ -2,7 +2,7 @@ import { setLocalSchedule, delay, cancelAllSchedule } from "../lib/index.js";
 import { allConfig } from "../db/configDb.js";
 import { getScheduleList, updateSchedule } from "../proxy/aibotk.js";
 import {
-  getNewsContent, getEveryDayContent, roomSay, getRoomEveryDayContent, contactSay, getCountDownContent
+  getNewsContent, getEveryDayContent, roomSay, getRoomEveryDayContent, contactSay, getCountDownContent, getCustomContent
 } from "../common/index.js";
 import globalConfig from "../db/global.js";
 
@@ -127,6 +127,45 @@ const sendNews = async ({ that, target, item, isMulti, targets }) => {
           await delay(item.delay);
         } else {
           await delay(1000);
+        }
+      } catch (e) {
+        console.log(`定时任务失败，可能群已经解散或者好友不存在: ${e}`);
+      }
+    }
+  }
+};
+
+
+/**
+ * 发送自定义定制内容
+ * @param that
+ * @param target
+ * @param type 类型 room contact
+ * @param item
+ * @param isMulti 是否多个目标
+ * @param targets 发送的多个目标
+ * @return {Promise<void>}
+ */
+const sendCustomContent = async ({ that, target, type, item, isMulti, targets }) => {
+  let contents = await getCustomContent(item.sortId);
+  console.log("定制内容发送", contents);
+
+  if (!isMulti) {
+    for(const reply of contents) {
+      await contactSay(target, reply)
+      await delay(200)
+    }
+  } else {
+    for (let single of targets) {
+      try {
+        for(const reply of contents) {
+          type === 'room' ? await roomSay(single, '', reply): await contactSay(single, reply)
+          await delay(200)
+        }
+        if (item.delay) {
+          await delay(item.delay);
+        } else {
+          await delay(800);
         }
       } catch (e) {
         console.log(`定时任务失败，可能群已经解散或者好友不存在: ${e}`);
@@ -359,6 +398,8 @@ async function sendMultiTaskMessage(that, task) {
       await sendCustom({ that, isMulti: true, targets, item: { ...task.taskInfo, type: task.type } });
     } else if (task.taskType === "countdown") {
       await sendCountDown({ that, isMulti: true, targets, item: task.taskInfo });
+    } else if (task.taskType === "customContent") {
+      await sendCustomContent({ that, isMulti: true, targets, type: task.type, item: task.taskInfo });
     }
   } catch (error) {
     console.log("立即发送定时任务失败：", error);
@@ -392,6 +433,13 @@ async function startSendMultiTask({ that, task }) {
       targets,
       item: task.taskInfo
     });
+  } else if (task.taskType === "customContent") {
+    await sendCustomContent ({
+      that,
+      isMulti: true,
+      targets,
+      item: task.taskInfo
+    });
   }
 }
 
@@ -412,6 +460,11 @@ async function setMultiTask(that, task) {
         that,
         task
       }), `schedule_countdown_${task.id}`);
+    } else if (task.taskType === "customContent") {
+      setLocalSchedule(task.cron, startSendMultiTask.bind(null, {
+        that,
+        task
+      }), `schedule_customcontent_${task.id}`);
     }
   } catch (e) {
     console.log("catch error:" + e);

@@ -1,7 +1,7 @@
 import api from '../proxy/api.js'
-import { getConfig, getMeiNv, getWordCloudConfig } from '../proxy/aibotk.js'
+import { getConfig, getMeiNv, getWordCloudConfig, getCustomEvents } from '../proxy/aibotk.js'
 import { getConstellation, msgArr, getNewsType } from '../lib/index.js'
-import { initTaskLocalSchedule, initTimeSchedule } from "../task/index.js";
+import { initTaskLocalSchedule, initTimeSchedule, initMultiTask } from "../task/index.js";
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { removeRecord } from "../db/roomDb.js";
@@ -18,11 +18,16 @@ import { getDifyReply, reset as difyReset } from "../proxy/difyAi.js";
  * @param avatar
  * @returns {string} 内容
  */
-async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
+async function dispatchEventContent(that, eName, msg, name, id, avatar, room, roomName, sourceMsg) {
   try {
     let content = '',
       type = 1,
       url = ''
+
+    if(eName.includes('event-')) {
+      const res = await getCustomEvents({ msg: msg || '', sourceMsg: sourceMsg || '', wxid: id, name, eventId: eName, roomName: roomName || '' })
+      return res;
+    }
     switch (eName) {
       case 'rubbish':
         content = await api.getRubbishType(msg)
@@ -106,6 +111,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room) {
         await getConfig()
         await initTaskLocalSchedule(that)
         await initTimeSchedule(that)
+        await initMultiTask(that)
         reset();
         officialReset();
         difyReset();
