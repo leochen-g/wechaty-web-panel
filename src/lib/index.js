@@ -2,7 +2,6 @@ import Crypto from 'crypto'
 import * as schedule from 'node-schedule'
 import fs from 'fs'
 import dayjs from "dayjs";
-import { marked } from 'marked';
 
 /**
  * 设置定时器
@@ -462,12 +461,6 @@ export function extractImageLinks(text) {
 
   return imageLinks.map(item=>({ type: 2, url: item }));
 }
-export function convertMdToText(mdContent) {
-  // 使用 marked 库将 md 格式的内容转换成文本格式
-  const textContent = marked(mdContent, { gfm: true });
-
-  return textContent;
-};
 
 export { Base64Encode }
 export { Base64Decode }
