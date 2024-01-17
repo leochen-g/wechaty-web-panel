@@ -27,20 +27,24 @@ function getQrcodeKey(qrcode) {
  * 扫描登录，显示二维码
  */
 async function onScan(qrcode, status) {
-  await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
-  const aibotConfig = await getAibotConfig();
-  await getVerifyCode();
-  getQrcodeKey(qrcode)
-  Qrterminal.generate(qrcode)
-  console.log('扫描状态', status)
-  if(scanTime >= aibotConfig.scanTimes) {
-    console.log('长时间推送登录状态，平台二维码不再更新，请重启服务，或直接在终端扫码登录');
-  } else {
-    scanTime++
-    throttle(setQrCode(qrcode, status), 15000)
-  }
+  try {
+    await updatePuppetConfig({ puppetType: this.puppet.constructor.name })
+    const aibotConfig = await getAibotConfig();
+    await getVerifyCode();
+    getQrcodeKey(qrcode)
+    Qrterminal.generate(qrcode)
+    console.log('扫描状态', status)
+    if(scanTime >= aibotConfig.scanTimes) {
+      console.log('长时间推送登录状态，平台二维码不再更新，请重启服务，或直接在终端扫码登录');
+    } else {
+      scanTime++
+      throttle(setQrCode(qrcode, status), 15000)
+    }
 
-  const qrImgUrl = ['https://api.qrserver.com/v1/create-qr-code/?data=', encodeURIComponent(qrcode)].join('')
-  console.log(qrImgUrl)
+    const qrImgUrl = ['https://api.qrserver.com/v1/create-qr-code/?data=', encodeURIComponent(qrcode)].join('')
+    console.log(qrImgUrl)
+  } catch (e) {
+    console.log('二维码推送报错', e)
+  }
 }
 export default onScan

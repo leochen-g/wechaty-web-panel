@@ -8,7 +8,7 @@ import { getPuppetEol, isWindowsPlatform } from "../const/puppet-type.js";
 
 
 async function formatContent(text) {
-  const isWin = isWindowsPlatform()
+  const isWin = await isWindowsPlatform()
   if(isWin) {
     return text.replace(/\n/g, "\r");
   }

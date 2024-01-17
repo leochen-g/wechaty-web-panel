@@ -4,9 +4,9 @@
 [![Powered by Wechaty](https://img.shields.io/badge/Powered%20By-Wechaty-brightgreen.svg)](https://github.com/Wechaty/wechaty)
 [![NPM Version](https://badge.fury.io/js/wechaty-web-panel.svg)](https://www.npmjs.com/package/wechaty-web-panel)
 
-Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面板
+Wechaty Web Panel 插件，让你的 Wechaty 机器人快速接入 web 控制面板
 
-本项目为面板源码，如需可直接运行的项目，请直接拉取 [https://github.com/leochen-g/wechat-assistant-pro](https://github.com/leochen-g/wechat-assistant-pro) 即可
+本项目为插件源码，非直接运行的项目。如需可直接运行的项目，请直接拉取 [https://github.com/leochen-g/wechat-assistant-pro](https://github.com/leochen-g/wechat-assistant-pro) 即可
 
 ## 面板主要功能
 
@@ -24,20 +24,23 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 - [x] ChatGPT api (支持切换模型)
 - [x] ChatGPT 网页hook
 - [x] 微信对话开放平台
-- [x] dify 平台和fastgpt无缝适配
+- [x] Dify 平台和FastGPT无缝适配
+- [x] GPT-4V识图功能
 - [ ] 更多
 
 * 定时任务
 
 - [x] 新闻定时发送
+- [x] 倒计时提醒
 - [x] 自定义内容定时发送
+- [x] 个性化内容定制
 - [x] 微信每日说,定时给女朋友和群友发送每日天气提醒，以及每日一句
 - [ ] 更多功能等你来 pr
 
 * 技能中心
 
 - [x] 关键词加好友
-- [x] 关键词加群
+- [x] 关键词加群，群欢迎词设置
 - [x] 关键词回复
 - [x] 关键词事件
   - [x] 天气查询 例："上海天气"
@@ -68,13 +71,13 @@ Wechaty Web Panel 插件，让你的 wechaty 机器人快速接入 web 控制面
 - [x] 主动发送消息
 - [x] 主动更新配置
 - [x] 主动同步好友和群列表
-- [x] 多群消息同步
+- [x] 跨群聊天，打通多群沟通
 - [x] 回调事件
-- [x] 群发助手
+- [x] 群发助手，转发助手
 - [x] openapi请求
 - [x] rss订阅推送
 
-更多详情介绍：[传送门](https://www.xkboke.com/web-inn/secretary/client.html#%E5%B0%8F%E5%8A%A9%E6%89%8B%E5%8A%9F%E8%83%BD%E4%B8%80%E8%A7%88)
+更多详情介绍：[传送门](https://help.aibotk.com/?plugin=czw_emDoc&post=2)
 
 ## 提前准备
 
