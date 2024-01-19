@@ -2,7 +2,7 @@ import {ChatClient} from "./sdk/difyClient.js";
 import { addAichatRecord } from "../db/aichatDb.js";
 import { getPromotInfo } from "../proxy/aibotk.js";
 import { ContentCensor } from "../lib/contentCensor.js";
-import { getPuppetEol } from "../const/puppet-type.js";
+import { getPuppetEol, isWindowsPlatform } from '../const/puppet-type.js'
 import dayjs from "dayjs";
 import { extractImageLinks } from '../lib/index.js'
 
@@ -22,11 +22,13 @@ class DifyAi {
     this.contentCensor = null
     this.chatOption = {};
     this.eol = '\n'
+    this.iswindows = false;
   }
 
 
   async init() {
     this.eol = await getPuppetEol();
+    this.iswindows = await isWindowsPlatform()
     if(this.config.promotId) {
       const promotInfo = await getPromotInfo(this.config.promotId)
       if(promotInfo) {
@@ -98,9 +100,9 @@ class DifyAi {
       let replys = []
       let message;
       if(this.config.showQuestion) {
-        message = `${content}${this.eol}-----------${this.eol}` + text.replaceAll('\n', this.eol);
+        message = `${content}${this.eol}-----------${this.eol}` +  this.iswindows ? text.replaceAll('\n', this.eol) : text;
       } else {
-        message = text.replaceAll('\n', this.eol);
+        message =  this.iswindows ? text.replaceAll('\n', this.eol) : text;
       }
       const imgs = extractImageLinks(message)
 
@@ -121,7 +123,7 @@ class DifyAi {
       }
       return replys
     } catch (e) {
-      console.log('dify 请求报错：'+ e);
+      console.log('Dify 请求报错：'+ e);
       return []
     }
   }

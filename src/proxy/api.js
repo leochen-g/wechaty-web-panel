@@ -1,5 +1,5 @@
 import { req, txReq } from './superagent.js'
-import { EMOHOST, TULING, ONE, MEINV } from './config.js'
+import { EMOHOST, TULING, MEINV } from './config.js'
 import { randomRange, MD5 } from '../lib/index.js'
 import { allConfig } from '../db/configDb.js'
 import { getFireNews } from "./aibotk.js";
@@ -214,9 +214,11 @@ async function getNews(id, num = 10) {
       return `${news}${eol}`
     } else {
       console.log('获取新闻接口失败：请申请https://www.tianapi.com/apiview/51 这个接口', content.msg)
+      return ''
     }
   } catch (error) {
     console.log('获取天行新闻失败：请申请https://www.tianapi.com/apiview/51 这个接口', error)
+    return ''
   }
 }
 /**

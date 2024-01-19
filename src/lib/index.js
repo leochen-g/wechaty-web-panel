@@ -434,13 +434,13 @@ export function delHtmlTag(str) {
 }
 
 /**
- * 提取文字中的图片链接
+ * 提取文字中的图片链接 文件链接
  * @param text
  * @returns {*[]}
  */
 export function extractImageLinks(text) {
-  const httpRegex = /(http:\/\/\S+\.(?:jpg|png|gif|webp|jpeg))/g;
-  const httpsRegex = /(https:\/\/\S+\.(?:jpg|png|gif|webp|jpeg))/g;
+  const httpRegex = /(http:\/\/\S+\.(?:jpg|png|gif|webp|jpeg|mp4|doc|docx|xls|xlsx|ppt|pptx|avi|zip|wav|rar))/g;
+  const httpsRegex = /(https:\/\/\S+\.(?:jpg|png|gif|webp|jpeg|mp4|doc|docx|xls|xlsx|ppt|pptx|avi|zip|wav|rar))/g;
   const mdRegexHttps = /!\[[^\]]*\]\((https?:\/\/\S+)\)/g;
   const mdRegexHttp = /!\[[^\]]*\]\((http?:\/\/\S+)\)/g;
 
@@ -458,6 +458,8 @@ export function extractImageLinks(text) {
   while ((match = mdRegexHttp.exec(text)) !== null || (match = mdRegexHttps.exec(text)) !== null) {
     imageLinks.push(match[1]);
   }
+
+  imageLinks = Array.from(new Set(imageLinks))
 
   return imageLinks.map(item=>({ type: 2, url: item }));
 }
