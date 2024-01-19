@@ -168,6 +168,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     let contactId = contact.id;
     let contactAvatar = await contact.avatar();
     const userSelfName = that.currentUser?.name() || that.userSelf()?.name()
+
     switch (type) {
       case that.Message.Type.Text:
         content = msg.text();

@@ -8,6 +8,7 @@ import { removeRecord } from "../db/roomDb.js";
 import { getGptOfficialReply, reset as officialReset } from "../proxy/openAi.js";
 import { getGptUnOfficialReply, reset } from "../proxy/openAiHook.js";
 import { getDifyReply, reset as difyReset } from "../proxy/difyAi.js";
+import { outApi } from '../proxy/outapi.js'
 
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
@@ -26,6 +27,13 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
 
     if(eName.includes('event-')) {
       const res = await getCustomEvents({ msg: msg || '', sourceMsg: sourceMsg || '', wxid: id, name, eventId: eName, roomName: roomName || '' })
+      return res;
+    }
+    /**
+     * 扩展 api
+     */
+    if(eName.includes('outapi-')) {
+      const res = await outApi({ msg: msg || '', sourceMsg: sourceMsg || '', wxid: id, name, eventId: eName, roomName: roomName || '' })
       return res;
     }
     switch (eName) {

@@ -5,7 +5,7 @@ import { formatDate, getDay, groupArray, delay } from '../lib/index.js'
 import { FileBox } from 'file-box'
 import { allConfig } from '../db/configDb.js'
 import { getPuppetEol, isWindowsPlatform } from "../const/puppet-type.js";
-
+import sharp from 'sharp'
 
 async function formatContent(text) {
   const isWin = await isWindowsPlatform()
@@ -216,6 +216,15 @@ async function roomSay(room, contact, msg) {
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
+      if(obj.mediaType === 'image/webp') {
+        const buffer = await obj.toBuffer()
+        sharp(buffer).png().toBuffer(async (err, buffer, info)=> {
+          const file = FileBox.fromBuffer(buffer, 'send.png')
+          contact ? await room.say('', contact) : ''
+          await room.say(file)
+        });
+        return
+      }
       contact ? await room.say('', contact) : ''
       await delay(500)
       await room.say(obj)
@@ -278,6 +287,14 @@ async function contactSay(contact, msg, isRoom = false) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
       await obj.ready()
+      if(obj.mediaType === 'image/webp') {
+        const buffer = await obj.toBuffer()
+        sharp(buffer).png().toBuffer(async (err, buffer, info)=> {
+          const file = FileBox.fromBuffer(buffer, 'send.png')
+          await contact.say(file)
+        });
+        return
+      }
       await contact.say(obj)
     } else if (msg.type === 3 && msg.url) {
       // bse64文件
