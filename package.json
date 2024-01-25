@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.6.38",
+  "version": "1.6.39",
   "description": "智能微秘书插件",
   "exports": {
     ".": {
@@ -80,9 +80,7 @@
     "rss-parser": "^3.13.0",
     "sharp": "^0.33.2",
     "superagent": "^5.3.1",
-    "uuid": "^9.0.0",
-    "wechaty": "^1.20.2",
-    "wechaty-puppet-service": "^1.19.9"
+    "uuid": "^9.0.0"
   },
   "publishConfig": {
     "registry": " https://registry.npmjs.org/",
