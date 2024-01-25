@@ -225,7 +225,7 @@ async function roomSay(room, contact, msg) {
         });
         return
       }
-      contact ? await room.say('', contact) : ''
+      // contact ? await room.say('', contact) : ''
       await delay(500)
       await room.say(obj)
     } else if (msg.type === 3 && msg.url) {

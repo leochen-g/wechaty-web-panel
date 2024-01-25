@@ -9,6 +9,7 @@ import { extractImageLinks } from '../lib/index.js'
 
 class DifyAi {
   constructor(config = {
+    isAiAgent: false, // 是否为 ai agent 模式
     token: '', // api 秘钥
     proxyPass: '', // 请求地址
     showQuestion: true, // 显示原文
@@ -16,7 +17,7 @@ class DifyAi {
     promotId: '',
     systemMessage: '', // 预设promotion
   }) {
-    console.log('difyAi config', config);
+    console.log('Dify config', config);
     this.difyChat = null;
     this.config = config;
     this.contentCensor = null
@@ -40,6 +41,7 @@ class DifyAi {
     }
     const baseOptions = {
       apiKey: this.config.token,
+      stream: this.config.isAiAgent,
       debug: !!this.config.debug,
       systemMessage: this.config.systemMessage || '',
     }
@@ -62,7 +64,7 @@ class DifyAi {
   async getReply(content, uid, adminId = '', systemMessage = '') {
     try {
       if(!this.difyChat) {
-        console.log('启用dify对话平台');
+        console.log('启用Dify对话平台');
         await this.init()
       }
       if(this.config.filter) {
@@ -80,7 +82,7 @@ class DifyAi {
         }
       }
       console.log('this.chatOption[uid]', this.chatOption[uid]);
-      const { conversationId, text } = systemMessage ? await this.difyChat.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid }) : await this.difyChat.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid });
+      const { conversationId, text, files } = systemMessage ? await this.difyChat.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid }) : await this.difyChat.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid });
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {
@@ -120,6 +122,13 @@ class DifyAi {
       if(imgs.length) {
         console.log('提取到内容中的图片', imgs)
         replys = replys.concat(imgs)
+      }
+
+      if(files.length) {
+        console.log('回复内容带文件', files)
+        files.forEach(item=> {
+          replys.push({ type: 2, url: item })
+        })
       }
       return replys
     } catch (e) {

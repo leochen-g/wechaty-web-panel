@@ -1,4 +1,4 @@
-import {get4vReply} from "../botInstance/gpt4v.js";
+import {get4vReply, getDify4vReply} from "../botInstance/gpt4v.js";
 
 class MultiReply {
   constructor() {
@@ -74,14 +74,25 @@ class BotManage {
    */
   async generateImage(username, question, config) {
     const images = [];
-    for(let id of this.userBotDict[username].imageIds) {
-      const msg = await this.Bot.Message.find({ id })
-      const file = await msg.toFileBox()
-      const base = await file.toDataURL()
-      images.push(base)
+    if(config.robotType === 8) {
+      // 如果是 dify 平台
+      for(let id of this.userBotDict[username].imageIds) {
+        const msg = await this.Bot.Message.find({ id })
+        const file = await msg.toFileBox()
+        images.push(file)
+      }
+      const replys = await getDify4vReply(images, question, config, username);
+      return replys;
+    } else {
+      for(let id of this.userBotDict[username].imageIds) {
+        const msg = await this.Bot.Message.find({ id })
+        const file = await msg.toFileBox()
+        const base = await file.toDataURL()
+        images.push(base)
+      }
+      const replys = await get4vReply(images, question, config);
+      return replys;
     }
-    const replys = await get4vReply(images, question, config);
-    return replys;
   }
 
   getImage(username, content, step) {

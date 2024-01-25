@@ -28,7 +28,7 @@ export async function dispatchBot({botType, content, uid, adminId, config}) {
           break
         case 8:
           // dify ai
-          console.log('进入dify聊天');
+          console.log('进入Dify聊天');
           res = await getDifyAiReply(content, uid, adminId, config)
           replys = res
           break

@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.6.37",
+  "version": "1.6.38",
   "description": "智能微秘书插件",
   "exports": {
     ".": {
@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
-    "axios": "^0.27.2",
+    "axios": "^1.6.6",
     "baidu-aip-sdk": "^4.16.10",
     "dayjs": "^1.11.7",
     "eventsource-parser": "^1.0.0",
@@ -80,7 +80,9 @@
     "rss-parser": "^3.13.0",
     "sharp": "^0.33.2",
     "superagent": "^5.3.1",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "wechaty": "^1.20.2",
+    "wechaty-puppet-service": "^1.19.9"
   },
   "publishConfig": {
     "registry": " https://registry.npmjs.org/",

@@ -45,6 +45,7 @@ export async function getGpt4vChat({ room, roomId, roomName, isMention, msgConte
               }
               const config = {
                 ...finalConfig.botConfig,
+                robotType: finalConfig.robotType,
                 proxyPass: finalConfig.botConfig.proxyPass,
                 apiKey: finalConfig.botConfig.token,
               }

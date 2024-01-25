@@ -17,10 +17,10 @@ export function resetAll() {
   })
   difyAi = {}
 }
-export async function getDifyAiReply(content, uid, adminId, config = { token: "", debug: false, proxyPass: "", proxyUrl: "", showQuestion: false, timeoutMs: 80, model: "", systemMessage: "", keywordSystemMessages: [] }) {
+export async function getDifyAiReply(content, uid, adminId, config = { token: "", debug: false, proxyPass: "", proxyUrl: "", showQuestion: false, timeoutMs: 80, model: "", systemMessage: "", keywordSystemMessages: [], isAiAgent: false }) {
   if (!config.token) {
-    console.log('请到智能微秘书平台配置dify的 api秘钥方可使用')
-    return [{ type: 1, content: '请到智能微秘书平台配置dify的 api秘钥方可使用' }]
+    console.log('请到智能微秘书平台配置Dify的 api秘钥方可使用')
+    return [{ type: 1, content: '请到智能微秘书平台配置Dify的 api秘钥方可使用' }]
   }
 
   if(!difyAi[adminId]) {
