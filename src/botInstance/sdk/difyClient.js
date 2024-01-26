@@ -40,6 +40,7 @@ export class DifyClient {
   updateApiKey(apiKey) {
     this.apiKey = apiKey
   }
+
   async sendUploadRequest(
     method,
     endpoint,
@@ -51,29 +52,29 @@ export class DifyClient {
     const headers = {
       ...{
         Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
       ...headerParams
-    };
+    }
 
-    const url = `${this.baseUrl}${endpoint}`;
+    const url = `${this.baseUrl}${endpoint}`
     let response = await axios({
-        method,
-        url,
-        data,
-        params,
-        headers,
-        responseType: "json",
-      });
+      method,
+      url,
+      data,
+      params,
+      headers,
+      responseType: 'json'
+    })
 
-    return response;
+    return response
   }
 
   async sendRequest({ method, endpoint, data, params, stream = false, headerParams = {}, timeoutMs = 100 * 1000 }) {
     const headers = {
       ...{
         Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
       ...headerParams
     }
@@ -100,8 +101,8 @@ export class DifyClient {
         data,
         params,
         headers,
-        responseType: "stream",
-      });
+        responseType: 'stream'
+      })
     }
 
     return response
@@ -120,9 +121,9 @@ export class DifyClient {
   }
 
   fileUpload(data) {
-    return this.sendUploadRequest(routes.fileUpload.method, routes.fileUpload.url(), data, null,false, {
-      "Content-Type": 'multipart/form-data'
-    });
+    return this.sendUploadRequest(routes.fileUpload.method, routes.fileUpload.url(), data, null, false, {
+      'Content-Type': 'multipart/form-data'
+    })
   }
 }
 
@@ -131,9 +132,9 @@ export class CompletionClient extends DifyClient {
     const data = {
       inputs,
       user,
-      response_mode: stream ? "streaming" : "blocking",
-      files,
-    };
+      response_mode: stream ? 'streaming' : 'blocking',
+      files
+    }
     return this.sendRequest({
       method: routes.createCompletionMessage.method,
       endpoint: routes.createCompletionMessage.url(),
@@ -151,14 +152,16 @@ export class ChatClient extends DifyClient {
       inputs: {},
       query,
       user,
-      response_mode: this.stream ? "streaming" : "blocking",
-      files,
+      response_mode: this.stream ? 'streaming' : 'blocking',
+      files
     }
     if (systemMessage || this.systemMessage) {
       data.inputs['systemMessage'] = systemMessage || this.systemMessage
     }
     if (conversationId) data.conversation_id = conversationId
-    console.log('request data', data)
+    if (this.debug) {
+      console.log('request data', data)
+    }
     const res = await this.sendRequest({
       method: routes.createChatMessage.method,
       endpoint: routes.createChatMessage.url(),
@@ -166,44 +169,90 @@ export class ChatClient extends DifyClient {
       stream: this.stream,
       timeoutMs
     })
+
+    function unicodeToChar(text) {
+      if (!text)
+        return ''
+
+      return text.replace(/\\u[0-9a-f]{4}/g, (_match, p1) => {
+        return String.fromCharCode(parseInt(p1, 16))
+      })
+    }
+
     const asyncSSE = (stream) => {
-      return new Promise((resolve, reject)=> {
-        const answer = []
+      return new Promise((resolve, reject) => {
+        const answers = []
+        const thought = []
         const files = []
         let conversation_id = ''
         let id = ''
         try {
           stream.on('data', data => {
-            const stream = new TextDecoder().decode(data).split('data: ')
-            if(stream[1]) {
-              const res = JSON.parse(stream[1]) || {}
-              if(res.event === 'agent_message' && res.answer || res.event === 'message' && res.answer) {
-                answer.push(res.answer)
+            const streams = new TextDecoder('utf-8').decode(data, { stream: true }).split('\n')
+            streams.forEach(stream => {
+              if (stream && stream.startsWith('data: ')) {
+                let res = {}
+                try {
+                  res = JSON.parse(stream.substring(6)) || {}
+                } catch (e) {
+                  console.log('json 解析错误，不影响输出', e)
+                  return
+                }
+
+                if (!res.event || res.event === 'error' || res.status === 400) {
+                  console.log(`流式输出错误code:${res.code}`, res.message)
+                  answers.push(res.message)
+                  return
+                }
+                if (res.event === 'agent_message' && res.answer || res.event === 'message' && res.answer) {
+                  conversation_id = res.conversation_id
+                  answers.push(unicodeToChar(res.answer))
+                }
+                if (res.event === 'message_file') {
+                  console.log('收到一个需要展示的文件，稍后发送')
+                  files.push(res.url)
+                }
+                if (res.event === 'agent_thought' && res.thought) {
+                  console.log('Dify Agent 正在思考...')
+                  thought.push(res.thought)
+                }
+                if (res.event === 'message_end') {
+                  console.log('流数据接收完毕，正在组装数据进行发送')
+                  conversation_id = res.conversation_id
+                  id = res.id
+                }
               }
-              if(res.event === 'message_file') {
-                console.log('收到一个需要展示的文件，稍后发送')
-                files.push(res.url)
-              }
-              if(res.event === 'message_end') {
-                console.log('流数据接收完毕，正在组装数据进行发送')
-                conversation_id = res.conversation_id
-                id = res.id
-              }
-              if(res.event === 'error') {
-                console.log(`流式输出错误code:${res.code}`, res.message)
-                answer.push(res.message)
-              }
+            })
+
+          })
+          stream.on('end', async () => {
+            const { data } = conversation_id ? await this.getConversationMessages(user, conversation_id, null, 2) : { data: { data: [] } }
+            const lastMessage = data.data[data.data.length - 1] || {}
+            if (this.debug) {
+              console.log('获取最后一条对话记录', lastMessage)
             }
-          });
-          stream.on('end', () => {
-            resolve({ text: answer.join(''), conversationId: conversation_id, id,  files })
-          });
+            let answer = ''
+            let finalFiles = []
+            if (lastMessage.answer) {
+              answer = lastMessage.answer
+            } else {
+              answer = thought[thought.length - 1] ? thought[thought.length - 1] : answers.join('')
+            }
+            if (lastMessage.message_files && lastMessage.message_files.length) {
+              lastMessage.message_files.forEach(item => {
+                finalFiles.push(item.url)
+              })
+            } else {
+              finalFiles = files
+            }
+            resolve({ text: answer, conversationId: conversation_id, id, files: finalFiles })
+          })
         } catch (e) {
           resolve({ text: `AI agent 出错，${e}`, conversationId: '', files: [] })
         }
       })
     }
-    if(!this.stream) {
+    if (!this.stream) {
       if (res.data.code) {
         if (this.debug) {
           console.log('dify request error', res.data.code, res.data.message)
@@ -219,10 +268,9 @@ export class ChatClient extends DifyClient {
         id: response.id
       }
     } else {
-      console.log('进入Dify智能助手输出模式，请耐心等待模型的思考')
-      const result = await asyncSSE(res.data);
-      console.log('result', result)
-      return  result;
+      console.log('进入Dify Agent 智能助手输出模式，请耐心等待模型的思考')
+      const result = await asyncSSE(res.data)
+      return result
     }
   }
 

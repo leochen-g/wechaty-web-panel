@@ -10,6 +10,7 @@ import { extractImageLinks } from '../lib/index.js'
 class DifyAi {
   constructor(config = {
     isAiAgent: false, // 是否为 ai agent 模式
+    showDownloadUrl: false, // 显示文件下载链接
     token: '', // api 秘钥
     proxyPass: '', // 请求地址
     showQuestion: true, // 显示原文
@@ -17,9 +18,8 @@ class DifyAi {
     promotId: '',
     systemMessage: '', // 预设promotion
   }) {
-    console.log('Dify config', config);
     this.difyChat = null;
-    this.config = config;
+    this.config = { showDownloadUrl: false, isAiAgent: false, ...config };
     this.contentCensor = null
     this.chatOption = {};
     this.eol = '\n'
@@ -119,6 +119,14 @@ class DifyAi {
           content: item.trim()
         }
       })
+
+      if(!imgs.length && files.length && this.config.showDownloadUrl) {
+        let downLoadUrl = `----------------${this.eol}`
+        files.forEach((item, index)=> {
+          downLoadUrl += `[下载${index+1}]:${item}${this.eol}`
+        })
+        replys[replys.length - 1].content = `${replys[replys.length - 1].content}${this.eol}${this.eol}${downLoadUrl}`
+      }
       if(imgs.length) {
         console.log('提取到内容中的图片', imgs)
         replys = replys.concat(imgs)
@@ -136,7 +144,6 @@ class DifyAi {
       return []
     }
   }
-
 }
 
 export default DifyAi;

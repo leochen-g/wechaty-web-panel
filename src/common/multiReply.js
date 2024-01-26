@@ -27,6 +27,10 @@ class BotManage {
     this.userBotDict[username] = new MultiReply();
     this.userBotDict[username].userName = username;
     this.userBotDict[username].imageIds = [content.id];
+    setTimeout(()=> {
+      console.log('清理图像识别对话缓存')
+      this.removeBot(username)
+    }, 10 * 60 * 1000)
     return await this.updateBot(username, content);
   }
 
@@ -42,8 +46,9 @@ class BotManage {
       this.userBotDict[username].stepRecord.push(0);
       if (content.type === 3) {
         this.userBotDict[username].step += 1;
+        // 请描述你对图片的问题，最多支持5张图片，已收到${this.userBotDict[username].imageIds.length}张图片
         return [
-          { type: 1, content: `请描述你对图片的问题，最多支持5张图片，已收到${this.userBotDict[username].imageIds.length}张图片` }
+          { type: 1, content: '' }
         ];
       }
     } else if (this.userBotDict[username].step == 1) {
@@ -98,24 +103,27 @@ class BotManage {
   getImage(username, content, step) {
     if(this.userBotDict[username].imageIds.length === 5) {
       this.removeBot(username)
+      // 本次对话已经重置，请重新发送图片
       let replys = {
         type: 1,
-        content: "本次对话已经重置，请重新发送图片"
+        content: ""
       };
       return [replys]
     }
     this.userBotDict[username].step = step;
     this.userBotDict[username].imageIds.push(content.id)
     if(this.userBotDict[username].imageIds.length === 5) {
+      // 已收到5张图片，请描述你的问题，再次发送图片将会重置本次对话
       let replys = {
         type: 1,
-        content: "已收到5张图片，请描述你的问题，再次发送图片将会重置本次对话"
+        content: ""
       };
       return [replys]
     }
+    // `请描述你的问题，最多支持5张图片，已收到${this.userBotDict[username].imageIds.length}张图片`
     let replys = {
       type: 1,
-      content: `请描述你的问题，最多支持5张图片，已收到${this.userBotDict[username].imageIds.length}张图片`
+      content: ''
     };
     return [replys];
   }

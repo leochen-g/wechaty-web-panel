@@ -2,7 +2,7 @@ import { getImageVision } from "./sdk/chatGPT4V.js";
 import { getPuppetEol, isWindowsPlatform } from '../const/puppet-type.js'
 import { ChatClient } from './sdk/difyClient.js'
 import { extractImageLinks } from '../lib/index.js'
-
+import FormData from 'form-data'
 export async function get4vReply(images, question, config) {
   try {
     const iswindows = await isWindowsPlatform()
@@ -47,9 +47,10 @@ export async function getDify4vReply(images, question, config, userId) {
     console.log('进入Dify图像识别模式')
     for(const file of images) {
       try {
-        const readable = new Blob([await file.toBuffer()])
+        const base64 = await file.toBase64()
+        const readable =  Buffer.from(base64, 'base64')
         const formData = new FormData();
-        formData.append('file', readable, file.name);
+        formData.append('file', readable, {contentType: file.mediaType, filename: file.name});
         formData.append('user', userId)
         const res = await difyClient.fileUpload(formData)
         if(res.data.id) {
