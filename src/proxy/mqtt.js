@@ -167,7 +167,7 @@ async function initMqtt(that) {
                   console.log(`获取到输入的验证码:${globalConfig.getVerifyCode()}，正在填入`)
                   const verifyCode = globalConfig.getVerifyCode() // 通过一些途径输入验证码
                   try {
-                    await that.enterVerifyCode(id, verifyCode) // 如果没抛错，则说明输入成功，会推送登录事件
+                    await that.enterVerifyCode(globalConfig.getVerifyId(), verifyCode) // 如果没抛错，则说明输入成功，会推送登录事件
                   } catch (e) {
                     console.log('验证码校验错误：', e.message)
                     // 如果抛错，请根据 message 处理，目前发现可以输错3次，超过3次错误需要重新扫码。
