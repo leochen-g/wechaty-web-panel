@@ -255,6 +255,14 @@ async function roomSay(room, contact, msg) {
         username: msg.username || ''
       })
       await room.say(miniProgram)
+    } else if (msg.type === 8 && msg.url && msg.voiceLength) {
+      const fileBox = FileBox.fromUrl(msg.url);
+      fileBox.mimeType = "audio/silk";
+      fileBox.mediaType = "audio/silk";
+      fileBox.metadata = {
+        voiceLength: msg.voiceLength,
+      };
+      await room.say(fileBox)
     }
   } catch (e) {
     console.log('群回复错误', e)
@@ -266,7 +274,7 @@ async function roomSay(room, contact, msg) {
  * @param contact
  * @param msg
  * @param isRoom
- *  type 1 文字 2 图片url 3 图片base64 4 url链接 5 小程序  6 名片
+ *  type 1 文字 2 图片url 3 图片base64 4 url链接 5 小程序  6 名片 7 富文本 8 语音
  */
 async function contactSay(contact, msg, isRoom = false) {
   const config = await allConfig()
@@ -321,6 +329,14 @@ async function contactSay(contact, msg, isRoom = false) {
         username: msg.username || ''
       })
       await contact.say(miniProgram)
+    } else if (msg.type === 8 && msg.url && msg.voiceLength) {
+      const fileBox = FileBox.fromUrl(msg.url);
+      fileBox.mimeType = "audio/silk";
+      fileBox.mediaType = "audio/silk";
+      fileBox.metadata = {
+        voiceLength: msg.voiceLength,
+      };
+      await contact.say(fileBox)
     }
   } catch (e) {
     console.log('私聊发送消息失败', e)

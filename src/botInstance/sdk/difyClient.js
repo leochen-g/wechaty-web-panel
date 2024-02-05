@@ -195,7 +195,7 @@ export class ChatClient extends DifyClient {
                 try {
                   res = JSON.parse(stream.substring(6)) || {}
                 } catch (e) {
-                  console.log('json 解析错误，不影响输出', e)
+                  // console.log('json 解析错误，不影响输出', e)
                   return
                 }
 

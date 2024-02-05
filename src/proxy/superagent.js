@@ -63,19 +63,20 @@ function get({ url, params, contentType = 'application/json', platform = 'tx', a
         if (err) {
           console.log('请求出错', err)
           reject(err)
-        }
-        if (spider) {
-          // 如果是爬取内容，直接返回页面html
-          resolve(res.text)
         } else {
-          // 如果是非爬虫，返回格式化后的内容
-          res = res && res.text && JSON.parse(res.text) || {}
-          if (platform !== 'chuan') {
-            if ((res.code !== 200 && platform === 'tx') || (res.code !== 200 && platform === 'aibot') || (res.code !== 0 && platform === 'qi') || (res.code !== 100000 && platform === 'tl')) {
-              console.error(`接口${url}请求失败`, res.msg || res.text)
+          if (spider) {
+            // 如果是爬取内容，直接返回页面html
+            resolve(res.text)
+          } else {
+            // 如果是非爬虫，返回格式化后的内容
+            res = res && res.text && JSON.parse(res.text) || {}
+            if (platform !== 'chuan') {
+              if ((res.code !== 200 && platform === 'tx') || (res.code !== 200 && platform === 'aibot') || (res.code !== 0 && platform === 'qi') || (res.code !== 100000 && platform === 'tl')) {
+                console.error(`接口${url}请求失败`, res.msg || res.text)
+              }
             }
+            resolve(res)
           }
-          resolve(res)
         }
       })
   })
@@ -98,19 +99,20 @@ function post({ url, params, contentType = 'application/json', authorization = '
         if (err) {
           console.log('请求出错', err)
           reject(err)
-        }
-        if (spider) {
-          // 如果是爬取内容，直接返回页面html
-          resolve(res.text)
         } else {
-          // 如果是非爬虫，返回格式化后的内容
-          res = res && res.text && JSON.parse(res.text) || {}
-          if (platform !== 'chuan') {
-            if ((res.code !== 200 && platform === 'tx') || (res.code !== 200 && platform === 'aibot') || (res.code !== 100000 && platform === 'tl')) {
-              console.error(`接口请求失败${url}`, res.msg || res.text || res.error)
+          if (spider) {
+            // 如果是爬取内容，直接返回页面html
+            resolve(res.text)
+          } else {
+            // 如果是非爬虫，返回格式化后的内容
+            res = res && res.text && JSON.parse(res.text) || {}
+            if (platform !== 'chuan') {
+              if ((res.code !== 200 && platform === 'tx') || (res.code !== 200 && platform === 'aibot') || (res.code !== 100000 && platform === 'tl')) {
+                console.error(`接口请求失败${url}`, res.msg || res.text || res.error)
+              }
             }
+            resolve(res)
           }
-          resolve(res)
         }
       })
   })

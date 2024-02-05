@@ -1,4 +1,5 @@
 import {get4vReply, getDify4vReply} from "../botInstance/gpt4v.js";
+import {getImageVision} from '../proxy/multimodal.js'
 
 class MultiReply {
   constructor() {
@@ -88,7 +89,7 @@ class BotManage {
       }
       const replys = await getDify4vReply(images, question, config, username);
       return replys;
-    } else {
+    } else if(config.robotType === 6) {
       for(let id of this.userBotDict[username].imageIds) {
         const msg = await this.Bot.Message.find({ id })
         const file = await msg.toFileBox()
@@ -96,6 +97,15 @@ class BotManage {
         images.push(base)
       }
       const replys = await get4vReply(images, question, config);
+      return replys;
+    } else {
+      for(let id of this.userBotDict[username].imageIds) {
+        const msg = await this.Bot.Message.find({ id })
+        const file = await msg.toFileBox()
+        const base = await file.toDataURL()
+        images.push(base)
+      }
+      const replys = await getImageVision(images, question, config);
       return replys;
     }
   }
