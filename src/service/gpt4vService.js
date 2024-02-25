@@ -23,9 +23,9 @@ export async function getGpt4vChat({ room, roomId, roomName, isMention, msgConte
           }
           const config = {
             ...finalConfig.botConfig,
-            robotType: finalConfig.botConfig?.open4vConfig.type || finalConfig.robotType,
-            proxyPass: finalConfig.botConfig?.open4vConfig.baseUrl || finalConfig.botConfig?.proxyPass,
-            apiKey: finalConfig.botConfig?.open4vConfig.token || finalConfig.botConfig?.token
+            robotType: finalConfig.botConfig?.open4vConfig?.type || finalConfig.robotType,
+            proxyPass: finalConfig.botConfig?.open4vConfig?.baseUrl || finalConfig.botConfig?.proxyPass,
+            apiKey: finalConfig.botConfig?.open4vConfig?.token || finalConfig.botConfig?.token
           }
           const res = await gpt4vRes.run(uniqueId, { type: 1, content: msg }, config)
           if(res.length) {
