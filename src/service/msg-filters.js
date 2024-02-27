@@ -68,7 +68,7 @@ async function addSchedule(that, obj) {
     let nickName = scheduleObj.subscribe
     let time = scheduleObj.time
     let Rule1 = scheduleObj.isLoop ? time : new Date(time)
-    let content = scheduleObj.content
+    let content = scheduleObj.content.replaceAll('\\n', '\n')
     let contact = await that.Contact.find({ name: nickName })
     let id = scheduleObj.id
     setLocalSchedule(Rule1, async () => {

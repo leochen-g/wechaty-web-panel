@@ -8,9 +8,10 @@ import { getPuppetEol, isWindowsPlatform } from "../const/puppet-type.js";
 import sharp from 'sharp'
 
 async function formatContent(text) {
+  text = text.replaceAll('\\n', '\n');
   const isWin = await isWindowsPlatform()
   if(isWin) {
-    return text.replace(/\n/g, "\r");
+    return text.replaceAll(/\n/g, "\r").replaceAll(/\n/g, "\r");
   }
   return text;
 }
