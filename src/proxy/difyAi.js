@@ -26,6 +26,7 @@ export async function getDifyReply(content, uid) {
       timeoutMs: config.openaiTimeout, // 超时时间 s
       systemMessage: config.openaiSystemMessage, // 预设promotion
       filter: config.chatFilter,
+      isAiAgent: config?.difyAgent || false,
       filterConfig: {
         type: 1,
         appId: config.filterAppid,

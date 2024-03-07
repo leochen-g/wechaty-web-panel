@@ -213,6 +213,7 @@ async function getConfig() {
       openaiModel:'gpt-3.5-turbo',
       dify_token: '',
       dify_baseUrl: '',
+      difyAgent: false,
       proxyUrl: '',
       proxyPassUrl: '',
       chatFilter: 0,

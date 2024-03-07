@@ -248,7 +248,7 @@ async function keywordsMsg({ msg, config, room, isMention }) {
   }
 }
 
-async function robotMsg({ msg, name, id, config, isMention, room, isFriend }) {
+async function robotMsg({ msg, name, id, config, isMention, room, roomId, isFriend }) {
   // 如果群里没有提及不开启机器人聊天
   if (room && !isMention && config.roomAt || room && !isMention && !config.roomAt && isFriend && config.friendNoReplyInRoom) {
     return []
@@ -257,7 +257,7 @@ async function robotMsg({ msg, name, id, config, isMention, room, isFriend }) {
       let msgArr = [] // 返回的消息列表
       if (config.autoReply) {
         console.log('开启了机器人自动回复功能')
-        msgArr = await dispatch.dispatchAiBot(config.defaultBot, msg, name, id)
+        msgArr = await dispatch.dispatchAiBot(config.defaultBot, msg, name, `${roomId ? roomId + '_' : ''}${id}`)
       } else {
         console.log('没有开启机器人自动回复功能')
         msgArr = [{ type: 1, content: '', url: '' }]
@@ -341,7 +341,7 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
               const msgArr = await dispatchBot({
                 botType: finalConfig.robotType,
                 content: msg,
-                uid: id,
+                uid: `${roomId ? roomId + '_' : ''}${id}`,
                 adminId: finalConfig.id,
                 config: finalConfig.botConfig
               })
