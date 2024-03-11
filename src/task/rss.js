@@ -43,7 +43,7 @@ async function setContent(feed, info) {
     const res = { type: 4, url: feed.link, title: delHtmlTag(feed.title), description: delHtmlTag(feed.content).substring(0,80), thumbUrl: info.thumbUrl };
     return [res];
   } else {
-    const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}${delHtmlTag(feed.title)}${eol}${eol}【摘要】：${delHtmlTag(feed.content).substring(0,300)}...${eol}【链接】:${feed.link}${eol}${eol}${info.suffixWord || ''}`;
+    const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}${delHtmlTag(feed.title)}${eol}${eol}【摘要】：${delHtmlTag(feed.content).substring(0,600)}...${eol}【链接】:${feed.link}${eol}${eol}${info.suffixWord || ''}`;
     return [{ type: 1, content: content }]
   }
 }

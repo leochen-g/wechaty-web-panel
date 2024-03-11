@@ -101,7 +101,7 @@ class DifyAi {
       let replys = []
       let message;
       if(this.config.showQuestion) {
-        message = `${content}${this.eol}-----------${this.eol}` +  this.iswindows ? text.replaceAll('\n', this.eol) : text;
+        message = `${content}${this.eol}-----------${this.eol}` +  (this.iswindows ? text.replaceAll('\n', this.eol) : text);
       } else {
         message =  this.iswindows ? text.replaceAll('\n', this.eol) : text;
       }
