@@ -113,6 +113,7 @@ async function updateContactInfo(that, noCache = false) {
       res.push(obj)
     }
     await updateFriendInfo(res, 80)
+    console.log(`更新群列表完毕，共获取到${realContact.length}个好友信息`)
   } catch (e) {
     console.log('e', e)
   }
@@ -157,6 +158,7 @@ async function updateRoomInfo(that, noCache = false) {
       res.push(obj)
     }
     await updateRoomsInfo(res, 80)
+    console.log(`更新群列表完毕，共获取到${roomList.length}个群聊`)
   } catch (e) {
     console.log('e', e)
   }

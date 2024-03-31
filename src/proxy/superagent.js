@@ -37,12 +37,13 @@ service.interceptors.response.use(
         return Promise.resolve(result)
       }
     }
-    const res = [{ type: 1, content: '回调接口网络错误：' + response.status }]
+    console.log(`回调接口网络错误：${response.status}`)
+    const res = [{ type: 1, content: '' }]
     return Promise.resolve(res)
   },
   (err) => {
-    console.log('err', err)
-    const res = [{ type: 1, content: '网络错误，请稍后重试' }]
+    console.log('回调接口网络错误:', err)
+    const res = [{ type: 1, content: '' }]
     return Promise.resolve(res)
   }
 )

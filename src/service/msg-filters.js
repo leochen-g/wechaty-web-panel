@@ -336,7 +336,7 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
             if (keyword || !finalConfig?.keywords.length) {
               msg = keyword ? msg.replace(keyword, '') : msg
               if (finalConfig.limitNum > 0 && finalConfig.limitNum <= finalConfig.usedNum) {
-                return [{ type: 1, content: finalConfig.rechargeTip || '聊天次数已用完，请联系管理员充值' }]
+                return [{ type: 1, content: finalConfig.rechargeTip || '' }]
               }
               const msgArr = await dispatchBot({
                 botType: finalConfig.robotType,

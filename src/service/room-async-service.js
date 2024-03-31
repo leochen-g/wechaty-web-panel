@@ -220,7 +220,7 @@ const unidirectionalMapper = async (message, one) => {
             20:'CallRecord',   // Call Record (voice and video, maybe group?)
           }
           const type = typeMap[message.type()]
-          messageList.unshift(`${prefix}: ${type}`)
+          // messageList.unshift(`${prefix}: ${type}`)
         }
         break
     }
@@ -426,6 +426,3 @@ async function dispatchAsync(that, msg, list) {
   }
 }
 export { dispatchAsync }
-export default {
-  dispatchAsync,
-}
