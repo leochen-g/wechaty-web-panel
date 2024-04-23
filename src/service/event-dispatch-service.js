@@ -8,6 +8,7 @@ import { removeRecord } from "../db/roomDb.js";
 import { getGptOfficialReply, reset as officialReset } from "../proxy/openAi.js";
 import { getGptUnOfficialReply, reset } from "../proxy/openAiHook.js";
 import { getDifyReply, reset as difyReset } from "../proxy/difyAi.js";
+import { getCozeReply, reset as cozeReset } from '../proxy/cozeAi.js'
 import { outApi } from '../proxy/outapi.js'
 
 /**
@@ -123,6 +124,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
         reset();
         officialReset();
         difyReset();
+        cozeReset();
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:
@@ -187,6 +189,11 @@ async function dispatchAiBot(bot, msg, name, id) {
       case 9:
         // fast gpt
         res = await getGptOfficialReply(msg, id, true)
+        replys = res
+        break
+      case 11:
+        // coze
+        res = await getCozeReply(msg, id)
         replys = res
         break
       default:

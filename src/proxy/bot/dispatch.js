@@ -1,6 +1,7 @@
 import { getChatGPTReply } from "./chatgpt.js";
 import { getChatGPTWebReply } from "./chatgpt-web.js";
 import { getDifyAiReply } from "./dify.js";
+import { getCozeReply } from './coze.js'
 import { updateChatRecord } from "../aibotk.js";
 import globalConfig from '../../db/global.js'
 
@@ -35,6 +36,11 @@ export async function dispatchBot({botType, content, uid, adminId, config}) {
         case 9:
           // fastGPT api
           res = await getChatGPTReply(content, uid, adminId, config, true)
+          replys = res
+          break
+        case 11:
+          // coze api
+          res = await getCozeReply(content, uid, adminId, config)
           replys = res
           break
         default:

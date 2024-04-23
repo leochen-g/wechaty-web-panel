@@ -439,8 +439,8 @@ export function delHtmlTag(str) {
  * @returns {*[]}
  */
 export function extractImageLinks(text) {
-  const httpRegex = /(http:\/\/\S+\.(?:jpg|png|gif|webp|jpeg|mp4|doc|docx|xls|xlsx|ppt|pptx|avi|zip|wav|rar|pdf|txt|log))/g;
-  const httpsRegex = /(https:\/\/\S+\.(?:jpg|png|gif|webp|jpeg|mp4|doc|docx|xls|xlsx|ppt|pptx|avi|zip|wav|rar|pdf|txt|log))/g;
+  // const httpRegex = /(http:\/\/\S+\.(?:jpg|png|gif|webp|jpeg|mp4|doc|docx|xls|xlsx|ppt|pptx|avi|zip|wav|rar|pdf|txt|log))/g;
+  // const httpsRegex = /(https:\/\/\S+\.(?:jpg|png|gif|webp|jpeg|mp4|doc|docx|xls|xlsx|ppt|pptx|avi|zip|wav|rar|pdf|txt|log))/g;
   const mdRegexHttps = /!\[[^\]]*\]\((https?:\/\/\S+)\)/g;
   const mdRegexHttp = /!\[[^\]]*\]\((http?:\/\/\S+)\)/g;
   const fileRegexHttp = /\[[^\]]*\]\((http?:\/\/\S+)\)/g;
@@ -449,13 +449,13 @@ export function extractImageLinks(text) {
   let imageLinks = [];
   let match;
 
-  while ((match = httpRegex.exec(text)) !== null) {
-    imageLinks.push(match[0]);
-  }
-
-  while ((match = httpsRegex.exec(text)) !== null) {
-    imageLinks.push(match[0]);
-  }
+  // while ((match = httpRegex.exec(text)) !== null) {
+  //   imageLinks.push(match[0]);
+  // }
+  //
+  // while ((match = httpsRegex.exec(text)) !== null) {
+  //   imageLinks.push(match[0]);
+  // }
 
   while ((match = mdRegexHttp.exec(text)) !== null || (match = mdRegexHttps.exec(text)) !== null || (match = fileRegexHttp.exec(text)) !== null || (match = filesRegexHttp.exec(text)) !== null) {
     imageLinks.push(match[1]);

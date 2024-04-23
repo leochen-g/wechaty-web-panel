@@ -8,6 +8,7 @@ import { delay, randomRange } from "../lib/index.js";
 import { reset } from './bot/chatgpt.js'
 import { reset as webReset } from './bot/chatgpt-web.js'
 import { reset as difyReset } from './bot/dify.js'
+import { reset as cozeReset } from './bot/coze.js'
 import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
 import globalConfig from "../db/global.js";
 import { resetScanTime } from '../handlers/on-scan.js'
@@ -186,6 +187,7 @@ async function initMqtt(that) {
               reset(content.updateId)
               webReset(content.updateId)
               difyReset(content.updateId)
+              cozeReset(content.updateId)
             }
           } else if(topic === `aibotk/${userId}/rssconfig`) {
             console.log('更新rss配置')
