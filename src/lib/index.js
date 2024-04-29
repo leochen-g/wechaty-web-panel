@@ -431,7 +431,10 @@ function groupArray(array, subGroupLength) {
 }
 
 export function delHtmlTag(str) {
-  return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
+  if(str) {
+    return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
+  }
+  return ''
 }
 
 export function isCDNFileUrl(url) {
