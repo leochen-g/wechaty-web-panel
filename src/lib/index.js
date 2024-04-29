@@ -2,6 +2,7 @@ import Crypto from 'crypto'
 import * as schedule from 'node-schedule'
 import fs from 'fs'
 import dayjs from "dayjs";
+import path from 'path'
 
 /**
  * 设置定时器
@@ -433,6 +434,22 @@ export function delHtmlTag(str) {
   return str.replace(/<[^>]+>/g,"");//去掉所有的html标记
 }
 
+export function isCDNFileUrl(url) {
+  // 常见的CDN文件扩展名
+  const cdnFileExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.mp4', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.avi', '.zip', '.wav', '.rar', '.pdf', '.txt', '.log' ];
+
+  try {
+    const parsedUrl = new URL(url);
+    const fileExt = path.extname(parsedUrl.pathname).toLowerCase();
+
+    // 检查文件扩展名是否在cdnFileExtensions列表中
+    return cdnFileExtensions.includes(fileExt);
+  } catch (err) {
+    // 无效的URL
+    return false;
+  }
+}
+
 /**
  * 提取文字中的图片链接 文件链接
  * @param text
@@ -461,7 +478,7 @@ export function extractImageLinks(text) {
     imageLinks.push(match[1]);
   }
 
-  imageLinks = Array.from(new Set(imageLinks))
+  imageLinks = Array.from(new Set(imageLinks)).filter(item=> isCDNFileUrl(item))
 
   return imageLinks.map(item=>({ type: 2, url: item }));
 }

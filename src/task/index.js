@@ -62,7 +62,7 @@ async function setTask(that, item, name, callback) {
  * @param targets 发送的多个目标
  * @return {Promise<void>}
  */
-const sendCustom = async ({ that, target, item, isMulti, targets }) => {
+async function sendCustom ({ that, target, item, isMulti, targets }) {
   for (let reply of item.contents) {
     console.log("定时任务开始发送，内容：", `${reply.type === 1 ? reply.content : reply.url}`);
     await delay(1000);
@@ -113,7 +113,7 @@ const sendCustom = async ({ that, target, item, isMulti, targets }) => {
  * @param targets 发送的多个目标
  * @return {Promise<void>}
  */
-const sendNews = async ({ that, target, item, isMulti, targets }) => {
+async function sendNews ({ that, target, item, isMulti, targets }) {
   let content = await getNewsContent(item.sortId, item.endWord, item.num || 10);
   console.log("新闻资讯开始发送，内容：", content);
   await delay(200);
@@ -146,7 +146,7 @@ const sendNews = async ({ that, target, item, isMulti, targets }) => {
  * @param targets 发送的多个目标
  * @return {Promise<void>}
  */
-const sendCustomContent = async ({ that, target, type, item, isMulti, targets }) => {
+async function  sendCustomContent ({ that, target, type, item, isMulti, targets }) {
   let contents = await getCustomContent(item.sortId);
   console.log("定制内容发送", contents);
 
@@ -182,7 +182,7 @@ const sendCustomContent = async ({ that, target, type, item, isMulti, targets })
  * @param item
  * @return {Promise<void>}
  */
-const sendEveryDay = async ({ that, target, item }) => {
+async function sendEveryDay({ that, target, item }) {
   let content = "";
   if (item.type === "room") {
     content = await getRoomEveryDayContent(item.memorialDay, item.city, item.endWord);
@@ -203,7 +203,7 @@ const sendEveryDay = async ({ that, target, item }) => {
  * @param targets 发送的多个目标
  * @return {Promise<void>}
  */
-const sendCountDown = async ({ that, target, item, isMulti, targets }) => {
+async function sendCountDown ({ that, target, item, isMulti, targets }) {
   let content = await getCountDownContent(item.memorialDay, item.prefix, item.suffix, item.endWord);
   console.log("倒计时任务开始工作,发送内容：", content);
   await delay(1000);

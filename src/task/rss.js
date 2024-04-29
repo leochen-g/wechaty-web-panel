@@ -8,7 +8,12 @@ import dayjs from "dayjs";
 
 async function getRssContent(info) {
   try {
-    const parser = new rssParser();
+    const parser = new rssParser({
+      requestOptions: {
+        rejectUnauthorized: false,
+      },
+      headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' },
+    });
     console.log('订阅源:' + info.rssUrl);
     const feed = await parser.parseURL(info.rssUrl);
     const lastItem = await getRssHistoryById(info.id);
@@ -16,7 +21,7 @@ async function getRssContent(info) {
     if(feed.items && feed.items.length) {
       // 当存在历史推送记录 需要判读是否推送过
       const last = feed.items[0];
-      const lastContent = last.link;
+      const lastContent = last.link || last.title;
       if(lastItem) {
         if(lastContent !== lastItem.lastContent) {
           const content = await setContent(last, info);
@@ -43,7 +48,7 @@ async function setContent(feed, info) {
     const res = { type: 4, url: feed.link, title: delHtmlTag(feed.title), description: delHtmlTag(feed.content).substring(0,80), thumbUrl: info.thumbUrl };
     return [res];
   } else {
-    const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}${delHtmlTag(feed.title)}${eol}${eol}【摘要】：${delHtmlTag(feed.content).substring(0,600)}...${eol}【链接】:${feed.link}${eol}${eol}${info.suffixWord || ''}`;
+    const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}${delHtmlTag(feed.title)}${eol}${eol}【摘要】：${delHtmlTag(feed.content).substring(0,1500)}...${eol}【链接】:${feed.link}${eol}${eol}${info.suffixWord || ''}`;
     return [{ type: 1, content: content }]
   }
 }
@@ -107,7 +112,7 @@ async function setTask(that, item, name, callback) {
  * @param item
  * @return {Promise<void>}
  */
-const sendRssContent = async ({ that, target, item }) => {
+async function sendRssContent ({ that, target, item }) {
   const replys = await getRssContent(item);
   for (let reply of replys) {
     console.log("检测到rss内容更新，开始发送：", `${reply.type === 1 ? reply.content : reply.url}`);
@@ -150,6 +155,7 @@ export async function initRssTask(that) {
   try {
     cancelAllSchedule("task_rss");
     const rssTasks = await getAllRssConfig(); // 获取配置信息
+    console.log(`获取到 rss 任务 :${rssTasks.length}个`)
     // 每日说定时任务
     if (rssTasks && rssTasks.length > 0) {
       rssTasks.forEach((item, index) => {
