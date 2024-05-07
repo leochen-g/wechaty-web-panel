@@ -233,6 +233,7 @@ async function getConfig() {
       roomAt: 1,
       friendNoReplyInRoom: 0,
       defaultReply: '',
+      forwards: [],
       ...config,
       cloudRoom
     })

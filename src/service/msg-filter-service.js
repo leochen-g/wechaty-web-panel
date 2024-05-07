@@ -45,6 +45,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
       { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
       { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
+      { bool: config.forwards && config.forwards.length > 0, method: 'keywordForward' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.preventWords, method: 'preventWordCheck' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },
@@ -77,6 +78,7 @@ async function filterRoomMsg({that, msg, name, id, avatar, room, isMention, room
     const gptConfig = globalConfig.getAllGptConfig() // 获取gpt配置信息
     const resArray = [
       { bool: msg === '', method: 'emptyMsg' },
+      { bool: config.forwards && config.forwards.length > 0, method: 'keywordForward' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: !!config.preventWords, method: 'preventWordCheck' },
       { bool: config.eventKeywords && config.eventKeywords.length > 0, method: 'eventMsg' },

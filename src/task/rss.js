@@ -159,13 +159,13 @@ export async function sendRssTaskMessage(that, info) {
  */
 export async function initRssTask(that) {
   try {
-    cancelAllSchedule("task_rss");
+    cancelAllSchedule("rss_");
     const rssTasks = await getAllRssConfig(); // 获取配置信息
     console.log(`获取到 rss 任务 :${rssTasks.length}个`)
     // 每日说定时任务
     if (rssTasks && rssTasks.length > 0) {
       rssTasks.forEach((item, index) => {
-        setTask(that, item, `task_rss_${index}`, sendRssContent);
+        setTask(that, item, `rss_${index}`, sendRssContent);
       });
     }
   } catch (e) {

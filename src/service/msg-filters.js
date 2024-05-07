@@ -1,12 +1,14 @@
 import dispatch from './event-dispatch-service.js'
 import { getConfig, setSchedule, updateSchedule } from '../proxy/aibotk.js'
-import { contentDistinguish, setLocalSchedule, isRealDate } from '../lib/index.js'
+import { contentDistinguish, setLocalSchedule, isRealDate, delay } from '../lib/index.js'
 import { addRoom } from '../common/index.js'
 import { service, callbackAibotApi } from '../proxy/superagent.js'
 import { dispatchBot } from '../proxy/bot/dispatch.js'
 import globalConfig from '../db/global.js'
 import { getUser } from '../db/userDb.js'
 import { allConfig } from '../db/configDb.js'
+import { getPuppetEol } from '../const/puppet-type.js'
+import dayjs from 'dayjs'
 
 async function emptyMsg({ room, isMention }) {
   const config = await allConfig()
@@ -422,6 +424,98 @@ async function customBot({ that, msg, name, id, config, room, isMention }) {
   const timeout = item.timeout || 60
   let res = await service.post(item.customUrl, data, { timeout: timeout * 1000 })
   return res
+}
+
+function checkKeyword(forward, msg) {
+  const keywords = forward.keywords;
+  const reg = forward.reg;
+  for(let key of keywords) {
+    if ((reg === 1 && msg.includes(key)) || (reg === 2 && msg === key)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getForwardConfig({ name, id, room, roomId, roomName, msg, config }) {
+  const configs = config.forwards
+  if (configs && configs.length) {
+    let finalConfig = ''
+    if (room) {
+      finalConfig = room && configs.find((item) => {
+        const targetNames = []
+        const targetIds = []
+        item.targets.forEach(tItem => {
+          targetNames.push(tItem.name)
+          targetIds.push(tItem.id)
+        })
+        const keywordCheck = checkKeyword(item, msg)
+        return keywordCheck && item.type === 'room' && (targetNames.includes(roomName) || targetIds.includes(roomId))
+      })
+    } else {
+      finalConfig = configs.find((item) => {
+        const targetNames = []
+        const targetIds = []
+        item.targets.forEach(tItem => {
+          targetNames.push(tItem.name)
+          targetIds.push(tItem.id)
+        })
+        const keywordCheck = checkKeyword(item, msg)
+        return keywordCheck && item.type === 'contact' && (targetNames.includes(name) || targetIds.includes(id))
+      })
+    }
+    return finalConfig
+  }
+}
+
+async function getTargets(that, targets, type) {
+  const finalTargets = []
+  if(type ==='room') {
+    for(let item of targets) {
+      try {
+        const room = await that.Room.find({ id: item.id, topic: item.name });
+        targets.push(room)
+      } catch (e) {
+        console.log('查询转发群组失败', e)
+      }
+    }
+  } else {
+    for(let item of targets) {
+      try {
+        const room = await that.Contact.find({ id: item.id, name: item.name });
+        targets.push(room)
+      } catch (e) {
+        console.log('查询转发好友失败', e)
+      }
+    }
+  }
+
+  return finalTargets;
+}
+
+export async function keywordForward({ that, msg, name, id, config, room, isMention, roomId, roomName  }) {
+  try {
+    const forwards = config.forwards || [];
+    if(forwards.length) {
+      const finalConfig = getForwardConfig({ name, id, room, roomId, roomName })
+      if(finalConfig) {
+        const finalTargets = await getTargets(that, finalConfig.forwardTargets, finalConfig.forwardType)
+        if(finalTargets.length) {
+          const eol = await getPuppetEol()
+          for(let contact of finalTargets) {
+            const content = room ? `【关键词转发】${eol} 时间：${dayjs().format('MM-DD HH:mm:ss')} ${eol}收到群聊【${roomName}】中【${name}】发送的内容：${msg}` : `【关键词转发】${eol} 时间：${dayjs().format('MM-DD HH:mm:ss')} ${eol}收到好友【${name}】发送的内容：${msg}`
+            await contact.say(content)
+            await delay(3000)
+          }
+          return [{ type: 1, content: '' }]
+        }
+      }
+    }
+    return []
+  } catch (e) {
+    console.log('转发消息失败', e)
+    return []
+  }
 }
 
 export { customBot }
