@@ -1,8 +1,7 @@
-import nedb from "./nedb.js";
-import path from "path";
-import os from "os";
-import globalConfig from "./global.js";
-import fs from "fs";
+import nedb from './nedb.js'
+import path from 'path'
+import os from 'os'
+import globalConfig from './global.js'
 
 
 let rdb = null;
@@ -36,8 +35,12 @@ function initDb() {
 export async function addRssHistory(info) {
   try {
     initDb()
-    let doc = await rdb.update({_id: info.id}, info, {upsert: true })
-    return doc;
+    const hasExit = await rdb.find({_id: info.id})
+    if(hasExit) {
+      return await rdb.update({ _id: info.id }, info, { upsert: true });
+    } else {
+      return await rdb.insert(info);
+    }
   } catch (error) {
     console.log("插入数据错误", error);
   }

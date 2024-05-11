@@ -17,6 +17,7 @@ async function getRssContent(info) {
     console.log('订阅源:' + info.rssUrl);
     const feed = await parser.parseURL(info.rssUrl);
     const lastItem = await getRssHistoryById(info.id);
+    console.log('上一条消息', JSON.stringify(lastItem))
     // 当存在文章的时候
     if(feed.items && feed.items.length) {
       // 当存在历史推送记录 需要判读是否推送过
