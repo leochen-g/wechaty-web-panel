@@ -474,7 +474,7 @@ async function getTargets(that, targets, type) {
     for(let item of targets) {
       try {
         const room = await that.Room.find({ id: item.id, topic: item.name });
-        targets.push(room)
+        finalTargets.push(room)
       } catch (e) {
         console.log('查询转发群组失败', e)
       }
@@ -483,7 +483,7 @@ async function getTargets(that, targets, type) {
     for(let item of targets) {
       try {
         const room = await that.Contact.find({ id: item.id, name: item.name });
-        targets.push(room)
+        finalTargets.push(room)
       } catch (e) {
         console.log('查询转发好友失败', e)
       }
@@ -497,7 +497,7 @@ export async function keywordForward({ that, msg, name, id, config, room, isMent
   try {
     const forwards = config.forwards || [];
     if(forwards.length) {
-      const finalConfig = getForwardConfig({ name, id, room, roomId, roomName })
+      const finalConfig = getForwardConfig({ name, id, room, msg, config, roomId, roomName })
       if(finalConfig) {
         const finalTargets = await getTargets(that, finalConfig.forwardTargets, finalConfig.forwardType)
         if(finalTargets.length) {
@@ -546,5 +546,6 @@ export default {
   robotMsg,
   maxLengthMsg,
   customChat,
-  preventWordCheck
+  preventWordCheck,
+  keywordForward
 }
