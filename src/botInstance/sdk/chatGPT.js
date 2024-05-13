@@ -274,7 +274,15 @@ Current date: ${currentDate}`;
             }
             if ((_a = response == null ? void 0 : response.choices) == null ? void 0 : _a.length) {
               const message2 = response.choices[0].message;
-              result.text = message2.content;
+              if(typeof message2.content === 'string') {
+                result.text = message2.content;
+              } else if(Array.isArray(message2.content)){
+                const finalContent = message2.content.find(item=> item.type === 'text')
+                if(finalContent) {
+                  result.text = finalContent?.text?.content || ''
+                }
+              }
+
               if (message2.role) {
                 result.role = message2.role;
               }

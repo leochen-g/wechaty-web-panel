@@ -5,6 +5,7 @@ import { roomSay, contactSay } from "../common/index.js";
 import rssParser from 'rss-parser';
 import { getPuppetEol } from "../const/puppet-type.js";
 import dayjs from "dayjs";
+import { getRssLast, updateRssLast } from '../proxy/aibotk.js'
 
 async function getRssContent(info) {
   try {
@@ -16,24 +17,24 @@ async function getRssContent(info) {
     });
     console.log('订阅源:' + info.rssUrl);
     const feed = await parser.parseURL(info.rssUrl);
-    const lastItem = await getRssHistoryById(info.id);
-    console.log('上一条消息', JSON.stringify(lastItem))
+    const lastItem = await getRssLast(info.id);
+    console.log('上一条已经推送的消息', JSON.stringify(lastItem))
     // 当存在文章的时候
     if(feed.items && feed.items.length) {
       // 当存在历史推送记录 需要判读是否推送过
       const last = feed.items[0];
       const lastContent = last.link || last.title;
       if(lastItem) {
-        if(lastContent !== lastItem.lastContent) {
+        if(lastContent !== lastItem?.lastContent) {
           const content = await setContent(last, info);
-          void updateRssHistory(info.id, {lastContent: lastContent, lastTime: dayjs().format('YYYY-MM-DD HH:mm:ss')})
+          void updateRssLast(info.id, lastContent)
           return content;
         }
         console.log('rss内容未更新,最后一条内容已推送');
         return [];
       } else {
         const content = await setContent(last, info);
-        void addRssHistory({_id: info.id, id: info.id, lastContent: lastContent, lastTime: dayjs().format('YYYY-MM-DD HH:mm:ss')})
+        void updateRssLast(info.id, lastContent)
         return content;
       }
     }
@@ -50,7 +51,8 @@ async function setContent(feed, info) {
       const res = { type: 4, url: feed.link, title: delHtmlTag(feed.title), description: delHtmlTag(feed.content).substring(0,80), thumbUrl: info.thumbUrl };
       return [res];
     } else {
-      const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}${delHtmlTag(feed.title)}${eol}${eol}【摘要】：${delHtmlTag(feed.content).substring(0,1500)}...${eol}【链接】:${feed.link}${eol}${eol}${info.suffixWord || ''}`;
+      const desc = delHtmlTag(feed.content)?.substring(0,1500)?.trim()
+      const content = `${info.prefixWord ? info.prefixWord + eol + eol: ''}${delHtmlTag(feed.title)}${eol}${eol} ${desc ? `【摘要】：${desc}...${eol}` : ''}【链接】:${feed.link}${eol}${eol}${info.suffixWord || ''}`;
       return [{ type: 1, content: content }]
     }
   } catch (e) {

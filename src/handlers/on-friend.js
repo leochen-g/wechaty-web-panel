@@ -19,7 +19,7 @@ async function onFriend(friendship) {
             console.log('无认证关键词,10秒后将会自动通过好友请求')
             await delay(10000)
             await friendship.accept()
-          } else if (config.acceptFriendKeyWords.length > 0 && config.acceptFriendKeyWords.includes(hello)) {
+          } else if (config.acceptFriendKeyWords.length > 0 && config.acceptFriendKeyWords.find(item=> item.includes(hello))) {
             console.log(`触发关键词${hello},10秒后自动通过好友请求`)
             await delay(10000)
             await friendship.accept()

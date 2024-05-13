@@ -306,6 +306,43 @@ export async function getRssConfig() {
     console.log('获取rss配置文件失败:' + error)
   }
 }
+/**
+ * 更新rss最后一条内容的配置
+ * @return {Promise<*>}
+ */
+async function updateRssLast(id, lastcontent) {
+  try {
+    console.log('id----', id, lastcontent)
+    let option = {
+      method: 'POST',
+      url: `/rss/lastcontent/${id}`,
+      params: {
+        content: lastcontent
+      },
+    }
+    let content = await aiBotReq(option)
+    return content
+  } catch (error) {
+    console.log('获取rss配置文件失败:' + error)
+  }
+}
+/**
+ * 更新rss最后一条内容的配置
+ * @return {Promise<*>}
+ */
+async function getRssLast(id) {
+  try {
+    let option = {
+      method: 'GET',
+      url: `/rss/lastcontent/${id}`,
+      params: {},
+    }
+    let content = await aiBotReq(option)
+    return content.data;
+  } catch (error) {
+    console.log('获取rss配置文件失败:' + error)
+  }
+}
 
 /**
  * 更新对话次数
@@ -691,7 +728,9 @@ export { getOne }
 export { getMaterial }
 export { getFireNews }
 export { updateChatRecord }
-export {  getPromotInfo }
+export {  getPromotInfo  }
+export {  getRssLast  }
+export {  updateRssLast  }
 export default {
   getConfig,
   getScheduleList,
@@ -711,5 +750,7 @@ export default {
   getMaterial,
   getFireNews,
   clearVerifyCode,
+  getRssLast,
+  updateRssLast,
   getVerifyCode
 }
