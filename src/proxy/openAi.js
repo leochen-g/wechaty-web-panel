@@ -26,6 +26,9 @@ export async function getGptOfficialReply(content, uid, isFastGPT) {
       showQuestion: config.showQuestion, // 显示原文
       timeoutMs: config.openaiTimeout, // 超时时间 s
       model: config.openaiModel, // 模型
+      temperature: config?.temperature, // 温度
+      top_p: config?.top_p, // 随机值
+      presence_penalty: config?.presence_penalty, // 离散值
       systemMessage: config.openaiSystemMessage, // 预设promotion
       filter: config.chatFilter,
       filterConfig: {

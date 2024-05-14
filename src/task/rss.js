@@ -40,6 +40,7 @@ async function getRssContent(info) {
     }
   } catch (e) {
     console.log("获取rss内容失败，大概率是订阅源格式不规范，请更换:" + e);
+    return [];
   }
 }
 

@@ -122,12 +122,11 @@ let ChatGPTAPI = class {
       ...completionParams
     };
     this._systemMessage = systemMessage;
-    if (this._systemMessage === void 0) {
-      const currentDate = new Date().toISOString().split("T")[0];
-      this._systemMessage = `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.
-Knowledge cutoff: 2021-09-01
-Current date: ${currentDate}`;
-    }
+//     if (!this._systemMessage) {
+//       const currentDate = new Date().toISOString().split("T")[0];
+//       this._systemMessage = `You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.
+// Current date: ${currentDate}`;
+//     }
     this._maxModelTokens = maxModelTokens;
     this._maxResponseTokens = maxResponseTokens;
     this._getMessageById = getMessageById ?? this._defaultGetMessageById;

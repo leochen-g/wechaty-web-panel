@@ -13,6 +13,9 @@ let chatGPT = null
 
 class OfficialOpenAi {
   constructor(config = {
+    temperature: 0.8,
+    top_p: 1,
+    presence_penalty: 1,
     token: '', // token
     debug: 0,  // 开启调试
     proxyPass: '', // 反向代理地址
@@ -46,7 +49,7 @@ class OfficialOpenAi {
     }
     const baseOptions = {
       apiKey: this.config.token,
-      completionParams: { model: this.config.model },
+      completionParams: { model: this.config.model, temperature: this.config?.temperature || 0.8, top_p: this.config?.top_p || 1, presence_penalty: this.config?.presence_penalty || 1 },
       debug: this.config.debug,
       systemMessage: this.config.systemMessage || '',
     }
@@ -56,23 +59,31 @@ class OfficialOpenAi {
       if (this.config.model.toLowerCase().includes('32k')) {
         baseOptions.maxModelTokens = 32768
         baseOptions.maxResponseTokens = 8192
-      }// if use GPT-4 Turbo
-      else if (this.config.model.toLowerCase().includes('1106-preview')) {
+      }// if use GPT-4 Turbo preview 4o
+      else if (this.config.model.toLowerCase().includes('-preview') || this.config.model.toLowerCase().includes('-turbo') || this.config.model.toLowerCase().includes('gpt-4o')) {
         baseOptions.maxModelTokens = 128000
         baseOptions.maxResponseTokens = 4096
-      }
-      else {
+      } else {
         baseOptions.maxModelTokens = 8192
-        baseOptions.maxResponseTokens = 2048
+        baseOptions.maxResponseTokens = 4096
       }
     }
     if (this.config.model.toLowerCase().includes('gpt-3.5')) {
-      if (this.config.model.toLowerCase().includes('16k') || this.config.model.toLowerCase().includes('turbo-1106')) {
+      if (this.config.model.toLowerCase() === 'gpt-3.5-turbo' || this.config.model.toLowerCase().includes('16k') || this.config.model.toLowerCase().includes('turbo-1106') || this.config.model.toLowerCase().includes('turbo-0125')) {
         baseOptions.maxModelTokens = 16385
         baseOptions.maxResponseTokens = 4096
       } else {
-        baseOptions.maxResponseTokens = 1000
+        baseOptions.maxModelTokens = 4096
+        baseOptions.maxResponseTokens = 1024
       }
+    }
+
+    if (this.config?.modelMaxToken) {
+      baseOptions.maxModelTokens = this.config.modelMaxToken;
+    }
+
+    if (this.config?.maxToken) {
+      baseOptions.maxResponseTokens = this.config.maxToken;
     }
 
     if(this.config.proxyUrl) {
