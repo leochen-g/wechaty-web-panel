@@ -56,7 +56,20 @@ async function dispatchFriendFilterByMsgType(that, msg) {
     }
     switch (type) {
       case that.Message.Type.Text:
-        content = msg.text()
+      case that.Message.Type.Url:
+        if(type === that.Message.Type.Url) {
+          console.log(`发消息人${await contact.name()}:发了一个h5链接`)
+          const urlLink = await msg.toUrlLink()
+          if (config.parseMini && urlLink.payload) {
+            const urlParse = `【链接解析】${eol}${eol}标题：${urlLink.title()}${eol}描述：${urlLink.description()}${eol}链接：${urlLink.url()}${eol}缩略图：${urlLink.thumbnailUrl()}`
+            contact.say(urlParse)
+          }
+          console.log('urlLink', urlLink)
+          content = `[链接]:${urlLink.url()}`
+        } else {
+          content = msg.text()
+        }
+
         if (!isOfficial) {
           console.log(`发消息人${name}:${content}`)
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages)
@@ -162,15 +175,6 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         }
         console.log('mini', miniProgram)
         break
-      case that.Message.Type.Url:
-        console.log(`发消息人${await contact.name()}:发了一个h5链接`)
-        const urlLink = await msg.toUrlLink()
-        if (config.parseMini && urlLink.payload) {
-          const urlParse = `【链接解析】${eol}${eol}标题：${urlLink.title()}${eol}描述：${urlLink.description()}${eol}链接：${urlLink.url()}${eol}缩略图：${urlLink.thumbnailUrl()}`
-          contact.say(urlParse)
-        }
-        console.log('urlLink', urlLink)
-        break
       case that.Message.Type.Transfer:
         console.log(`发消息人${await contact.name()}: 发起一个转账，请在手机接收`)
         console.log('内容', msg.payload)
@@ -209,7 +213,20 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
 
     switch (type) {
       case that.Message.Type.Text:
-        content = msg.text()
+      case that.Message.Type.Url:
+        if(type === that.Message.Type.Url) {
+          console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个h5链接`)
+          const urlLink = await msg.toUrlLink()
+          if (config.parseMiniRooms.includes(roomName) && urlLink.payload) {
+            const urlParse = `【链接解析】${eol}${eol}标题：${urlLink.title()}${eol}描述：${urlLink.description()}${eol}链接：${urlLink.url()}${eol}缩略图：${urlLink.thumbnailUrl()}`
+            room.say(urlParse)
+          }
+          console.log('urlLink', urlLink)
+          content = `[链接]:${urlLink.url()}`
+        } else {
+          content = msg.text()
+        }
+
         const mentionSelf = await msg.mentionSelf() || content.includes(`@${userSelfName}`)
         const receiverName = receiver?.name()
         content = content.replace('@' + receiverName, '').replace('@' + userSelfName, '').replace(/@[^,，：:\s@]+/g, '').trim()
@@ -349,15 +366,6 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           room.say(miniParse)
         }
         console.log('mini', miniProgram)
-        break
-      case that.Message.Type.Url:
-        console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个h5链接`)
-        const urlLink = await msg.toUrlLink()
-        if (config.parseMiniRooms.includes(roomName) && urlLink.payload) {
-          const urlParse = `【链接解析】${eol}${eol}标题：${urlLink.title()}${eol}描述：${urlLink.description()}${eol}链接：${urlLink.url()}${eol}缩略图：${urlLink.thumbnailUrl()}`
-          room.say(urlParse)
-        }
-        console.log('urlLink', urlLink)
         break
       case that.Message.Type.Transfer:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发起了转账，请在手机查看`)

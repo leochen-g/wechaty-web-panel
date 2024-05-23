@@ -99,7 +99,7 @@ async function initMqtt(that) {
         mqttclient.on('message', async function (topic, message) {
           const content = JSON.parse(message.toString())
           if (topic === `aibotk/${userId}/say`) {
-            if (content.target === 'Room') {
+            if (content.target === 'Room' || content.target === 'room') {
               console.log(`收到群：${content.roomName}发送消息请求： ${content.message.content || content.message.url}`)
               const room = content.wxid && await that.Room.find({ id: content.wxid }) || await that.Room.find({ topic: content.roomName })
               if (!room) {
@@ -108,7 +108,7 @@ async function initMqtt(that) {
               } else {
                 await roomSay.call(that,room, '', content.message)
               }
-            } else if (content.target === 'Contact') {
+            } else if (content.target === 'Contact' || content.target === 'contact') {
               console.log(`收到联系人：${content.alias || content.name}发送消息请求： ${content.message.content || content.message.url}`)
               let contact = (content.wxid && await that.Contact.load(content.wxid)) || (await that.Contact.find({ name: content.name })) || (await that.Contact.find({ alias: content.alias })) || (await that.Contact.find({ weixin: content.weixin })) // 获取你要发送的联系人
               if (!contact) {
@@ -120,17 +120,17 @@ async function initMqtt(that) {
             }
           } if (topic === `aibotk/${userId}/multisay`) {
             console.log('触发批量发送消息请求', content.target);
-            if (content.target === 'Room') {
+            if (content.target === 'Room' || content.target === 'room') {
               for(let room of content.groups) {
                 await sendRoomSay(that, room, content.messages)
                 await delay(600)
               }
-            } else if (content.target === 'Contact') {
+            } else if (content.target === 'Contact' || content.target === 'contact') {
               for(let contact of content.groups) {
                 await sendContactSay(that, contact, content.messages)
                 await delay(600)
               }
-            } else if(content.target === 'RoomNotice') {
+            } else if(content.target === 'RoomNotice' || content.target === 'roomnotice' ||content.target === 'roomNotice') {
               for(let room of content.groups) {
                 await sendRoomsNotice(that, room, content.messages)
                 await delay(600)
