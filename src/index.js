@@ -12,6 +12,7 @@ import onError from './handlers/on-error.js'
 import onRoomtopic from './handlers/on-roomtopic.js'
 import onRoomleave from './handlers/on-roomleave.js'
 import onVerifyCode from './handlers/on-verifycode.js'
+import onRecordMessage from './handlers/on-record-message.js'
 import dayjs from "dayjs";
 const originalConsoleLog = console.log;
 
@@ -64,6 +65,14 @@ function WechatyWebPanelPlugin(config = { apiKey, apiSecret, scanTimes }) {
     if (!ignoreEvents.includes('verify-code')) bot.on('verify-code', onVerifyCode)
   }
 }
+
+function WechatyMessageRecordPlugin() {
+  return function(bot) {
+    bot.on('message', onRecordMessage)
+  }
+}
+
 export {
-  WechatyWebPanelPlugin
+  WechatyWebPanelPlugin,
+  WechatyMessageRecordPlugin
 }

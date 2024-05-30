@@ -93,8 +93,8 @@ async function dispatchFriendFilterByMsgType(that, msg) {
             }
             replys = await getContactTextReply(that, contact, content.trim())
             for (let reply of replys) {
-              await delay(1000)
               await contactSay.call(that, contact, reply)
+              await delay(200)
             }
           }
         } else {
@@ -129,8 +129,8 @@ async function dispatchFriendFilterByMsgType(that, msg) {
             }
             replys = await getContactTextReply(that, contact, text.trim())
             for (let reply of replys) {
-              await delay(1000)
               await contactSay.call(that, contact, reply)
+              await delay(200)
             }
           } else {
             console.log('语音解析结果没有匹配到需要回复的关键词')
@@ -247,8 +247,8 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         })
         if (gpt4vReplys.length) {
           for (let reply of gpt4vReplys) {
-            await delay(1000)
             await roomSay.call(that, room, contact, reply)
+            await delay(200)
           }
           return
         }
@@ -265,8 +265,8 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           isMention: mentionSelf
         })
         for (let reply of replys) {
-          await delay(1000)
           await roomSay.call(that, room, contact, reply)
+          await delay(200)
         }
 
         const cloudRoom = config.cloudRoom
@@ -350,8 +350,8 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
               isMention: true
             })
             for (let reply of replys) {
-              await delay(1000)
               await roomSay.call(that, room, contact, reply)
+              await delay(200)
             }
           } else {
             console.log('语音解析结果没有匹配到需要回复的关键词')

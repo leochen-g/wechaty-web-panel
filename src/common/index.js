@@ -255,7 +255,6 @@ async function roomSay(room, contact, msg) {
     } else if (msg.type === 8 && msg.url && msg.voiceLength) {
       const fileBox = FileBox.fromUrl(msg.url);
       fileBox.mimeType = "audio/silk";
-      fileBox.mediaType = "audio/silk";
       fileBox.metadata = {
         voiceLength: msg.voiceLength,
       };
@@ -324,7 +323,6 @@ async function contactSay(contact, msg, isRoom = false) {
     } else if (msg.type === 8 && msg.url && msg.voiceLength) {
       const fileBox = FileBox.fromUrl(msg.url);
       fileBox.mimeType = "audio/silk";
-      fileBox.mediaType = "audio/silk";
       fileBox.metadata = {
         voiceLength: msg.voiceLength,
       };

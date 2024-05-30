@@ -1,4 +1,4 @@
-import api from '../proxy/api.js'
+import { getRubbishType, getMingYan, getSweetWord, getStar, getNews, getXing, getSkl, getLunar, getGoldReply, getXhy, getRkl, getEmo, getCname } from '../proxy/api.js'
 import { getConfig, getMeiNv, getWordCloudConfig, getCustomEvents } from '../proxy/aibotk.js'
 import { getConstellation, msgArr, getNewsType } from '../lib/index.js'
 import { initTaskLocalSchedule, initTimeSchedule, initMultiTask } from "../task/index.js";
@@ -39,42 +39,42 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
     }
     switch (eName) {
       case 'rubbish':
-        content = await api.getRubbishType(msg)
+        content = await getRubbishType(msg)
         break
       case 'mingyan':
-        content = await api.getMingYan()
+        content = await getMingYan()
         break
       case 'sweetword':
-        content = await api.getSweetWord()
+        content = await getSweetWord()
         break
       case 'star':
         let xing = getConstellation(msg)
-        content = await api.getStar(xing)
+        content = await getStar(xing)
         break
       case 'news':
         let newsId = getNewsType(msg)
-        content = await api.getNews(newsId)
+        content = await getNews(newsId)
         break
       case 'xing':
-        content = await api.getXing(msg)
+        content = await getXing(msg)
         break
       case 'skl':
-        content = await api.getSkl(msg)
+        content = await getSkl(msg)
         break
       case 'lunar':
-        content = await api.getLunar(msg)
+        content = await getLunar(msg)
         break
       case 'goldreply':
-        content = await api.getGoldReply(msg)
+        content = await getGoldReply(msg)
         break
       case 'xhy':
-        content = await api.getXhy(msg)
+        content = await getXhy(msg)
         break
       case 'rkl':
-        content = await api.getRkl(msg)
+        content = await getRkl(msg)
         break
       case 'emo':
-        url = await api.getEmo(msg)
+        url = await getEmo(msg)
         type = 2
         break
       case 'meinv':
@@ -82,7 +82,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
         type = 2
         break
       case 'cname':
-        content = await api.getCname()
+        content = await getCname()
         break
       case 'removeRecord': {
         const roomName = await room.topic() // 获取群名
@@ -151,20 +151,6 @@ async function dispatchAiBot(bot, msg, name, id) {
         // 天行机器人
         res = await api.getResByTX(msg, id)
         replys = [{ type: 1, content: res }]
-        break
-      case 1:
-        // 天行图灵机器人
-        res = await api.getResByTXTL(msg, id)
-        replys = [{ type: 1, content: res }]
-        break
-      case 2:
-        // 图灵机器人
-        res = await api.getResByTL(msg, id)
-        replys = [{ type: 1, content: res }]
-        break
-      case 3:
-        // 微信闲聊
-        replys = [{ type: 1, content: '微信闲聊已下线，建议使用微信对话开放平台: https://openai.weixin.qq.com' }]
         break
       case 5:
         // 微信开放对话平台
