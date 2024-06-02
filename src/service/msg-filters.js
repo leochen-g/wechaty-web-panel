@@ -9,6 +9,7 @@ import { getUser } from '../db/userDb.js'
 import { allConfig } from '../db/configDb.js'
 import { getPuppetEol } from '../const/puppet-type.js'
 import dayjs from 'dayjs'
+import {getHistoryByNum, getHistoryByTime} from "../db/chatHistory.js";
 
 async function emptyMsg({ room, isMention }) {
   const config = await allConfig()
@@ -518,6 +519,35 @@ export async function keywordForward({ that, msg, name, id, config, room, isMent
   }
 }
 
+
+export async function summerChat({ that, msg, name, id, config, room, isMention, roomId, roomName  }) {
+  const { role } = config.userInfo
+  const item = config.summerConfig
+  // 如果关闭了 或者关键词没有匹配上 直接不需要总结回复
+  if(!item.open || !checkKeyword(item, msg) || role!=='vip') return [];
+  // 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
+  if ((room && item.needAt === 1 && !isMention) || (room && item.scope === 'friend') || (!room && item.scope === 'room')) {
+    return []
+  }
+  let histories = []
+  if(item.summerType === 'time') {
+    histories = await getHistoryByTime({id: room ? roomId: id, name: room ? roomName: name }, item.summerTime)
+  } else {
+    histories = await getHistoryByNum({id: room ? roomId: id, name: room ? roomName: name }, item.summerNum)
+  }
+  let content = '';
+  for (const item of histories) {
+    if (item.content && item.content !== 'undefined' && item.content !== 'null' && item.content) {
+      content = `${content}\n对话时间:${dayjs.unix(item.time).format('YYYY-MM-DD HH:mm:ss')}:\n用户昵称:${item.chatName}:\n对话内容:${item.content}\n`;
+    }
+  }
+  if(config.debug) {
+    console.log('获取到的聊天内容', content)
+  }
+  const res = await dispatch.dispatchSummerBot({content, config: item, uid: room ? `${roomId}_${id}`: id})
+  return  res;
+}
+
 export { customBot }
 export { callbackEvent }
 export { emptyMsg }
@@ -534,6 +564,7 @@ export { preventWordCheck }
 export { getCustomConfig }
 export default {
   getCustomConfig,
+  summerChat,
   customBot,
   callbackEvent,
   emptyMsg,

@@ -12,6 +12,7 @@ import { reset as cozeReset } from './bot/coze.js'
 import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
 import globalConfig from "../db/global.js";
 import { resetScanTime } from '../handlers/on-scan.js'
+import {clearHistory} from "../db/chatHistory.js";
 
 let mqttclient = null
 
@@ -197,6 +198,11 @@ async function initMqtt(that) {
             console.log('更新批量定时任务')
             await getTasks()
             void initMultiTask(that)
+          } else if(topic === `aibotk/${userId}/history`) {
+            console.log('历史记录操作')
+            if(content.event === 'clear') {
+              clearHistory()
+            }
           }
         })
       }

@@ -5,10 +5,10 @@ import { initTaskLocalSchedule, initTimeSchedule, initMultiTask } from "../task/
 import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { removeRecord } from "../db/roomDb.js";
-import { getGptOfficialReply, reset as officialReset } from "../proxy/openAi.js";
+import { getGptOfficialReply, reset as officialReset, getSimpleGptReply } from "../proxy/openAi.js";
 import { getGptUnOfficialReply, reset } from "../proxy/openAiHook.js";
-import { getDifyReply, reset as difyReset } from "../proxy/difyAi.js";
-import { getCozeReply, reset as cozeReset } from '../proxy/cozeAi.js'
+import { getDifyReply, reset as difyReset, getDifySimpleReply } from "../proxy/difyAi.js";
+import { getCozeReply, reset as cozeReset, getCozeSimpleReply } from '../proxy/cozeAi.js'
 import { outApi } from '../proxy/outapi.js'
 
 /**
@@ -192,9 +192,46 @@ async function dispatchAiBot(bot, msg, name, id) {
     return ''
   }
 }
+
+async function dispatchSummerBot({ content, uid, config}) {
+  try {
+    let res, replys
+    switch (config.botType) {
+      case 6:
+        // ChatGPT-api
+        res = await getSimpleGptReply({content, uid, config, isFastGPT:false})
+        replys = res
+        break
+      case 8:
+        // dify ai
+        res = await getDifySimpleReply({content, uid, config})
+        replys = res
+        break
+      case 9:
+        // fast gpt
+        res =  await getSimpleGptReply({content, uid, config, isFastGPT:true})
+        replys = res
+        break
+      case 11:
+        // coze
+        res = await getCozeSimpleReply({content, uid, config, isFastGPT:true})
+        replys = res
+        break
+      default:
+        replys = [{ type: 1, content: '' }]
+        break
+    }
+    return replys
+  } catch (e) {
+    console.log('群聊总结信息获取失败', e)
+    return ''
+  }
+}
 export { dispatchEventContent }
 export { dispatchAiBot }
+export { dispatchSummerBot }
 export default {
+  dispatchSummerBot,
   dispatchEventContent,
   dispatchAiBot,
 }

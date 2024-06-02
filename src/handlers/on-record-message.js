@@ -1,4 +1,6 @@
-import { allConfig } from '../db/configDb.js'
+import {allConfig} from '../db/configDb.js'
+import {addHistory} from "../db/chatHistory.js";
+import dayjs from "dayjs";
 
 async function onRecordMessage(msg) {
   try {
@@ -12,17 +14,29 @@ async function onRecordMessage(msg) {
     const type = msg.type()
     const isOfficial = contact.type() === this.Contact.Type.Official
     let content = ''
+    if (msgSelf || isOfficial || role !== 'vip') return
     switch (type) {
       case this.Message.Type.Text:
       case this.Message.Type.Url:
         if(type === this.Message.Type.Url) {
           const urlLink = await msg.toUrlLink()
           console.log('urlLink', urlLink)
-          content = `[链接]:${urlLink.url()}`
+          content = `[链接](${urlLink.url()})`
         } else {
           content = msg.text()
         }
         console.log(`记录内容：【${roomName}】发消息人${contactName}:${content}`)
+        const historyItem = {
+          conversionId: room ? room.id : contact.id,
+          conversionName: room ? roomName : contactName,
+          isRoom: !!room,
+          isRobot: false,
+          content: content,
+          chatName: contactName,
+          chatId: contact.id,
+          time: dayjs().unix()
+        }
+        void addHistory(historyItem)
         return
       default:
         break

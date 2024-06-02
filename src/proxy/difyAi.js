@@ -39,3 +39,22 @@ export async function getDifyReply(content, uid) {
     }
     return await difyAi.getReply(content, uid)
 }
+
+
+export async function getDifySimpleReply({content, uid, config}) {
+    if (!config.token) {
+        console.log('请到智能微秘书平台配置聊天总结API Token参数方可使用')
+        return [{ type: 1, content: '请到平台配置API Token参数方可使用' }]
+    }
+    const chatConfig = {
+        token: config.token, // token
+        debug: config.debug,  // 开启调试
+        proxyPass: config.baseUrl, // 反向代理地址
+        showQuestion: false, // 显示原文
+        timeoutMs: config.timeout, // 超时时间 s
+        systemMessage: '', // 预设promotion
+        isAiAgent: true,
+    }
+
+    return await new DifyAi(chatConfig).getReply(content, uid)
+}

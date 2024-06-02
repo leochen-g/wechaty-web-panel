@@ -43,3 +43,24 @@ export async function getGptOfficialReply(content, uid, isFastGPT) {
     }
     return await chatGPT.getReply(content, uid, '', '', isFastGPT)
 }
+
+
+
+export async function getSimpleGptReply({content, uid, config, isFastGPT}) {
+    if (!config.token) {
+        console.log('请到智能微秘书平台配置聊天总结的API Token参数方可使用')
+        return [{ type: 1, content: '请到平台配置聊天总结的API Token参数方可使用' }]
+    }
+    const chatConfig = {
+        token: config.token, // token
+        debug: config.debug,  // 开启调试
+        proxyPass: config.baseUrl, // 反向代理地址
+        proxyUrl: '', // 代理地址
+        showQuestion: false, // 显示原文
+        timeoutMs: config.timeout, // 超时时间 s
+        model: config.model, // 模型
+        systemMessage: config.prompt, // 预设promotion
+    }
+
+    return await new OfficialOpenAi(chatConfig).getReply(content, uid, '', '', isFastGPT)
+}

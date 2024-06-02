@@ -6,6 +6,8 @@ import { formatDate, getDay, groupArray, delay } from '../lib/index.js'
 import { FileBox } from 'file-box'
 import { allConfig } from '../db/configDb.js'
 import { getPuppetEol, isWindowsPlatform } from "../const/puppet-type.js";
+import dayjs from "dayjs";
+import {addHistory} from "../db/chatHistory.js";
 
 async function formatContent(text) {
   text = text.replaceAll('\\n', '\n');
@@ -195,6 +197,30 @@ async function addRoomWelcomeSay(room, roomName, contactName, msg) {
     await room.say(obj)
   }
 }
+
+async function addReplyHistory(that, { content, contact, room }) {
+  const config = await allConfig()
+  const { role } = config.userInfo
+  if(role!=='vip') return
+  const robotInfo = that.currentUser
+  const userSelfName = robotInfo?.name() // 机器人名称
+  const userSelfId = robotInfo?.id // 机器人名称
+
+  const contactName = contact?.name() // 接收消息人昵称
+  const contactId = contact?.id // 接收消息人id
+  const roomName = room ? await room.topic() : '';
+  const historyItem = {
+    conversionId: room ? room.id : contactId,
+    conversionName: room ? roomName : contactName,
+    isRoom: !!room,
+    isRobot: true,
+    content: content,
+    chatName: userSelfName,
+    chatId: userSelfId,
+    time: dayjs().unix()
+  }
+  void addHistory(historyItem)
+}
 /**
  * 群关键词回复
  * @param {*} contact
@@ -216,6 +242,7 @@ async function roomSay(room, contact, msg) {
       const content = await formatContent(msg.content)
       // 文字
       contact ? await room.say(content, contact) : await room.say(content)
+      void addReplyHistory(this, { content, contact: null, room: room } )
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
@@ -225,6 +252,7 @@ async function roomSay(room, contact, msg) {
       // contact ? await room.say('', contact) : ''
       await delay(500)
       await room.say(obj)
+      void addReplyHistory(this, { content: `[文件或图片](${msg.url})`, contact: null, room: room } )
     } else if (msg.type === 3 && msg.url) {
       // bse64文件
       let obj = FileBox.fromDataURL(msg.url, 'room-avatar.jpg')
@@ -241,6 +269,7 @@ async function roomSay(room, contact, msg) {
         url: msg.url,
       })
       await room.say(url)
+      void addReplyHistory(this, { content: `[链接](${msg.url})`, contact: null, room: room } )
     } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl) {
       let miniProgram = new this.MiniProgram({
         appid: msg.appid,
@@ -287,6 +316,7 @@ async function contactSay(contact, msg, isRoom = false) {
       const content = await formatContent(msg.content)
       // 文字
       await contact.say(content)
+      void addReplyHistory(this, { content, contact, room: null } )
     } else if (msg.type === 2 && msg.url) {
       // url文件
       let obj = FileBox.fromUrl(msg.url)
@@ -295,6 +325,7 @@ async function contactSay(contact, msg, isRoom = false) {
         obj =  FileBox.fromUrl(`${AIBOTK_OUTAPI}/convert?url=${msg.url}`)
       }
       await contact.say(obj)
+      void addReplyHistory(this, { content: `[文件或图片](${msg.url})`, contact, room: null } )
     } else if (msg.type === 3 && msg.url) {
       // bse64文件
       let obj = FileBox.fromDataURL(msg.url, 'user-avatar.jpg')
@@ -309,6 +340,7 @@ async function contactSay(contact, msg, isRoom = false) {
         url: msg.url,
       })
       await contact.say(url)
+      void addReplyHistory(this, { content: `[链接](${msg.url})`, contact, room: null } )
     } else if (msg.type === 5 && msg.appid && msg.title && msg.pagePath && msg.description && msg.thumbUrl) {
       let miniProgram = new this.MiniProgram({
         appid: msg.appid,
