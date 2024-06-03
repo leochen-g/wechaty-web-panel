@@ -20,12 +20,10 @@ async function onRecordMessage(msg) {
       case this.Message.Type.Url:
         if(type === this.Message.Type.Url) {
           const urlLink = await msg.toUrlLink()
-          console.log('urlLink', urlLink)
           content = `[链接](${urlLink.url()})`
         } else {
           content = msg.text()
         }
-        console.log(`记录内容：【${roomName}】发消息人${contactName}:${content}`)
         const historyItem = {
           conversionId: room ? room.id : contact.id,
           conversionName: room ? roomName : contactName,
