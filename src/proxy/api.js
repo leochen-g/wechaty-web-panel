@@ -137,8 +137,9 @@ export async function getTXweather(city) {
     let option = {
       method: 'GET', url: 'tianqi', params: { city: city }
     }
-    let todayInfo = await txReq(option)
-
+    const res = await txReq(option)
+    let todayInfo = res.list[0];
+    console.log('todayInfo', todayInfo)
     let obj = {
       weatherTips: todayInfo.tips,
       todayWeather: `今天:${todayInfo.weather}${eol}温度:${todayInfo.lowest}/${todayInfo.highest}${eol}${todayInfo.wind} ${todayInfo.windspeed}${eol}${eol}`

@@ -239,6 +239,7 @@ async function getConfig() {
       friendNoReplyInRoom: 0,
       defaultReply: '',
       forwards: [],
+      openRecord: false,
       ...config,
       cloudRoom
     })

@@ -14,7 +14,7 @@ async function onRecordMessage(msg) {
     const type = msg.type()
     const isOfficial = contact.type() === this.Contact.Type.Official
     let content = ''
-    if (msgSelf || isOfficial || role !== 'vip') return
+    if (msgSelf || isOfficial || role !== 'vip' || !config.openRecord) return
     switch (type) {
       case this.Message.Type.Text:
       case this.Message.Type.Url:

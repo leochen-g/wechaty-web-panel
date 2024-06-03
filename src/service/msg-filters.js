@@ -536,16 +536,22 @@ export async function summerChat({ that, msg, name, id, config, room, isMention,
     histories = await getHistoryByNum({id: room ? roomId: id, name: room ? roomName: name }, item.summerNum)
   }
   let content = '';
-  for (const item of histories) {
-    if (item.content && item.content !== 'undefined' && item.content !== 'null' && item.content) {
-      content = `${content}\n对话时间:${dayjs.unix(item.time).format('YYYY-MM-DD HH:mm:ss')}:\n用户昵称:${item.chatName}:\n对话内容:${item.content}\n`;
+  if(histories.length) {
+    for (const item of histories) {
+      if (item.content && item.content !== 'undefined' && item.content !== 'null' && item.content) {
+        content = `${content}\n对话时间:${dayjs.unix(item.time).format('YYYY-MM-DD HH:mm:ss')}:\n用户昵称:${item.chatName}:\n对话内容:${item.content}\n`;
+      }
     }
+    if(config.debug) {
+      console.log('获取到的聊天内容', content)
+    }
+    console.log('开始总结聊天内容')
+    const res = await dispatch.dispatchSummerBot({content, config: item, uid: room ? `${roomId}_${id}`: id})
+    return  res;
+  } else {
+    console.log('没有获取到任何聊天记录内容，无法进行总结，请确认已经开启聊天记录')
+    return [{type: 1, content: ''}]
   }
-  if(config.debug) {
-    console.log('获取到的聊天内容', content)
-  }
-  const res = await dispatch.dispatchSummerBot({content, config: item, uid: room ? `${roomId}_${id}`: id})
-  return  res;
 }
 
 export { customBot }

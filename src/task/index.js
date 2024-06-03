@@ -152,14 +152,14 @@ async function  sendCustomContent ({ that, target, type, item, isMulti, targets 
 
   if (!isMulti) {
     for(const reply of contents) {
-      await contactSay(target, reply)
+      await contactSay.call(that, target, reply)
       await delay(200)
     }
   } else {
     for (let single of targets) {
       try {
         for(const reply of contents) {
-          type === 'room' ? await roomSay(single, '', reply): await contactSay(single, reply)
+          type === 'room' ? await roomSay.call(that, single, '', reply): await contactSay.call(that,single, reply)
           await delay(200)
         }
         if (item.delay) {

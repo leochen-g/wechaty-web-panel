@@ -202,9 +202,9 @@ async function addReplyHistory(that, { content, contact, room }) {
   const config = await allConfig()
   const { role } = config.userInfo
   if(role!=='vip') return
-  const robotInfo = that.currentUser
-  const userSelfName = robotInfo?.name() // 机器人名称
-  const userSelfId = robotInfo?.id // 机器人名称
+  const robotInfo = that?.currentUser || {}
+  const userSelfName = robotInfo?.name() || '' // 机器人名称
+  const userSelfId = robotInfo?.id || '' // 机器人名称
 
   const contactName = contact?.name() // 接收消息人昵称
   const contactId = contact?.id // 接收消息人id
