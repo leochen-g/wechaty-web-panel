@@ -8,6 +8,29 @@ Wechaty Web Panel 插件，让你的 Wechaty 机器人快速接入 web 控制面
 
 本项目为插件源码，非直接运行的项目。如需可直接运行的项目，请直接拉取 [https://github.com/leochen-g/wechat-assistant-pro](https://github.com/leochen-g/wechat-assistant-pro) 即可
 
+## 快速测试
+
+### 下载源码并安装依赖
+
+```sh
+git clone https://github.com/leochen-g/wechaty-web-panel.git
+cd wechaty-web-panel
+npm install # 可指定淘宝镜像源加速: --registry=https://registry.npmmirror.com
+```
+
+### 测试微信
+
+在 test/wechat.js文件中填入apiKey与apiSecret，运行如下命令
+```sh
+npm run test:wechat
+```
+
+### 测试企业微信
+需要有企业微信token，在test/wework.js填入workProToken、apiKey与apiSecret，运行如下命令
+```sh
+npm run test:wework
+```
+
 ## 面板主要功能
 
 * 定时提醒
