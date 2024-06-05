@@ -1,4 +1,4 @@
-import { getRubbishType, getMingYan, getSweetWord, getStar, getNews, getXing, getSkl, getLunar, getGoldReply, getXhy, getRkl, getEmo, getCname } from '../proxy/api.js'
+import { getRubbishType, getMingYan, getSweetWord, getStar, getNews, getXing, getSkl, getLunar, getGoldReply, getXhy, getRkl, getEmo, getCname, getResByTX } from '../proxy/api.js'
 import { getConfig, getMeiNv, getWordCloudConfig, getCustomEvents } from '../proxy/aibotk.js'
 import { getConstellation, msgArr, getNewsType } from '../lib/index.js'
 import { initTaskLocalSchedule, initTimeSchedule, initMultiTask } from "../task/index.js";
@@ -149,7 +149,7 @@ async function dispatchAiBot(bot, msg, name, id) {
     switch (bot) {
       case 0:
         // 天行机器人
-        res = await api.getResByTX(msg, id)
+        res = await getResByTX(msg, id)
         replys = [{ type: 1, content: res }]
         break
       case 5:
