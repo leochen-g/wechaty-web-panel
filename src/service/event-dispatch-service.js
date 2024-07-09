@@ -143,7 +143,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
  * @param {*} name 发消息人
  * @param {*} id 发消息人id
  */
-async function dispatchAiBot(bot, msg, name, id) {
+async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, roomName }) {
   try {
     let res, replys
     switch (bot) {
@@ -169,12 +169,12 @@ async function dispatchAiBot(bot, msg, name, id) {
         break
       case 8:
         // dify ai
-        res = await getDifyReply(msg, id)
+        res = await getDifyReply({ content: msg, id, inputs: { uid, uname, roomId, roomName } })
         replys = res
         break
       case 9:
         // fast gpt
-        res = await getGptOfficialReply(msg, id, true)
+        res = await getGptOfficialReply(msg, id, true, { uid, uname, roomId, roomName })
         replys = res
         break
       case 11:
@@ -193,28 +193,28 @@ async function dispatchAiBot(bot, msg, name, id) {
   }
 }
 
-async function dispatchSummerBot({ content, uid, config}) {
+async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, config}) {
   try {
     let res, replys
     switch (config.botType) {
       case 6:
         // ChatGPT-api
-        res = await getSimpleGptReply({content, uid, config, isFastGPT:false})
+        res = await getSimpleGptReply({content, uid: id, config, isFastGPT:false})
         replys = res
         break
       case 8:
         // dify ai
-        res = await getDifySimpleReply({content, uid, config})
+        res = await getDifySimpleReply({content, id, inputs: { uid, uname, roomId, roomName }, config})
         replys = res
         break
       case 9:
         // fast gpt
-        res =  await getSimpleGptReply({content, uid, config, isFastGPT:true})
+        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, uname, roomId, roomName } })
         replys = res
         break
       case 11:
         // coze
-        res = await getCozeSimpleReply({content, uid, config, isFastGPT:true})
+        res = await getCozeSimpleReply({content, uid: id, config, isFastGPT:true})
         replys = res
         break
       default:

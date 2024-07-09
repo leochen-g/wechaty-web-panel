@@ -17,7 +17,7 @@ export function resetAll() {
   })
   chatGPT = {}
 }
-export async function getChatGPTReply(content, uid, adminId, config = { token: "", debug: false, proxyPass: "", proxyUrl: "", showQuestion: false, timeoutMs: 80, model: "", systemMessage: "", keywordSystemMessages: [] }, isFastGPT) {
+export async function getChatGPTReply({ content, variables }, uid, adminId, config = { token: "", debug: false, proxyPass: "", proxyUrl: "", showQuestion: false, timeoutMs: 80, model: "", systemMessage: "", keywordSystemMessages: [] }, isFastGPT) {
     if (!config.token) {
       console.log('请到智能微秘书平台配置Openai apikey参数方可使用')
       return [{ type: 1, content: '请到平台配置Openai apikey参数方可使用' }]
@@ -36,5 +36,5 @@ export async function getChatGPTReply(content, uid, adminId, config = { token: "
         content = content.replace(finalSystemMsg.keyword, '')
       }
     }
-    return await chatGPT[adminId].getReply(content, uid, adminId, systemMessage, isFastGPT)
+    return await chatGPT[adminId].getReply(content, uid, adminId, systemMessage, isFastGPT, variables)
 }

@@ -251,7 +251,7 @@ async function keywordsMsg({ msg, config, room, isMention }) {
   }
 }
 
-async function robotMsg({ msg, name, id, config, isMention, room, roomId, isFriend }) {
+async function robotMsg({ msg, name, id, config, isMention, roomName, room, roomId, isFriend }) {
   // 如果群里没有提及不开启机器人聊天
   if (room && !isMention && config.roomAt || room && !isMention && !config.roomAt && isFriend && config.friendNoReplyInRoom) {
     return []
@@ -260,7 +260,7 @@ async function robotMsg({ msg, name, id, config, isMention, room, roomId, isFrie
       let msgArr = [] // 返回的消息列表
       if (config.autoReply) {
         console.log('开启了机器人自动回复功能')
-        msgArr = await dispatch.dispatchAiBot(config.defaultBot, msg, name, `${roomId ? roomId + '_' : ''}${id}`)
+        msgArr = await dispatch.dispatchAiBot({ bot: config.defaultBot, msg, name, uname: name, uid: id, roomName: roomName || '',  roomId: roomId || '', id: `${roomId ? roomId + '_' : ''}${id}` })
       } else {
         console.log('没有开启机器人自动回复功能')
         msgArr = [{ type: 1, content: '', url: '' }]
@@ -344,9 +344,13 @@ async function customChat({ msg, name, id, config, isMention, room, roomId, room
               const msgArr = await dispatchBot({
                 botType: finalConfig.robotType,
                 content: msg,
-                uid: `${roomId ? roomId + '_' : ''}${id}`,
+                id: `${roomId ? roomId + '_' : ''}${id}`,
                 adminId: finalConfig.id,
-                config: finalConfig.botConfig
+                config: finalConfig.botConfig,
+                uid: id,
+                uname: name,
+                roomId,
+                roomName
               })
               if (msgArr.length) return msgArr
               console.log('自定义回复获取内容失败，启用全局配置')
@@ -546,7 +550,7 @@ export async function summerChat({ that, msg, name, id, config, room, isMention,
       console.log('获取到的聊天内容', content)
     }
     console.log('开始总结聊天内容')
-    const res = await dispatch.dispatchSummerBot({content, config: item, uid: room ? `${roomId}_${id}`: id})
+    const res = await dispatch.dispatchSummerBot({content, config: item, uid: id, uname: name, roomId: roomId, roomName,  id: room ? `${roomId ? roomId + '_' : ''}${id}`: id})
     return  res;
   } else {
     console.log('没有获取到任何聊天记录内容，无法进行总结，请确认已经开启聊天记录')

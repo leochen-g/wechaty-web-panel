@@ -12,7 +12,7 @@ export function reset() {
   }
 }
 
-export async function getGptOfficialReply(content, uid, isFastGPT) {
+export async function getGptOfficialReply(content, uid, isFastGPT, variables) {
     const config = await allConfig()
     if (!config.gpttoken) {
       console.log('请到智能微秘书平台配置Openai apikey参数方可使用')
@@ -41,12 +41,12 @@ export async function getGptOfficialReply(content, uid, isFastGPT) {
     if(!chatGPT) {
       chatGPT = new OfficialOpenAi(chatConfig)
     }
-    return await chatGPT.getReply(content, uid, '', '', isFastGPT)
+    return await chatGPT.getReply(content, uid, '', '', isFastGPT, variables)
 }
 
 
 
-export async function getSimpleGptReply({content, uid, config, isFastGPT}) {
+export async function getSimpleGptReply({content, uid, config, isFastGPT, variables}) {
     if (!config.token) {
         console.log('请到智能微秘书平台配置聊天总结的API Token参数方可使用')
         return [{ type: 1, content: '请到平台配置聊天总结的API Token参数方可使用' }]
@@ -62,5 +62,5 @@ export async function getSimpleGptReply({content, uid, config, isFastGPT}) {
         systemMessage: config.prompt, // 预设promotion
     }
 
-    return await new OfficialOpenAi(chatConfig).getReply(content, uid, '', '', isFastGPT)
+    return await new OfficialOpenAi(chatConfig).getReply(content, uid, '', '', isFastGPT, variables)
 }

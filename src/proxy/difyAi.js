@@ -12,7 +12,7 @@ export function reset() {
   }
 }
 
-export async function getDifyReply(content, uid) {
+export async function getDifyReply({ content, id, inputs}) {
     const config = await allConfig()
     if (!config.dify_token) {
       console.log('请到智能微秘书平台配置difyAi apikey参数方可使用')
@@ -37,11 +37,11 @@ export async function getDifyReply(content, uid) {
     if(!difyAi) {
       difyAi = new DifyAi(chatConfig)
     }
-    return await difyAi.getReply(content, uid)
+    return await difyAi.getReply({ content, inputs }, id)
 }
 
 
-export async function getDifySimpleReply({content, uid, config}) {
+export async function getDifySimpleReply({content, id, inputs, config}) {
     if (!config.token) {
         console.log('请到智能微秘书平台配置聊天总结API Token参数方可使用')
         return [{ type: 1, content: '请到平台配置API Token参数方可使用' }]
@@ -56,5 +56,5 @@ export async function getDifySimpleReply({content, uid, config}) {
         isAiAgent: true,
     }
 
-    return await new DifyAi(chatConfig).getReply(content, uid)
+    return await new DifyAi(chatConfig).getReply({content, inputs }, id)
 }

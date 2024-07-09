@@ -61,7 +61,7 @@ class DifyAi {
   }
 
 
-  async getReply(content, uid, adminId = '', systemMessage = '') {
+  async getReply({ content, inputs }, id, adminId = '', systemMessage = '') {
     try {
       if(!this.difyChat) {
         console.log('启用Dify对话平台');
@@ -76,12 +76,12 @@ class DifyAi {
       }
       if(systemMessage || content === 'reset' || content === '重置') {
         console.log('重新更新上下文对话');
-        this.chatOption[uid] = {}
+        this.chatOption[id] = {}
         if(content === 'reset' || content === '重置') {
           return [{type: 1, content: '上下文已重置'}]
         }
       }
-      const { conversationId, text, files } = systemMessage ? await this.difyChat.sendMessage(content, { ...this.chatOption[uid], systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid }) : await this.difyChat.sendMessage(content, { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: uid });
+      const { conversationId, text, files } = systemMessage ? await this.difyChat.sendMessage(content, { ...this.chatOption[id], inputs,  systemMessage, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: id }) : await this.difyChat.sendMessage(content, { ...this.chatOption[id], inputs, timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000, user: id });
       if(this.config.filter) {
         const censor = await this.contentCensor.checkText(text)
         if(!censor) {
@@ -90,11 +90,11 @@ class DifyAi {
         }
       }
       if(this.config.record) {
-        void addAichatRecord({ contactId: uid, adminId, input: content, output: text, time: dayjs().format('YYYY-MM-DD HH:mm:ss') })
+        void addAichatRecord({ contactId: id, adminId, input: content, output: text, time: dayjs().format('YYYY-MM-DD HH:mm:ss') })
       }
       // 保存对话id 对于同一个用户的对话不更新conversationId
-      if(!this.chatOption[uid]?.conversationId) {
-        this.chatOption[uid] = {
+      if(!this.chatOption[id]?.conversationId) {
+        this.chatOption[id] = {
             conversationId
         };
       }

@@ -146,10 +146,12 @@ export class CompletionClient extends DifyClient {
 
 export class ChatClient extends DifyClient {
   async sendMessage(query, {
-    systemMessage, user, conversationId = null, timeoutMs = 100 * 1000, files = null
+    systemMessage, user, conversationId = null, timeoutMs = 100 * 1000, files = null, inputs
   }) {
     const data = {
-      inputs: {},
+      inputs: {
+        ...inputs
+      },
       query,
       user,
       response_mode: this.stream ? 'streaming' : 'blocking',

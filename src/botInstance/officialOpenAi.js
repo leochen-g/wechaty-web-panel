@@ -136,7 +136,7 @@ class OfficialOpenAi {
   }
 
 
-  async getReply(content, uid, adminId = '', systemMessage = '', isFastGPT) {
+  async getReply(content, uid, adminId = '', systemMessage = '', isFastGPT, variables) {
     try {
       if(!this.chatGPT) {
         console.log(isFastGPT ? '看到此消息说明启用了FastGPT' : '看到此消息说明已启用ChatGPT');
@@ -164,9 +164,14 @@ class OfficialOpenAi {
         }
       }
 
+
       const sendParams = { ...this.chatOption[uid], timeoutMs: this.config.timeoutMs * 1000 || 80 * 1000 }
       if(systemMessage) {
         sendParams.systemMessage = systemMessage;
+      }
+
+      if(isFastGPT && variables) {
+        sendParams.variables = variables
       }
 
       const { conversationId, text, id } = await this.chatGPT.sendMessage(content, sendParams);

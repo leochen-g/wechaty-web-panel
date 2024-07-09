@@ -158,7 +158,8 @@ let ChatGPTAPI = class {
       stream = !!onProgress,
       completionParams,
       conversationId,
-      chatId
+      chatId,
+      variables
     } = opts;
     let { abortSignal } = opts;
     let abortController = null;
@@ -201,6 +202,9 @@ let ChatGPTAPI = class {
         };
         if(chatId) {
           body.chatId = chatId
+        }
+        if(variables) {
+          body.variables = variables
         }
         if (this._apiOrg) {
           headers["OpenAI-Organization"] = this._apiOrg;

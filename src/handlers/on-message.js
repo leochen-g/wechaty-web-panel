@@ -103,9 +103,16 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         break
       case that.Message.Type.Audio:
         let finalConfig = await getCustomConfig({ name, id: contact.id, roomName: '', roomId: '', room: false, type: 'openWhisper' })
+        if(!finalConfig && config?.customBot?.openWhisper) {
+          finalConfig = {
+            botConfig: {
+              whisperConfig: config?.customBot?.whisperConfig
+            }
+          }
+        }
         if(finalConfig) {
           const audioFileBox = await msg.toFileBox()
-          const text = await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
+          const text = msg.text().trim() ? msg.text().trim() : await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
           console.log('语音解析结果', text)
           const keyword = finalConfig.botConfig.whisperConfig?.keywords?.length ? finalConfig.botConfig?.whisperConfig.keywords?.find((item) => text.includes(item)): true;
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages)
@@ -161,9 +168,6 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         }
         break
       case that.Message.Type.Video:
-        console.log(`发消息人${await contact.name()}:发了一个视频`)
-        break
-      case that.Message.Type.Audio:
         console.log(`发消息人${await contact.name()}:发了一个视频`)
         break
       case that.Message.Type.MiniProgram:
@@ -313,9 +317,16 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
       case that.Message.Type.Audio:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个语音`)
         let finalConfig = await getCustomConfig({ name: contactName, id: contactId, roomName, roomId: room.id, room, type: 'openWhisper' })
+        if(!finalConfig && config?.customBot?.openWhisper) {
+          finalConfig = {
+            botConfig: {
+              whisperConfig: config?.customBot?.whisperConfig
+            }
+          }
+        }
         if(finalConfig) {
           const audioFileBox = await msg.toFileBox()
-          const text = await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
+          const text = msg.text().trim() ? msg.text().trim() : await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
           console.log('语音解析结果', text)
           const keyword = finalConfig.botConfig.whisperConfig?.keywords?.length ? finalConfig.botConfig?.whisperConfig?.keywords?.find((item) => text.includes(item)): true;
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages)
@@ -337,7 +348,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
               }
               return
             }
-            replys = await await getRoomTextReply({
+            replys = await getRoomTextReply({
               that,
               content: text,
               isFriend,
