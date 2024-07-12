@@ -143,7 +143,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
  * @param {*} name 发消息人
  * @param {*} id 发消息人id
  */
-async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, roomName }) {
+async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias, roomName }) {
   try {
     let res, replys
     switch (bot) {
@@ -169,12 +169,12 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, roomName 
         break
       case 8:
         // dify ai
-        res = await getDifyReply({ content: msg, id, inputs: { uid, uname, roomId, roomName } })
+        res = await getDifyReply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName } })
         replys = res
         break
       case 9:
         // fast gpt
-        res = await getGptOfficialReply(msg, id, true, { uid, uname, roomId, roomName })
+        res = await getGptOfficialReply(msg, id, true, { uid, uname, ualias: userAlias, roomId, roomName })
         replys = res
         break
       case 11:
@@ -193,7 +193,7 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, roomName 
   }
 }
 
-async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, config}) {
+async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, userAlias, config}) {
   try {
     let res, replys
     switch (config.botType) {
@@ -204,12 +204,12 @@ async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, co
         break
       case 8:
         // dify ai
-        res = await getDifySimpleReply({content, id, inputs: { uid, uname, roomId, roomName }, config})
+        res = await getDifySimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName }, config})
         replys = res
         break
       case 9:
         // fast gpt
-        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, uname, roomId, roomName } })
+        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, ualias: userAlias, uname, roomId, roomName } })
         replys = res
         break
       case 11:

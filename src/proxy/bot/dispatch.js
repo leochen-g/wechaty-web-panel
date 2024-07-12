@@ -10,7 +10,7 @@ import globalConfig from '../../db/global.js'
  * @param {botType: 机器人类别, content: 消息内容, uid: 说话的用户id, updateId: 更新的用户id, adminId: 对话实例id，用于分割不同配置, config: 机器人配置}
  * @returns
  */
-export async function dispatchBot({botType, content, id, uid, uname, roomId, roomName, adminId, config}) {
+export async function dispatchBot({botType, userAlias, content, id, uid, uname, roomId, roomName, adminId, config}) {
    console.log('进入定制机器人回复');
     try {
       const gptConfig = globalConfig.getGptConfigById(adminId);
@@ -30,12 +30,12 @@ export async function dispatchBot({botType, content, id, uid, uname, roomId, roo
         case 8:
           // dify ai
           console.log('进入Dify聊天');
-          res = await getDifyAiReply({ content, inputs: { uid, uname, roomId, roomName } }, id, adminId, config)
+          res = await getDifyAiReply({ content, inputs: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config)
           replys = res
           break
         case 9:
           // fastGPT api
-          res = await getChatGPTReply({ content, variables: { uid, uname, roomId, roomName } }, id, adminId, config, true)
+          res = await getChatGPTReply({ content, variables: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config, true)
           replys = res
           break
         case 11:

@@ -5,7 +5,7 @@ import globalConfig from '../db/global.js'
 
 let gpt4vRes = ''
 
-export async function getGpt4vChat({ room, roomId, roomName, isMention, msgContent, name, id, uniqueId, that }) {
+export async function getGpt4vChat({ room, roomId, roomName, isMention, userAlias, msgContent, name, id, uniqueId, that }) {
   if (!gpt4vRes) {
     gpt4vRes = new BotManage(100, that)
   }

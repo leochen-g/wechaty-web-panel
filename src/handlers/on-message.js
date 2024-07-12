@@ -47,6 +47,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
     const type = msg.type()
     const contact = msg.talker() // 发消息人
     const name = await contact.name()
+    const userAlias = await contact.alias() || '';
     const isOfficial = contact.type() === that.Contact.Type.Official
     let content = ''
     let replys = []
@@ -82,6 +83,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
               id: contact.id,
               roomName: '',
               isMention: false,
+              userAlias,
               name,
               msgContent: { type: 1, content }
             })
@@ -156,6 +158,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
           id: contact.id,
           uniqueId: contact.id,
           roomName: '',
+          userAlias,
           isMention: false,
           name,
           msgContent: { type: 3, id: msg.id }
@@ -214,6 +217,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     let contactId = contact.id
     let contactAvatar = await contact.avatar()
     const userSelfName = that.currentUser?.name() || that.userSelf()?.name()
+    const userAlias = await room?.alias(contact) || await contact.alias() || ''
 
     switch (type) {
       case that.Message.Type.Text:
@@ -247,6 +251,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           roomName,
           isMention: mentionSelf,
           name: contactName,
+          userAlias,
           msgContent: { type: 1, content }
         })
         if (gpt4vReplys.length) {
@@ -261,6 +266,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           content,
           isFriend,
           name: contactName,
+          userAlias,
           id: contactId,
           roomId: room.id,
           avatar: contactAvatar,
@@ -357,6 +363,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
               roomId: room.id,
               avatar: contactAvatar,
               room,
+              userAlias,
               roomName,
               isMention: true
             })
