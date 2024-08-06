@@ -6,13 +6,14 @@ import { dispatchEventContent } from '../service/event-dispatch-service.js'
 import { sendTaskMessage, initMultiTask, sendMultiTaskMessage } from "../task/index.js";
 import { delay, randomRange } from "../lib/index.js";
 import { reset } from './bot/chatgpt.js'
-import { reset as webReset } from './bot/chatgpt-web.js'
 import { reset as difyReset } from './bot/dify.js'
 import { reset as cozeReset } from './bot/coze.js'
+import { reset as qanyReset } from './bot/qany.js'
+import { reset as cozeV3Reset } from './bot/cozev3.js'
 import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
 import globalConfig from "../db/global.js";
 import { resetScanTime } from '../handlers/on-scan.js'
-import {clearHistory} from "../db/chatHistory.js";
+import { clearHistory } from "../db/chatHistory.js";
 
 let mqttclient = null
 
@@ -186,9 +187,10 @@ async function initMqtt(that) {
             if(content.event === 'update' || content.event === 'delete') {
               console.log('更新自定义对话配置，重置对话')
               reset(content.updateId)
-              webReset(content.updateId)
               difyReset(content.updateId)
               cozeReset(content.updateId)
+              qanyReset(content.updateId)
+              cozeV3Reset(content.updateId)
             }
           } else if(topic === `aibotk/${userId}/rssconfig`) {
             console.log('更新rss配置')

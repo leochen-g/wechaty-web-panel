@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.6.59",
+  "version": "1.6.60",
   "description": "智能微秘书插件",
   "exports": {
     ".": {
@@ -51,21 +51,21 @@
   "devDependencies": {
     "@chatie/semver": "^0.4.7",
     "@chatie/tsconfig": "^4.6.3",
+    "@grpc/grpc-js": "1.9.14",
+    "@juzi/wechaty": "^1.0.87",
+    "@juzi/wechaty-puppet": "^1.0.78",
+    "@juzi/wechaty-puppet-service": "^1.0.87",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.4.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
-    "@juzi/wechaty": "^1.0.87",
-    "@grpc/grpc-js": "1.9.14",
-    "@juzi/wechaty-puppet": "^1.0.78",
-    "@juzi/wechaty-puppet-service": "^1.0.87",
     "wechaty": "^1.20.2",
-    "wechaty-puppet-service": "^1.18.2",
-    "wechaty-puppet-wechat4u": "^1.14.12",
+    "wechaty-puppet": "^1.21.1",
     "wechaty-puppet-padlocal": "^1.20.1",
-    "wechaty-puppet": "^1.21.1"
+    "wechaty-puppet-service": "^1.18.2",
+    "wechaty-puppet-wechat4u": "^1.14.12"
   },
   "readme": "README.md",
   "engines": {
@@ -73,6 +73,7 @@
     "npm": ">=7"
   },
   "dependencies": {
+    "@coze/coze-js": "^0.1.2",
     "@dqbd/tiktoken": "^1.0.2",
     "axios": "^1.6.6",
     "baidu-aip-sdk": "^4.16.10",

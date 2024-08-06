@@ -41,7 +41,7 @@ async function onLogin(user) {
       file = await user.avatar()
       if(file) {
         const base = await file.toBase64()
-        avatarUrl = base ? await putqn(base, userId):''
+        avatarUrl = base ? await putqn(base, userInfo.robotId):''
       } else {
         console.log('头像未获取到，不影响项目正常使用')
       }

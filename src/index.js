@@ -45,7 +45,7 @@ function WechatyWebPanelPlugin(config = { apiKey, apiSecret, scanTimes }) {
     ignoreMessages: config.ignoreMessages || [],
     // 需要忽略的事件 ['scan', 'login', 'logout', 'friendship', 'room-join', 'room-topic', 'room-leave', 'message', 'ready', 'heartbeat', 'error']
     ignoreEvents: config.ignoreEvents || [],
-    scanTimes: config.scanTimes || 50
+    scanTimes: config.scanTimes || 800
   }
   globalConfig.setApikey(initConfig.apiKey)
   addAibotConfig(initConfig)

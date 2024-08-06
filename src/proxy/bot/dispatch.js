@@ -1,7 +1,8 @@
 import { getChatGPTReply } from "./chatgpt.js";
-import { getChatGPTWebReply } from "./chatgpt-web.js";
 import { getDifyAiReply } from "./dify.js";
 import { getCozeReply } from './coze.js'
+import { getCozeV3AiReply } from './cozev3.js'
+import { getQAnyReply } from './qany.js'
 import { updateChatRecord } from "../aibotk.js";
 import globalConfig from '../../db/global.js'
 
@@ -21,12 +22,6 @@ export async function dispatchBot({botType, userAlias, content, id, uid, uname, 
           res = await getChatGPTReply({ content }, id, adminId, config, false)
           replys = res
           break
-        case 7:
-          // ChatGPT web
-          console.log('进入聊天');
-          res = await getChatGPTWebReply(content, id, adminId, config)
-          replys = res
-          break
         case 8:
           // dify ai
           console.log('进入Dify聊天');
@@ -35,12 +30,26 @@ export async function dispatchBot({botType, userAlias, content, id, uid, uname, 
           break
         case 9:
           // fastGPT api
+          console.log('进入FastGPT聊天');
           res = await getChatGPTReply({ content, variables: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config, true)
           replys = res
           break
         case 11:
           // coze api
+          console.log('进入Coze V2聊天');
           res = await getCozeReply(content, id, adminId, config)
+          replys = res
+          break
+        case 12:
+          // coze v3 api
+          console.log('进入Coze V3聊天');
+          res = await getCozeV3AiReply({ content, inputs: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config)
+          replys = res
+          break
+        case 13:
+          // QAnything api
+          console.log('进入有道QAnything聊天');
+          res = await getQAnyReply(content, id, adminId, config)
           replys = res
           break
         default:

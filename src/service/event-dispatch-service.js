@@ -6,9 +6,10 @@ import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../comm
 import { getTencentOpenReply } from '../proxy/tencent-open.js'
 import { removeRecord } from "../db/roomDb.js";
 import { getGptOfficialReply, reset as officialReset, getSimpleGptReply } from "../proxy/openAi.js";
-import { getGptUnOfficialReply, reset } from "../proxy/openAiHook.js";
 import { getDifyReply, reset as difyReset, getDifySimpleReply } from "../proxy/difyAi.js";
+import { getCozeV3Reply, reset as cozeV3Reset, getCozeV3SimpleReply } from "../proxy/cozeV3Ai.js";
 import { getCozeReply, reset as cozeReset, getCozeSimpleReply } from '../proxy/cozeAi.js'
+import { getQAnyReply, reset as qanyReset, getQAnySimpleReply } from '../proxy/qAnyAi.js'
 import { outApi } from '../proxy/outapi.js'
 
 /**
@@ -121,10 +122,11 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
         await initTaskLocalSchedule(that)
         await initTimeSchedule(that)
         await initMultiTask(that)
-        reset();
         officialReset();
         difyReset();
         cozeReset();
+        qanyReset();
+        cozeV3Reset();
         content = '更新配置成功，请稍等一分钟后生效'
         break
       default:
@@ -162,11 +164,6 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
         res = await getGptOfficialReply(msg, id, false)
         replys = res
         break
-      case 7:
-        // ChatGPT-hook
-        res = await getGptUnOfficialReply(msg, id)
-        replys = res
-        break
       case 8:
         // dify ai
         res = await getDifyReply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName } })
@@ -180,6 +177,16 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
       case 11:
         // coze
         res = await getCozeReply(msg, id)
+        replys = res
+        break
+      case 12:
+        // coze v3
+        res = await getCozeV3Reply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName } })
+        replys = res
+        break
+      case 13:
+        // QAnything
+        res = await getQAnyReply(msg, id)
         replys = res
         break
       default:
@@ -215,6 +222,11 @@ async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, us
       case 11:
         // coze
         res = await getCozeSimpleReply({content, uid: id, config, isFastGPT:true})
+        replys = res
+        break
+      case 12:
+        // coze v3
+        res = await getCozeV3SimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName }, config})
         replys = res
         break
       default:
