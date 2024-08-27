@@ -548,7 +548,8 @@ export async function summerChat({ that, msg, name, id, config, room, userAlias,
         content = `${content}\n对话时间:${dayjs.unix(item.time).format('YYYY-MM-DD HH:mm:ss')}:\n用户昵称:${item.chatName}:\n对话内容:${item.content}\n`;
       }
     }
-    if(config.debug) {
+
+    if(item?.debug) {
       console.log('获取到的聊天内容', content)
     }
     console.log('开始总结聊天内容')

@@ -69,40 +69,44 @@ class CozeClient {
   }
 
   async sendRequest({ method, endpoint, data, params, stream = false, headerParams = {}, timeoutMs = 100 * 1000 }) {
-    const headers = {
-      ...{
-        Authorization: `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      ...headerParams,
-    };
+    try {
+      const headers = {
+        ...{
+          Authorization: `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        ...headerParams,
+      };
 
-    const url = `${this.baseUrl}${endpoint}`;
-    let response;
-    if (this.debug) {
-      console.log('request', url, { data, headers, params });
-    }
-    if (!stream) {
-      response = await axios.request({
-        method,
-        url,
-        data: data || {},
-        params: params || {},
-        headers,
-        timeout: timeoutMs,
-      });
-    } else {
-      response = await axios({
-        method,
-        url,
-        data,
-        params,
-        headers,
-        responseType: 'stream',
-      });
-    }
+      const url = `${this.baseUrl}${endpoint}`;
+      let response;
+      if (this.debug) {
+        console.log('request', url, { data, headers, params });
+      }
+      if (!stream) {
+        response = await axios.request({
+          method,
+          url,
+          data: data || {},
+          params: params || {},
+          headers,
+          timeout: timeoutMs,
+        });
+      } else {
+        response = await axios({
+          method,
+          url,
+          data,
+          params,
+          headers,
+          responseType: 'stream',
+        });
+      }
 
-    return response;
+      return response;
+    } catch (e) {
+      console.log('请求报错', e)
+    }
   }
 
   async getConversationId({ messages, timeoutMs }) {

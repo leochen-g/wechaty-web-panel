@@ -9,6 +9,7 @@ import { extractImageLinks } from '../lib/index.js'
 
 class CozeV3Ai {
   constructor(config = {
+    botId: '',
     isAiAgent: false, // 是否为 ai agent 模式
     showDownloadUrl: false, // 显示文件下载链接
     token: '', // api 秘钥

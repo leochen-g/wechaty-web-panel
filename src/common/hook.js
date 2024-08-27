@@ -42,7 +42,12 @@ export async function privateForward({ that, msg, name, config }) {
             if(item.type === 1 && msg.type() === 7) {
                 contact && msg && msg.forward(contact)
             } else {
-              contact && msg && msg.forward(contact)
+              if(msg.type() === 6) {
+                const file = await msg.toFileBox()
+                contact.say(file)
+              } else {
+                contact && msg && msg.forward(contact)
+              }
             }
           }
         }
