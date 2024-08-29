@@ -6,10 +6,11 @@ import { allConfig } from '../db/configDb.js'
 import { getAibotConfig } from '../db/aiDb.js'
 import { addRoomRecord } from '../db/roomDb.js'
 import { privateForward } from '../common/hook.js'
-import { getPuppetEol } from '../const/puppet-type.js'
+import {getPuppetEol } from '../const/puppet-type.js'
 import { getGpt4vChat } from '../service/gpt4vService.js'
 import { getVoiceText } from '../proxy/multimodal.js'
 import { getCustomConfig } from '../service/msg-filters.js'
+import { getPuppetInfo } from "../db/puppetDb.js";
 
 const ignoreRecord = [
   { type: 'include', word: '加入了群聊' },
@@ -104,6 +105,9 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         }
         break
       case that.Message.Type.Audio:
+
+        const puppetInfo = await getPuppetInfo()
+
         let finalConfig = await getCustomConfig({ name, id: contact.id, roomName: '', roomId: '', room: false, type: 'openWhisper' })
         if(!finalConfig && config?.customBot?.openWhisper) {
           finalConfig = {
@@ -114,8 +118,8 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         }
         if(finalConfig) {
           const audioFileBox = await msg.toFileBox()
-          const text = msg.text().trim() ? msg.text().trim() : await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
-          console.log('语音解析结果', text)
+          const text = puppetInfo.puppetType.includes('PuppetService')&&!msg.text().startsWith('@') ? msg.text().trim() : await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
+          console.log('语音解析结果:', text)
           const keyword = finalConfig.botConfig.whisperConfig?.keywords?.length ? finalConfig.botConfig?.whisperConfig.keywords?.find((item) => text.includes(item)): true;
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages)
           if (text.trim() && !isIgnore && keyword) {
