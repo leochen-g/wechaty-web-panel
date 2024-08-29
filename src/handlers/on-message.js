@@ -326,6 +326,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         break
       case that.Message.Type.Audio:
         console.log(`群名: ${roomName} 发消息人: ${contactName} 发了一个语音`)
+        const puppetInfo = await getPuppetInfo()
         let finalConfig = await getCustomConfig({ name: contactName, id: contactId, roomName, roomId: room.id, room, type: 'openWhisper' })
         if(!finalConfig && config?.customBot?.openWhisper) {
           finalConfig = {
@@ -336,7 +337,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         }
         if(finalConfig) {
           const audioFileBox = await msg.toFileBox()
-          const text = msg.text().trim() ? msg.text().trim() : await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
+          const text = puppetInfo.puppetType.includes('PuppetService')&&!msg.text().startsWith('@') ? msg.text().trim() : await getVoiceText(audioFileBox, finalConfig.botConfig.whisperConfig)
           console.log('语音解析结果', text)
           const keyword = finalConfig.botConfig.whisperConfig?.keywords?.length ? finalConfig.botConfig?.whisperConfig?.keywords?.find((item) => text.includes(item)): true;
           const isIgnore = checkIgnore(content.trim(), aibotConfig.ignoreMessages)
