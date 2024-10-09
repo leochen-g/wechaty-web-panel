@@ -5,6 +5,7 @@ import { ContentCensor } from "../lib/contentCensor.js";
 import { getPuppetEol, isWindowsPlatform } from '../const/puppet-type.js'
 import dayjs from "dayjs";
 import { extractImageLinks } from '../lib/index.js'
+import {getText2Speech} from "../proxy/multimodal.js";
 
 
 class DifyAi {
@@ -99,6 +100,13 @@ class DifyAi {
         };
       }
       let replys = []
+      console.log('是否开启语音', this.config?.openTTS)
+      if(this.config?.openTTS) {
+        replys = await getText2Speech(text, this.config.ttsConfig)
+        if(replys.length) {
+          return replys
+        }
+      }
       let message;
       if(this.config.showQuestion) {
         message = `${content}${this.eol}-----------${this.eol}` +  (this.iswindows ? text.replaceAll('\n', this.eol) : text);

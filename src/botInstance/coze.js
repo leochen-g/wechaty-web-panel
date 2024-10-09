@@ -6,6 +6,7 @@ import { getPuppetEol, isWindowsPlatform } from '../const/puppet-type.js'
 import dayjs from 'dayjs'
 import { extractImageLinks } from '../lib/index.js'
 import nodeFetch from 'node-fetch'
+import {getText2Speech} from "../proxy/multimodal.js";
 
 
 class CozeAi {
@@ -127,6 +128,12 @@ class CozeAi {
         parentMessageId: id
       }
       let replys = []
+      if(this.config?.openTTS) {
+        replys = await getText2Speech(text, this.config.ttsConfig)
+        if(replys.length) {
+          return replys
+        }
+      }
       let message
       if (this.config.showQuestion) {
         message = `${content}${this.eol}-----------${this.eol}` + (this.iswindows ? text.replaceAll('\n', this.eol) : text)

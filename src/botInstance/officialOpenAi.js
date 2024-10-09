@@ -8,6 +8,7 @@ import { getPuppetEol, isWindowsPlatform } from '../const/puppet-type.js'
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 import { extractImageLinks } from '../lib/index.js'
+import {getText2Speech} from "../proxy/multimodal.js";
 let chatGPT = null
 
 
@@ -198,6 +199,12 @@ class OfficialOpenAi {
       }
 
       let replys = []
+      if(this.config?.openTTS) {
+        replys = await getText2Speech(text, this.config.ttsConfig)
+        if(replys.length) {
+          return replys
+        }
+      }
       let message;
       if(this.config.showQuestion) {
         message = `${content}${this.eol}-----------${this.eol}` + (this.iswindows ? text.replaceAll('\n', this.eol) : text);

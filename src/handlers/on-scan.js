@@ -12,6 +12,15 @@ export function resetScanTime () {
   scanTime = 0
 }
 
+function extractLastPathWithCheck(url) {
+  const parts = url.split('/');
+  if (parts[parts.length - 2] === 'x') {
+    return parts[parts.length - 1];
+  } else {
+    return null; // 或者可以返回一个错误消息
+  }
+}
+
 function getQrcodeKey(qrcode) {
   if(!qrcode || !qrcode.startsWith('http')) return
   let url = new URL(qrcode);
@@ -19,6 +28,9 @@ function getQrcodeKey(qrcode) {
   if(searchParams.get('key')) {
     console.log('获取到二维码信息中的key')
     globalConfig.setQrKey(searchParams.get('key'))
+  } else if(extractLastPathWithCheck(qrcode)) {
+    console.log('获取到二维码信息中的key');
+    globalConfig.setQrKey(extractLastPathWithCheck(qrcode));
   } else {
     globalConfig.setQrKey('')
   }
