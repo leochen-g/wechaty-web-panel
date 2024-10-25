@@ -7,7 +7,8 @@ import { FileBox } from 'file-box'
 import { allConfig } from '../db/configDb.js'
 import { getPuppetEol, isWindowsPlatform } from "../const/puppet-type.js";
 import dayjs from "dayjs";
-import {addHistory} from "../db/chatHistory.js";
+import { addHistory } from "../db/chatHistory.js";
+import { getPuppetInfo } from "../db/puppetDb.js";
 
 async function formatContent(text) {
   text = text.replaceAll('\\n', '\n');
@@ -284,9 +285,16 @@ async function roomSay(room, contact, msg) {
     } else if (msg.type === 8 && msg.url && msg.voiceLength) {
       const fileBox = FileBox.fromUrl(msg.url);
       fileBox.mimeType = "audio/silk";
-      fileBox.metadata = {
-        voiceLength: msg.voiceLength,
-      };
+      const puppetInfo = await getPuppetInfo()
+      if(puppetInfo.puppetType === 'PuppetService') {
+        fileBox.metadata = {
+          duration: msg.voiceLength/1000,
+        };
+      } else {
+        fileBox.metadata = {
+          voiceLength: msg.voiceLength,
+        };
+      }
       await room.say(fileBox)
     }
   } catch (e) {
@@ -355,9 +363,16 @@ async function contactSay(contact, msg, isRoom = false) {
     } else if (msg.type === 8 && msg.url && msg.voiceLength) {
       const fileBox = FileBox.fromUrl(msg.url);
       fileBox.mimeType = "audio/silk";
-      fileBox.metadata = {
-        voiceLength: msg.voiceLength,
-      };
+      const puppetInfo = await getPuppetInfo()
+      if(puppetInfo.puppetType === 'PuppetService') {
+        fileBox.metadata = {
+          duration: msg.voiceLength/1000,
+        };
+      } else {
+        fileBox.metadata = {
+          voiceLength: msg.voiceLength,
+        };
+      }
       await contact.say(fileBox)
     }
   } catch (e) {

@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.6.65",
+  "version": "1.6.66",
   "description": "智能微秘书插件",
   "exports": {
     ".": {
