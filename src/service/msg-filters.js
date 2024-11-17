@@ -414,6 +414,7 @@ async function customBot({ that, msg, name, userAlias, id, config, room, isMenti
   const topic = room ? await room.topic() : ''
   const data = {
     robotId: contactSelf.robotId,
+    robotName: contactSelf.name,
     uid: id,
     uname: name,
     ualias: userAlias,
@@ -424,7 +425,7 @@ async function customBot({ that, msg, name, userAlias, id, config, room, isMenti
   item.moreData &&
   item.moreData.length &&
   item.moreData.forEach((mItem) => {
-    if (mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'ualias' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName' && mItem.key !== 'robotId') {
+    if (mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'ualias' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName' && mItem.key !== 'robotId' && mItem.key !=='robotName') {
       data[mItem.key] = mItem.value
     }
   })

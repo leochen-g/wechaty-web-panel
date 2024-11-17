@@ -45,7 +45,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: config.preventLength && msg.length > config.preventLength, method: 'maxLengthMsg' },
       { bool: msg.includes(NEWADDFRIEND), method: 'newFriendMsg' },
       { bool: config.roomJoinKeywords && config.roomJoinKeywords.length > 0, method: 'roomInviteMsg' },
-      { bool: msg.startsWith(REMINDKEY), method: 'scheduleJobMsg' },
+      { bool: msg.startsWith(REMINDKEY) && !config.no_remind, method: 'scheduleJobMsg' },
       { bool: config.forwards && config.forwards.length > 0, method: 'keywordForward' },
       { bool: config.callBackEvents && config.callBackEvents.length > 0, method: 'callbackEvent' },
       { bool: config.preventWords, method: 'preventWordCheck' },

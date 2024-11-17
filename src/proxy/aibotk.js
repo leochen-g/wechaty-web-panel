@@ -203,6 +203,7 @@ async function getConfig() {
 
     let cres = await updateConfig({
       puppetType: 'wechaty-puppet-wechat',
+      no_remind: false, // 不需要开启提醒
       botScope: 'all',
       parseMini: false,
       openaiSystemMessage: '',

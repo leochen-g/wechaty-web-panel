@@ -5,6 +5,7 @@ import { getCozeV3AiReply } from './cozev3.js'
 import { getQAnyReply } from './qany.js'
 import { updateChatRecord } from "../aibotk.js";
 import globalConfig from '../../db/global.js'
+import {getUser} from "../../db/userDb.js";
 
 /**
  * 消息转发
@@ -14,6 +15,7 @@ import globalConfig from '../../db/global.js'
 export async function dispatchBot({botType, userAlias, content, id, uid, uname, roomId, roomName, adminId, config}) {
    console.log('进入定制机器人回复');
     try {
+      const contactSelf = await getUser()
       const gptConfig = globalConfig.getGptConfigById(adminId);
       let res, replys
       switch (botType) {
@@ -25,13 +27,13 @@ export async function dispatchBot({botType, userAlias, content, id, uid, uname, 
         case 8:
           // dify ai
           console.log('进入Dify聊天');
-          res = await getDifyAiReply({ content, inputs: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config)
+          res = await getDifyAiReply({ content, inputs: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } }, id, adminId, config)
           replys = res
           break
         case 9:
           // fastGPT api
           console.log('进入FastGPT聊天');
-          res = await getChatGPTReply({ content, variables: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config, true)
+          res = await getChatGPTReply({ content, variables: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } }, id, adminId, config, true)
           replys = res
           break
         case 11:
@@ -43,7 +45,7 @@ export async function dispatchBot({botType, userAlias, content, id, uid, uname, 
         case 12:
           // coze v3 api
           console.log('进入Coze V3聊天');
-          res = await getCozeV3AiReply({ content, inputs: { uid, ualias: userAlias, uname, roomId, roomName } }, id, adminId, config)
+          res = await getCozeV3AiReply({ content, inputs: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } }, id, adminId, config)
           replys = res
           break
         case 13:

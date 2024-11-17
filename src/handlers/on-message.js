@@ -6,7 +6,7 @@ import { allConfig } from '../db/configDb.js'
 import { getAibotConfig } from '../db/aiDb.js'
 import { addRoomRecord } from '../db/roomDb.js'
 import { privateForward } from '../common/hook.js'
-import {getPuppetEol } from '../const/puppet-type.js'
+import { getPuppetEol } from '../const/puppet-type.js'
 import { getGpt4vChat } from '../service/gpt4vService.js'
 import { getVoiceText } from '../proxy/multimodal.js'
 import { getCustomConfig } from '../service/msg-filters.js'
@@ -43,6 +43,7 @@ function checkIgnore(msg, list) {
 async function dispatchFriendFilterByMsgType(that, msg) {
   try {
     const eol = await getPuppetEol()
+    const puppetInfo = await getPuppetInfo()
     const aibotConfig = await getAibotConfig()
     const config = await allConfig()
     const type = msg.type()
@@ -57,6 +58,7 @@ async function dispatchFriendFilterByMsgType(that, msg) {
       return
     }
     switch (type) {
+      case that.Message.Type.System:
       case that.Message.Type.Text:
       case that.Message.Type.Url:
         if(type === that.Message.Type.Url) {
@@ -68,6 +70,13 @@ async function dispatchFriendFilterByMsgType(that, msg) {
           }
           console.log('urlLink', urlLink)
           content = `[链接]:${urlLink.url()}`
+        } else if(type === that.Message.Type.System) {
+          const stext = msg.text();
+          if((stext.includes('你已添加') || stext.includes('You have added')) && puppetInfo.puppetType === 'PuppetMatrix') {
+            content = msg.text()
+          } else {
+            return
+          }
         } else {
           content = msg.text()
         }
@@ -105,8 +114,6 @@ async function dispatchFriendFilterByMsgType(that, msg) {
         }
         break
       case that.Message.Type.Audio:
-
-        const puppetInfo = await getPuppetInfo()
 
         let finalConfig = await getCustomConfig({ name, id: contact.id, roomName: '', roomId: '', room: false, type: 'openWhisper' })
         if(!finalConfig && config?.customBot?.openWhisper) {

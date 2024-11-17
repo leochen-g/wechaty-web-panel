@@ -11,6 +11,7 @@ import { getCozeV3Reply, reset as cozeV3Reset, getCozeV3SimpleReply } from "../p
 import { getCozeReply, reset as cozeReset, getCozeSimpleReply } from '../proxy/cozeAi.js'
 import { getQAnyReply, reset as qanyReset, getQAnySimpleReply } from '../proxy/qAnyAi.js'
 import { outApi } from '../proxy/outapi.js'
+import {getUser} from "../db/userDb.js";
 
 /**
  * 根据事件名称分配不同的api处理，并获取返回内容
@@ -148,6 +149,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
 async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias, roomName }) {
   try {
     let res, replys
+    const contactSelf = await getUser()
     switch (bot) {
       case 0:
         // 天行机器人
@@ -166,12 +168,12 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
         break
       case 8:
         // dify ai
-        res = await getDifyReply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName } })
+        res = await getDifyReply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
         replys = res
         break
       case 9:
         // fast gpt
-        res = await getGptOfficialReply(msg, id, true, { uid, uname, ualias: userAlias, roomId, roomName })
+        res = await getGptOfficialReply(msg, id, true, { uid, uname, ualias: userAlias, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name })
         replys = res
         break
       case 11:
@@ -181,7 +183,7 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
         break
       case 12:
         // coze v3
-        res = await getCozeV3Reply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName } })
+        res = await getCozeV3Reply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
         replys = res
         break
       case 13:
@@ -203,6 +205,7 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
 async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, userAlias, config}) {
   try {
     let res, replys
+    const contactSelf = await getUser()
     switch (config.botType) {
       case 6:
         // ChatGPT-api
@@ -211,12 +214,12 @@ async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, us
         break
       case 8:
         // dify ai
-        res = await getDifySimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName }, config})
+        res = await getDifySimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name }, config})
         replys = res
         break
       case 9:
         // fast gpt
-        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, ualias: userAlias, uname, roomId, roomName } })
+        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
         replys = res
         break
       case 11:
@@ -226,7 +229,7 @@ async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, us
         break
       case 12:
         // coze v3
-        res = await getCozeV3SimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName }, config})
+        res = await getCozeV3SimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name }, config})
         replys = res
         break
       default:
