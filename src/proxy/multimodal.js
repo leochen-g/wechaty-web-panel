@@ -21,7 +21,7 @@ export async function getVoiceText(file, aiConfig) {
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      timeout: 60000,
+      timeout: 180000,
       url: AIBOTK_OUTAPI + '/voice/text',
       headers: {
         ...formData.getHeaders(),
@@ -56,7 +56,7 @@ export async function getText2Speech(text, aiConfig) {
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      timeout: 60000,
+      timeout: 180000,
       url: AIBOTK_OUTAPI + '/text/speech',
       headers: {
         'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export async function getImageVision(images, question, config) {
     const reqConfig = {
       method: 'post',
       maxBodyLength: Infinity,
-      timeout: 60000,
+      timeout: 180000,
       url: AIBOTK_OUTAPI + '/image/vision',
       headers: {
         Authorization: `Bearer ${apiKey}`,

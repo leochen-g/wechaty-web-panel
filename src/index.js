@@ -13,6 +13,7 @@ import onRoomtopic from './handlers/on-roomtopic.js'
 import onRoomleave from './handlers/on-roomleave.js'
 import onVerifyCode from './handlers/on-verifycode.js'
 import onRecordMessage from './handlers/on-record-message.js'
+import onCallbackMessage from "./handlers/on-callback-message.js";
 import dayjs from "dayjs";
 const originalConsoleLog = console.log;
 
@@ -71,8 +72,14 @@ function WechatyMessageRecordPlugin() {
     bot.on('message', onRecordMessage)
   }
 }
+function WechatyMessageCallBackPlugin() {
+  return function(bot) {
+    bot.on('message', onCallbackMessage)
+  }
+}
 
 export {
   WechatyWebPanelPlugin,
-  WechatyMessageRecordPlugin
+  WechatyMessageRecordPlugin,
+  WechatyMessageCallBackPlugin
 }

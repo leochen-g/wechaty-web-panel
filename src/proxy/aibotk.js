@@ -247,6 +247,8 @@ async function getConfig() {
       defaultReply: '',
       forwards: [],
       openRecord: false,
+      openWhisper: false,
+      whisperConfig: {},
       ...config,
       cloudRoom
     })
