@@ -18,8 +18,9 @@ async function initStore() {
 }
 
 
-export async function uploadOssFile(file) {
-    const store = initStore()
-    const result = await store.put(file.name, file);
-    return result
+export async function uploadOssFile(fileName, file) {
+    console.log('file', file)
+    const store = await initStore()
+    const result = await store.put(fileName, file);
+    return result?.url || ''
 }
