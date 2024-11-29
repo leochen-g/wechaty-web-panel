@@ -249,6 +249,7 @@ async function getConfig() {
       openRecord: false,
       openWhisper: false,
       whisperConfig: {},
+      ignoreRoomMentionAll: true,
       ...config,
       cloudRoom
     })

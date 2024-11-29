@@ -245,8 +245,12 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
         } else {
           content = msg.text()
         }
+        let mentionSelf = await msg.mentionSelf() || content.includes(`@${userSelfName}`)
+        const isMentionAll = await msg.isMentionAll()
+        if(config?.ignoreRoomMentionAll && isMentionAll && mentionSelf) {
+          mentionSelf = false
+        }
 
-        const mentionSelf = await msg.mentionSelf() || content.includes(`@${userSelfName}`)
         const receiverName = receiver?.name()
         content = content.replace('@' + receiverName, '').replace('@' + userSelfName, '').replace(/@[^,，：:\s@]+/g, '').trim()
         console.log(`群名: ${roomName} 发消息人: ${contactName} 内容: ${content} | 机器人被@：${mentionSelf ? '是' : '否'}`)

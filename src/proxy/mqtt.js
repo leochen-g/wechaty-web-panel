@@ -1,33 +1,42 @@
 import * as mqtt from 'mqtt'
-import { allConfig } from '../db/configDb.js'
-import { contactSay, roomSay, sendRoomNotice } from '../common/index.js'
-import {getConfig, getMqttConfig, getGptConfig, getRssConfig, getVerifyCode, getTasks } from "./aibotk.js";
-import { dispatchEventContent } from '../service/event-dispatch-service.js'
-import { sendTaskMessage, initMultiTask, sendMultiTaskMessage } from "../task/index.js";
-import { delay, randomRange } from "../lib/index.js";
-import { reset } from './bot/chatgpt.js'
-import { reset as difyReset } from './bot/dify.js'
-import { reset as cozeReset } from './bot/coze.js'
-import { reset as qanyReset } from './bot/qany.js'
-import { reset as cozeV3Reset } from './bot/cozev3.js'
-import { initRssTask, sendRssTaskMessage } from "../task/rss.js";
+import {allConfig} from '../db/configDb.js'
+import {contactSay, roomSay, sendRoomNotice} from '../common/index.js'
+import {getConfig, getGptConfig, getMqttConfig, getRssConfig, getTasks, getVerifyCode} from "./aibotk.js";
+import {dispatchEventContent} from '../service/event-dispatch-service.js'
+import {initMultiTask, sendMultiTaskMessage, sendTaskMessage} from "../task/index.js";
+import {delay, randomRange} from "../lib/index.js";
+import {reset} from './bot/chatgpt.js'
+import {reset as difyReset} from './bot/dify.js'
+import {reset as cozeReset} from './bot/coze.js'
+import {reset as qanyReset} from './bot/qany.js'
+import {reset as cozeV3Reset} from './bot/cozev3.js'
+import {initRssTask, sendRssTaskMessage} from "../task/rss.js";
 import globalConfig from "../db/global.js";
-import { resetScanTime } from '../handlers/on-scan.js'
-import { clearHistory } from "../db/chatHistory.js";
+import {resetScanTime} from '../handlers/on-scan.js'
+import {clearHistory} from "../db/chatHistory.js";
 
 let mqttclient = null
 
+async function getContact(that, contact) {
+  const contactInfo = (contact.wxid && await that.Contact.find({id: contact.wxid || ''})) || (contact.id && await that.Contact.find({id: contact.id || ''})) || (contact.name && await that.Contact.find({name: contact.name || ''})) || (contact.alias && await that.Contact.find({alias: contact.alias || ''})) || (contact.weixin && await that.Contact.find({weixin: contact.weixin || ''}))
+  return contactInfo
+}
+async function getRoom(that, room) {
+  const roomInfo = (room.wxid && await that.Room.find({id: room.wxid || ''})) || (room.id && await that.Room.find({id: room.id || ''})) || (room.name && await that.Room.find({topic: room.name || ''})) || (room.roomName && await that.Room.find({topic: room.roomName || ''}))
+  return roomInfo
+}
 
-async function sendRoomSay(that, room, messages) {
+async function sendRoomSay(that, room, messages, atList) {
   console.log(`收到群：${room.name}批量发送消息请求， 消息数量【${messages.length}】`)
-  const finalRoom = await that.Room.find({ id: room.id, topic: room.name });
+  const finalRoom = await getRoom(room)
 
   if (!finalRoom) {
     console.log(`查找不到群：${room.name}，请检查群名是否正确`)
     return
   } else {
     for (let message of messages) {
-      await roomSay.call(that,finalRoom, '', message)
+      const atContacts = await getAtContacts(that, atList)
+      await roomSay.call(that,finalRoom, atContacts, message)
       await delay(500)
     }
   }
@@ -35,7 +44,7 @@ async function sendRoomSay(that, room, messages) {
 
 async function sendContactSay(that, contact, messages) {
   console.log(`收到好友：${contact.name}批量发送消息请求， 消息数量【${messages.length}】`)
-  const finalContact = await that.Contact.find({ id: contact.id || '', name: contact.name, alias: contact.alias || '',   weixin: contact.weixin || '' })
+  const finalContact = await getContact(that, contact)
 
   if (!finalContact) {
     console.log(`查找不到好友：${contact.name}，请检查好友名称是否正确`)
@@ -48,9 +57,27 @@ async function sendContactSay(that, contact, messages) {
   }
 }
 
+async function getAtContacts(that, atList) {
+  if (!atList || atList.length === 0) return ''
+  console.log('atList', atList)
+  let contacts = []
+  for (let contact of atList) {
+    if (contact.id === '@all' || contact.name === '@all') {
+      contacts.push('@all')
+      return contacts
+    }
+    let atContact = await getContact(that, contact)
+    if (atContact) {
+      contacts.push(atContact)
+    }
+  }
+  console.log('search contact', contacts)
+  return contacts
+}
+
 async function sendRoomsNotice(that, room, messages) {
   console.log(`收到群：${room.name}批量发送群公告请求， 公告数量【${messages.length}】`)
-  const finalRoom = await that.Room.find({ id: room.id, topic: room.name })
+  const finalRoom = await getRoom(that, room)
 
   if (!finalRoom) {
     console.log(`查找不到群：${room.name}，请检查群名是否正确`)
@@ -108,11 +135,12 @@ async function initMqtt(that) {
                 console.log(`查找不到群：${content.roomName}，请检查群名是否正确`)
                 return
               } else {
-                await roomSay.call(that,room, '', content.message)
+                const atContacts = content?.atList && content?.atList.length ? await getAtContacts(that, content?.atList) : ''
+                await roomSay.call(that, room, atContacts, content.message)
               }
             } else if (content.target === 'Contact' || content.target === 'contact') {
               console.log(`收到联系人：${content.alias || content.name}发送消息请求： ${content.message.content || content.message.url}`)
-              let contact = (content.wxid && await that.Contact.load(content.wxid)) || (await that.Contact.find({ name: content.name })) || (await that.Contact.find({ alias: content.alias })) || (await that.Contact.find({ weixin: content.weixin })) // 获取你要发送的联系人
+              let contact = await getContact(that, content) // 获取你要发送的联系人
               if (!contact) {
                 console.log(`查找不到联系人：${content.name || content.alias}，请检查联系人名称是否正确`)
                 return
@@ -124,7 +152,7 @@ async function initMqtt(that) {
             console.log('触发批量发送消息请求', content.target);
             if (content.target === 'Room' || content.target === 'room') {
               for(let room of content.groups) {
-                await sendRoomSay(that, room, content.messages)
+                await sendRoomSay(that, room, content.messages, content?.atList)
                 await delay(600)
               }
             } else if (content.target === 'Contact' || content.target === 'contact') {

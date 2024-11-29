@@ -23,8 +23,8 @@ async function onRecordMessage(msg) {
         const timestamp = msg.timestamp || dayjs().unix();
         const robotInfo = this.currentUser
         const isOfficial = contact.type() === this.Contact.Type.Official
-        let content = ''
         if (msgSelf || isOfficial) return
+        console.log('msg', msg)
         const baseMsg = {
             conversionId: room ? room.id : contact.id,
             conversionName: room ? roomName : contactName,
@@ -35,6 +35,39 @@ async function onRecordMessage(msg) {
             time: timestamp.length > 10 ? parseInt(timestamp / 1000) : timestamp
         }
         switch (type) {
+            case this.Message.Type.Channel:
+                baseMsg.type = '视频号'
+                const channelInfo = await msg.toChannel();
+                baseMsg.mediaInfo = {
+                    nickname: channelInfo.nickname(),
+                    coverUrl: channelInfo.coverUrl(),
+                    avatar: channelInfo.avatar(),
+                    desc: channelInfo.desc(),
+                    url: channelInfo.url(),
+                    objectId: channelInfo.objectId(),
+                    objectNonceId: channelInfo.objectNonceId()
+                }
+                break;
+            case this.Message.Type.Contact:
+                baseMsg.type = '名片'
+                const contactInfo = await msg.toContact();
+                baseMsg.mediaInfo = {
+                    name: contactInfo.name(),
+                    avatar: contactInfo.payload.avatar || '',
+                    wxid: contactInfo.id,
+                }
+                break;
+            case this.Message.Type.RedEnvelope:
+                baseMsg.type = '红包'
+                baseMsg.content = "收到红包"
+                break;
+            case this.Message.Type.Emoticon:
+                baseMsg.type = '自定义表情'
+                const emoticonFileBox = await msg.toFileBox();
+                const emoticonBuffer = await emoticonFileBox.toBuffer()
+                const emoticonUrl = await uploadOssFile(`${conversationRecord?.ossConfig?.custom_path || ''}${emoticonFileBox.name}`, emoticonBuffer)
+                baseMsg.url = emoticonUrl
+                break;
             case this.Message.Type.Text:
                 baseMsg.type = '文字'
                 baseMsg.content = msg.text().trim()
@@ -74,17 +107,24 @@ async function onRecordMessage(msg) {
                 const url = await uploadOssFile(`${conversationRecord?.ossConfig?.custom_path || ''}${attachFileBox.name}`, buffer)
                 baseMsg.url = url
                 break
+            case this.Message.Type.Audio:
+                baseMsg.type = '语音'
+                const audioFileBox = await msg.toFileBox()
+                const audioBuffer = await audioFileBox.toBuffer()
+                const audioUrl = await uploadOssFile(`${conversationRecord?.ossConfig?.custom_path || ''}${audioFileBox.name}`, audioBuffer)
+                baseMsg.url = audioUrl
+                break
             default:
                 break
         }
         console.log('baseMsg', baseMsg)
-        sendMessage(baseMsg, conversationRecord)
+        sendMessage(baseMsg, conversationRecord, robotInfo)
     } catch (e) {
         console.log('记录消息失败', e)
     }
 }
 
-function sendMessage(msgInfo, recordConfig) {
+function sendMessage(msgInfo, recordConfig, robotInfo) {
     const blackKey = ['conversationId', 'conversionName', 'isRoom', 'isRobot', 'chatName', 'chatId', 'chatAlias', 'time', 'type', 'url', 'mediaInfo', 'content']
     const baseData = {
         ...msgInfo
@@ -112,9 +152,17 @@ function sendMessage(msgInfo, recordConfig) {
         method: 'POST',
         timeout: timeout * 1000,
         headers: header,
-        data: baseData
+        data: {
+            robotInfo: {
+                wxid: robotInfo.id,
+                name: robotInfo.name(),
+            },
+            message: baseData
+        }
     }
-    console.log('config', config)
+    if(recordConfig?.debug) {
+        console.log('消息回调请求参数', config)
+    }
     axios.request(config).then((res) => {
         console.log('消息发送成功', res)
     }).catch((err) => {

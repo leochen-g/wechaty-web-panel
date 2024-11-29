@@ -242,7 +242,11 @@ async function roomSay(room, contact, msg) {
     if (msg.type === 1 && msg.content) {
       const content = await formatContent(msg.content)
       // 文字
-      contact ? await room.say(content, contact) : await room.say(content)
+      if(Array.isArray(contact)) {
+        await room.say(content, ...contact)
+      } else {
+        contact ? await room.say(content, contact) : await room.say(content)
+      }
       void addReplyHistory(this, { content, contact: null, room: room } )
     } else if (msg.type === 2 && msg.url) {
       // url文件
@@ -257,10 +261,15 @@ async function roomSay(room, contact, msg) {
     } else if (msg.type === 3 && msg.url) {
       // bse64文件
       let obj = FileBox.fromDataURL(msg.url, 'room-avatar.jpg')
-      contact ? await room.say('', contact) : ''
+      if(Array.isArray(contact)) {
+        await room.say('', ...contact)
+      } else {
+        contact ? await room.say('', contact) : ''
+      }
       await delay(500)
       await room.say(obj)
     } else if (msg.type === 4 && msg.url && msg.title && msg.description) {
+      // @ts-ignore
       const description = await formatContent(msg.description)
       const title = await formatContent(msg.title)
       let url = new this.UrlLink({
