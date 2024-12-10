@@ -28,7 +28,7 @@ async function getRoom(that, room) {
 
 async function sendRoomSay(that, room, messages, atList) {
   console.log(`收到群：${room.name}批量发送消息请求， 消息数量【${messages.length}】`)
-  const finalRoom = await getRoom(room)
+  const finalRoom = await getRoom(that, room)
 
   if (!finalRoom) {
     console.log(`查找不到群：${room.name}，请检查群名是否正确`)
