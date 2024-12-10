@@ -20,7 +20,7 @@ function initDb() {
     const dbpath = baseDir + "room.db";
 
     if (fs.existsSync(dbpath)) {
-      fs.unlinkSync(dbpath);
+      // fs.unlinkSync(dbpath);
     }
     rdb = nedb(dbpath)
   }

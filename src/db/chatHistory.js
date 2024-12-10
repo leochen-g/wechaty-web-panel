@@ -18,9 +18,9 @@ function initDb() {
       path.sep
     );
     const dbpath = baseDir + "chatHistory.db";
-    if (fs.existsSync(dbpath)) {
-      fs.unlinkSync(dbpath);
-    }
+    // if (fs.existsSync(dbpath)) {
+    //   fs.unlinkSync(dbpath);
+    // }
     rdb = nedb(dbpath)
   }
 }

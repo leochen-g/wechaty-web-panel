@@ -21,7 +21,7 @@ function initDb() {
     console.log('聊天记录路径：如果开启了记录会存到此处，未开启不会记录，所有记录都是存在本地', dbpath)
 
     if (fs.existsSync(dbpath)) {
-      fs.unlinkSync(dbpath);
+      // fs.unlinkSync(dbpath);
     }
     rdb = nedb(dbpath)
   }

@@ -1,6 +1,6 @@
 {
   "name": "wechaty-web-panel",
-  "version": "1.6.69",
+  "version": "1.6.70",
   "description": "智能微秘书插件",
   "exports": {
     ".": {
@@ -72,7 +72,7 @@
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.2",
     "ali-oss": "^6.21.0",
-    "axios": "^1.6.6",
+    "axios": "^1.7.4",
     "baidu-aip-sdk": "^4.16.10",
     "dayjs": "^1.11.7",
     "eventsource-parser": "^1.0.0",
