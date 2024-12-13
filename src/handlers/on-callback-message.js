@@ -9,7 +9,7 @@ async function onRecordMessage(msg) {
     try {
         const puppetInfo = await getPuppetInfo()
         const config = await allConfig()
-        const conversationRecord = config.conversationRecord || {}
+        const conversationRecord = config?.conversationRecord || {}
         const { role } = config && config.userInfo || { role: 'default' }
         if(role!=='vip' || !conversationRecord?.open) return
 

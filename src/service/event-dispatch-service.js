@@ -146,7 +146,7 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
  * @param {*} name 发消息人
  * @param {*} id 发消息人id
  */
-async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias, roomName }) {
+async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias, userWeixin, roomName }) {
   try {
     let res, replys
     const contactSelf = await getUser()
@@ -168,12 +168,12 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
         break
       case 8:
         // dify ai
-        res = await getDifyReply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
+        res = await getDifyReply({ content: msg, id, inputs: { uid, ualias: userAlias, uweixin: userWeixin, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
         replys = res
         break
       case 9:
         // fast gpt
-        res = await getGptOfficialReply(msg, id, true, { uid, uname, ualias: userAlias, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name })
+        res = await getGptOfficialReply(msg, id, true, { uid, uname, ualias: userAlias, uweixin: userWeixin, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name })
         replys = res
         break
       case 11:
@@ -183,7 +183,7 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
         break
       case 12:
         // coze v3
-        res = await getCozeV3Reply({ content: msg, id, inputs: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
+        res = await getCozeV3Reply({ content: msg, id, inputs: { uid, ualias: userAlias, uweixin: userWeixin, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
         replys = res
         break
       case 13:
@@ -202,7 +202,7 @@ async function dispatchAiBot({ bot, msg, name, id, uid, uname, roomId, userAlias
   }
 }
 
-async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, userAlias, config}) {
+async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, userAlias, userWeixin, config}) {
   try {
     let res, replys
     const contactSelf = await getUser()
@@ -214,12 +214,12 @@ async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, us
         break
       case 8:
         // dify ai
-        res = await getDifySimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name }, config})
+        res = await getDifySimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, uweixin: userWeixin, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name }, config})
         replys = res
         break
       case 9:
         // fast gpt
-        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, ualias: userAlias, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
+        res =  await getSimpleGptReply({content, uid: id, config, isFastGPT:true, variables: { uid, ualias: userAlias, uweixin: userWeixin, uname, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name } })
         replys = res
         break
       case 11:
@@ -229,7 +229,7 @@ async function dispatchSummerBot({ content, id, uid, uname, roomId, roomName, us
         break
       case 12:
         // coze v3
-        res = await getCozeV3SimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name }, config})
+        res = await getCozeV3SimpleReply({content, id, inputs: { uid, uname, ualias: userAlias, uweixin: userWeixin, roomId, roomName, robotId: contactSelf.robotId, robotName: contactSelf.name }, config})
         replys = res
         break
       default:

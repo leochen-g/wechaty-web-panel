@@ -138,15 +138,17 @@ async function getFireNews(id, num) {
 /**
  * 获取自定义内容
  * @param id
+ * @param taskId
  * @returns {Promise<[{type: number, content: string}]|*[]>}
  */
-export async function getCustomNews(id) {
+export async function getCustomNews(id, taskId) {
   try {
     let option = {
       method: 'GET',
       url: '/customnews',
       params: {
-        id
+        id,
+        taskId
       },
     }
     let content = await aiBotReq(option)

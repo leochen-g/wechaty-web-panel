@@ -5,13 +5,13 @@ const WEIXINOFFICIAL = ['朋友推荐消息', '微信支付', '微信运动', '�
 const DELETEFRIEND = '开启了朋友验证' // 被人删除后，防止重复回复
 const REMINDKEY = '提醒'
 const NEWADDFRIEND = '你已添加'
-async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, userAlias, id, room, isMention, roomName, roomId, isFriend }) {
+async function getMsgReply(resArray, { that, msg, name, contact, config, avatar, userAlias, userWeixin, id, room, isMention, roomName, roomId, isFriend }) {
   try {
     let msgArr = []
     for (let i = 0; i < resArray.length; i++) {
       const item = resArray[i]
       if (item.bool) {
-        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room, userAlias, isMention, roomName, roomId, isFriend })) || []
+        msgArr = (await msgFilter[item.method]({ that, msg, name, contact, config, avatar, id, room, userAlias, userWeixin, isMention, roomName, roomId, isFriend })) || []
       }
       if (msgArr.length > 0) {
         return msgArr
@@ -37,6 +37,7 @@ async function filterFriendMsg(that, contact, msg) {
     const gptConfig = globalConfig.getAllGptConfig() // 获取gpt配置信息
     const name = contact.name()
     const userAlias = await contact.alias() || '';
+    const userWeixin = contact.weixin() || '';
     const id = contact.id
     const avatar = await contact.avatar()
     const resArray = [
@@ -56,7 +57,7 @@ async function filterFriendMsg(that, contact, msg) {
       { bool: config.customBot && config.customBot.open, method: 'customBot' },
       { bool: config.autoReply && config.botScope !== 'room', method: 'robotMsg' },
     ]
-    const msgArr = await getMsgReply(resArray, { that, msg, userAlias, contact, name, config, avatar, id })
+    const msgArr = await getMsgReply(resArray, { that, msg, userAlias, userWeixin, contact, name, config, avatar, id })
     return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
   } catch (e) {
     console.log('filterFriendMsg error', e)
@@ -74,7 +75,7 @@ async function filterFriendMsg(that, contact, msg) {
  * 1 开启了好友验证 || 朋友推荐消息 || 发送的文字消息过长,大于40个字符
  * 2 初次添加好友
  */
-async function filterRoomMsg({that, msg, name, id, avatar, userAlias, room, isMention, roomName, roomId, isFriend }) {
+async function filterRoomMsg({that, msg, name, id, avatar, userAlias, userWeixin, room, isMention, roomName, roomId, isFriend }) {
   try {
     const config = await allConfig() // 获取配置信息
     const gptConfig = globalConfig.getAllGptConfig() // 获取gpt配置信息
@@ -90,7 +91,7 @@ async function filterRoomMsg({that, msg, name, id, avatar, userAlias, room, isMe
       { bool: config.customBot && config.customBot.open, method: 'customBot' },
       { bool: config.autoReply && config.botScope !== 'friend', method: 'robotMsg' },
     ]
-    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, userAlias, roomName, roomId, isMention, isFriend })
+    const msgArr = await getMsgReply(resArray, { that, msg, name, config, avatar, id, room, userAlias, userWeixin, roomName, roomId, isMention, isFriend })
     return msgArr.length > 0 ? msgArr : [{ type: 1, content: '', url: '' }]
   } catch (e) {
     console.log('filterRoomMsg error', e)

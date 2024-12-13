@@ -251,7 +251,7 @@ async function keywordsMsg({ msg, config, room, isMention }) {
   }
 }
 
-async function robotMsg({ msg, name, id, config, isMention, roomName,  userAlias, room, roomId, isFriend }) {
+async function robotMsg({ msg, name, id, config, isMention, roomName,  userAlias, userWeixin, room, roomId, isFriend }) {
   // 如果群里没有提及不开启机器人聊天
   if (room && !isMention && config.roomAt || room && !isMention && !config.roomAt && isFriend && config.friendNoReplyInRoom) {
     return []
@@ -260,7 +260,7 @@ async function robotMsg({ msg, name, id, config, isMention, roomName,  userAlias
       let msgArr = [] // 返回的消息列表
       if (config.autoReply) {
         console.log('开启了机器人自动回复功能')
-        msgArr = await dispatch.dispatchAiBot({ bot: config.defaultBot, msg, name, userAlias, uname: name, uid: id, roomName: roomName || '',  roomId: roomId || '', id: `${roomId ? roomId + '_' : ''}${id}` })
+        msgArr = await dispatch.dispatchAiBot({ bot: config.defaultBot, msg, name, userAlias, userWeixin, uname: name, uid: id, roomName: roomName || '',  roomId: roomId || '', id: `${roomId ? roomId + '_' : ''}${id}` })
       } else {
         console.log('没有开启机器人自动回复功能')
         msgArr = [{ type: 1, content: '', url: '' }]
@@ -326,7 +326,7 @@ async function getCustomConfig({ name, id, room, roomId, roomName, type }) {
   }
 }
 
-async function customChat({ msg, name, id, config, isMention, room, userAlias, roomId, roomName }) {
+async function customChat({ msg, name, id, config, isMention, room, userAlias, userWeixin, roomId, roomName }) {
   try {
     const gptConfigs = globalConfig.getAllGptConfig()
     if (gptConfigs && gptConfigs.length) {
@@ -351,6 +351,7 @@ async function customChat({ msg, name, id, config, isMention, room, userAlias, r
                 uname: name,
                 roomId,
                 userAlias,
+                userWeixin,
                 roomName
               })
               if (msgArr.length) return msgArr
@@ -403,7 +404,7 @@ function preventWordCheck({ msg, config, isMention, room }) {
   return []
 }
 
-async function customBot({ that, msg, name, userAlias, id, config, room, isMention }) {
+async function customBot({ that, msg, name, userAlias, userWeixin, id, config, room, isMention }) {
   const item = config.customBot
   // 如果匹配到关键词 群消息要求是必须@，但是没@ 就不需要回复 || 当为群消息关键词只在好友私聊时触发 || 非群消息只在群中触发
   if ((room && item.needAt === 1 && !isMention) || (room && item.needAt === undefined && !isMention) || (room && item.scope === 'friend') || (!room && item.scope === 'room')) {
@@ -418,6 +419,7 @@ async function customBot({ that, msg, name, userAlias, id, config, room, isMenti
     uid: id,
     uname: name,
     ualias: userAlias,
+    uweixin: userWeixin,
     roomId: (room && room.id) || '',
     roomName: (room && topic) || '',
     word: msg
@@ -425,7 +427,7 @@ async function customBot({ that, msg, name, userAlias, id, config, room, isMenti
   item.moreData &&
   item.moreData.length &&
   item.moreData.forEach((mItem) => {
-    if (mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'ualias' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName' && mItem.key !== 'robotId' && mItem.key !=='robotName') {
+    if (mItem.key !== 'uid' && mItem.key !== 'uname' && mItem.key !== 'ualias' && mItem.key !== 'uweixin' && mItem.key !== 'word' && mItem.key !== 'roomId' && mItem.key !== 'roomName' && mItem.key !== 'robotId' && mItem.key !=='robotName') {
       data[mItem.key] = mItem.value
     }
   })
@@ -527,7 +529,7 @@ export async function keywordForward({ that, msg, name, id, config, room, isMent
 }
 
 
-export async function summerChat({ that, msg, name, id, config, room, userAlias, isMention, roomId, roomName  }) {
+export async function summerChat({ that, msg, name, id, config, room, userAlias, userWeixin, isMention, roomId, roomName  }) {
   const { role } = config.userInfo
   const item = config.summerConfig
   // 如果关闭了 或者关键词没有匹配上 直接不需要总结回复
@@ -554,7 +556,7 @@ export async function summerChat({ that, msg, name, id, config, room, userAlias,
       console.log('获取到的聊天内容', content)
     }
     console.log('开始总结聊天内容')
-    const res = await dispatch.dispatchSummerBot({content, config: item, uid: id, userAlias, uname: name, roomId: roomId, roomName,  id: room ? `${roomId ? roomId + '_' : ''}${id}`: id})
+    const res = await dispatch.dispatchSummerBot({content, config: item, uid: id, userAlias, userWeixin, uname: name, roomId: roomId, roomName,  id: room ? `${roomId ? roomId + '_' : ''}${id}`: id})
     return  res;
   } else {
     console.log('没有获取到任何聊天记录内容，无法进行总结，请确认已经开启聊天记录')

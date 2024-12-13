@@ -229,7 +229,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
     let contactAvatar = await contact.avatar()
     const userSelfName = that.currentUser?.name() || that.userSelf()?.name()
     const userAlias = await room?.alias(contact) || await contact.alias() || ''
-
+    const userWeixin = contact.weixin() || '';
     switch (type) {
       case that.Message.Type.Text:
       case that.Message.Type.Url:
@@ -267,6 +267,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           isMention: mentionSelf,
           name: contactName,
           userAlias,
+          userWeixin,
           msgContent: { type: 1, content }
         })
         if (gpt4vReplys.length) {
@@ -282,6 +283,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
           isFriend,
           name: contactName,
           userAlias,
+          userWeixin,
           id: contactId,
           roomId: room.id,
           avatar: contactAvatar,
@@ -380,6 +382,7 @@ async function dispatchRoomFilterByMsgType(that, room, msg) {
               avatar: contactAvatar,
               room,
               userAlias,
+              userWeixin,
               roomName,
               isMention: true
             })

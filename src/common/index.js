@@ -35,9 +35,10 @@ async function getNewsContent(sortId, endWord = '', num = 10) {
 /**
  * 获取自定义定制内容
  * @param {*} sortId 定制Id
+ * @param taskId
  */
-export async function getCustomContent(sortId) {
-  let news = await getCustomNews(sortId)
+export async function getCustomContent(sortId, taskId) {
+  let news = await getCustomNews(sortId, taskId)
   return news
 }
 /**

@@ -144,10 +144,11 @@ async function sendNews ({ that, target, item, isMulti, targets }) {
  * @param item
  * @param isMulti 是否多个目标
  * @param targets 发送的多个目标
+ * @param taskId 任务id
  * @return {Promise<void>}
  */
-async function  sendCustomContent ({ that, target, type, item, isMulti, targets }) {
-  let contents = await getCustomContent(item.sortId);
+async function  sendCustomContent ({ that, target, type, item, isMulti, targets, taskId }) {
+  let contents = await getCustomContent(item.sortId, taskId);
   console.log("定制内容发送", contents);
 
   if (!isMulti) {
@@ -399,7 +400,7 @@ async function sendMultiTaskMessage(that, task) {
     } else if (task.taskType === "countdown") {
       await sendCountDown({ that, isMulti: true, targets, item: task.taskInfo });
     } else if (task.taskType === "customContent") {
-      await sendCustomContent({ that, isMulti: true, targets, type: task.type, item: task.taskInfo });
+      await sendCustomContent({ that, isMulti: true, targets, type: task.type, item: task.taskInfo, taskId: task.id });
     }
   } catch (error) {
     console.log("立即发送定时任务失败：", error);
@@ -438,7 +439,8 @@ async function startSendMultiTask({ that, task }) {
       that,
       isMulti: true,
       targets,
-      item: task.taskInfo
+      item: task.taskInfo,
+      taskId: task.id
     });
   }
 }
