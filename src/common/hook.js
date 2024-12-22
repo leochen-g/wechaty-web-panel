@@ -5,7 +5,7 @@ import { delay } from "../lib/index.js";
  * @returns {Promise<boolean>}
  */
 export async function privateForward({ that, msg, name, config }) {
-  const { role } = config?.userInfo
+  const { role } = config?.userInfo || {}
   const privateForwards = config.privateForwards
   if(role !== 'vip' || !privateForwards || !privateForwards.length || msg.text().includes('请在手机上查看]')) return false
   let result = false

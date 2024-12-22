@@ -1,6 +1,3 @@
-import { getGptConfigById, updateAllGptConfig, updateOneGptConfig } from "./gptConfig.js";
-import onVerifyCode from "../handlers/on-verifycode.js";
-
 class Config {
     constructor(){
         this.apiKey = '';

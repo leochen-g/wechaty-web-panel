@@ -129,9 +129,9 @@ async function scheduleJobMsg({ that, msg, name }) {
  * @param avatar 用户头像
  * @returns {String}
  */
-async function getEventReply(that, event, msg, name, id, avatar, room, roomName, sourceMsg) {
+async function getEventReply(that, event, msg, name, id, avatar, room, roomName, sourceMsg, contact, eventInfo) {
   try {
-    let reply = await dispatch.dispatchEventContent(that, event, msg, name, id, avatar, room, roomName, sourceMsg)
+    let reply = await dispatch.dispatchEventContent(that, event, msg, name, id, avatar, room, roomName, sourceMsg, contact, eventInfo)
     return reply
   } catch (e) {
     console.log('getEventReply error', e)
@@ -192,7 +192,7 @@ async function callbackEvent({ that, msg, name, id, config, room, isMention }) {
   }
 }
 
-async function eventMsg({ that, msg, name, id, avatar, config, room, isMention, roomName }) {
+async function eventMsg({ that, msg, name, id, avatar, config, room, isMention, roomName, contact }) {
   try {
     for (let item of config.eventKeywords) {
       for (let key of item.keywords) {
@@ -202,7 +202,7 @@ async function eventMsg({ that, msg, name, id, avatar, config, room, isMention, 
             return []
           }
           const replaceMsg = msg.replace(key, '')
-          let res = await getEventReply(that, item.event, replaceMsg, name, id, avatar, room, roomName, msg)
+          let res = await getEventReply(that, item.event, replaceMsg, name, id, avatar, room, roomName, msg, contact, item)
           return res
         }
       }

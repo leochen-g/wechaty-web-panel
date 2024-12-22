@@ -1,16 +1,31 @@
-import { getRubbishType, getMingYan, getSweetWord, getStar, getNews, getXing, getSkl, getLunar, getGoldReply, getXhy, getRkl, getEmo, getCname, getResByTX } from '../proxy/api.js'
-import { getConfig, getMeiNv, getWordCloudConfig, getCustomEvents } from '../proxy/aibotk.js'
-import { getConstellation, msgArr, getNewsType } from '../lib/index.js'
-import { initTaskLocalSchedule, initTimeSchedule, initMultiTask } from "../task/index.js";
-import { updateContactAndRoom, updateContactOnly, updateRoomOnly } from '../common/index.js'
-import { getTencentOpenReply } from '../proxy/tencent-open.js'
-import { removeRecord } from "../db/roomDb.js";
-import { getGptOfficialReply, reset as officialReset, getSimpleGptReply } from "../proxy/openAi.js";
-import { getDifyReply, reset as difyReset, getDifySimpleReply } from "../proxy/difyAi.js";
-import { getCozeV3Reply, reset as cozeV3Reset, getCozeV3SimpleReply } from "../proxy/cozeV3Ai.js";
-import { getCozeReply, reset as cozeReset, getCozeSimpleReply } from '../proxy/cozeAi.js'
-import { getQAnyReply, reset as qanyReset, getQAnySimpleReply } from '../proxy/qAnyAi.js'
-import { outApi } from '../proxy/outapi.js'
+import {
+  getCname,
+  getEmo,
+  getGoldReply,
+  getLunar,
+  getMingYan,
+  getNews,
+  getResByTX,
+  getRkl,
+  getRubbishType,
+  getSkl,
+  getStar,
+  getSweetWord,
+  getXhy,
+  getXing
+} from '../proxy/api.js'
+import {getConfig, getCustomEvents, getMeiNv, getWordCloudConfig} from '../proxy/aibotk.js'
+import {getConstellation, getNewsType, msgArr} from '../lib/index.js'
+import {initMultiTask, initTaskLocalSchedule, initTimeSchedule} from "../task/index.js";
+import {roomSay, updateContactAndRoom, updateContactOnly, updateRoomOnly} from '../common/index.js'
+import {getTencentOpenReply} from '../proxy/tencent-open.js'
+import {removeRecord} from "../db/roomDb.js";
+import {getGptOfficialReply, getSimpleGptReply, reset as officialReset} from "../proxy/openAi.js";
+import {getDifyReply, getDifySimpleReply, reset as difyReset} from "../proxy/difyAi.js";
+import {getCozeV3Reply, getCozeV3SimpleReply, reset as cozeV3Reset} from "../proxy/cozeV3Ai.js";
+import {getCozeReply, getCozeSimpleReply, reset as cozeReset} from '../proxy/cozeAi.js'
+import {getQAnyReply, reset as qanyReset} from '../proxy/qAnyAi.js'
+import {outApi} from '../proxy/outapi.js'
 import {getUser} from "../db/userDb.js";
 
 /**
@@ -22,7 +37,7 @@ import {getUser} from "../db/userDb.js";
  * @param avatar
  * @returns {string} 内容
  */
-async function dispatchEventContent(that, eName, msg, name, id, avatar, room, roomName, sourceMsg) {
+async function dispatchEventContent(that, eName, msg, name, id, avatar, room, roomName, sourceMsg, contact, eventInfo) {
   try {
     let content = '',
       type = 1,
@@ -130,6 +145,34 @@ async function dispatchEventContent(that, eName, msg, name, id, avatar, room, ro
         cozeV3Reset();
         content = '更新配置成功，请稍等一分钟后生效'
         break
+      case 'autoRoomCreate':
+        console.log('触发创建群聊指令，拉取用户并创建群聊')
+        const roomMembers = [contact]
+        const creatInfo = eventInfo?.otherInfo || { members: [], name: '', welcomes: [], tips: '' }
+        for (let member of creatInfo.members) {
+          console.log('member', member)
+          const target = member.id && (await that.Contact.find({id: member.id})) || member.name && (await that.Contact.find({name: member.name})); // 获取你要发送的联系人
+          if (target) {
+            roomMembers.push(target)
+          } else {
+            console.log(`没有查找到你预设进群的用户:${member.name},请确保是机器人的好友`)
+          }
+        }
+        that.Room.create(roomMembers, creatInfo.name || '').then((room)=> {
+          if (room) {
+            console.log('创建群聊成功')
+            if(creatInfo.welcomes && creatInfo.welcomes.length) {
+              for (let welcome of creatInfo.welcomes) {
+                void roomSay.call(that, room, contact, welcome)
+              }
+            }
+          }
+        }).catch(e => {
+            console.log('创建群聊失败', e)
+        })
+
+        content = creatInfo.tips || '正在拉您进群，请稍后...'
+        break;
       default:
         break
     }
