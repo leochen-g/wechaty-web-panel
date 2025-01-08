@@ -279,6 +279,9 @@ async function getCustomConfig({ name, id, room, roomId, roomName, type }) {
     let finalConfig = ''
     if (room) {
       finalConfig = room && gptConfigs.find((item) => {
+        if(item?.isAllRoom) {
+          return true
+        }
         const targetNames = []
         const targetIds = []
         item.targets.forEach(tItem => {
@@ -301,6 +304,9 @@ async function getCustomConfig({ name, id, room, roomId, roomName, type }) {
       })
     } else {
       finalConfig = !room && gptConfigs.find((item) => {
+        if(item?.isAllFriend) {
+          return true
+        }
         const targetNames = []
         const targetIds = []
         item.targets.forEach(tItem => {
