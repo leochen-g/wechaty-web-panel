@@ -12,12 +12,7 @@ export async function getContactTextReply(that, contact, msg) {
  * @param {*} name 发消息者昵称
  * @param {*} id 发消息者id
  */
-export async function getRoomTextReply({ that, content, name, id, avatar, room, isMention, roomName, userAlias, roomId, isFriend }) {
-  let result = await service.filterRoomMsg({ that, msg: content, userAlias, name, id, avatar, room, isMention, roomName, roomId, isFriend })
+export async function getRoomTextReply({ that, content, name, id, avatar, room, userWeixin, isMention, roomName, userAlias, roomId, isFriend }) {
+  let result = await service.filterRoomMsg({ that, userWeixin, msg: content, userAlias, name, id, avatar, room, isMention, roomName, roomId, isFriend })
   return result
-}
-
-export default {
-  getContactTextReply,
-  getRoomTextReply,
 }
