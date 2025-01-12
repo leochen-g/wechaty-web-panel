@@ -186,10 +186,13 @@ async function initMqtt(that) {
               await sendMultiTaskMessage(that, content.task)
             } else if (content.target === 'refreshCode') {
               console.log('强制更新二维码')
-              await this.refreshQrCode()
+              await that.refreshQrCode()
             } else if (content.target === 'getNewQrCode') {
               console.log('获取最新二维码')
               resetScanTime()
+            } else if (content.target === 'logout') {
+              console.log('退出登录')
+              that.logout()
             } else if (content.target === 'verifyCode') {
               console.log('触发了输入验证码事件')
               if (globalConfig.getVerifyId() === globalConfig.getQrKey()) {

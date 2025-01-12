@@ -343,7 +343,10 @@ async function customChat({ msg, name, id, config, isMention, room, userAlias, u
           if ((isRoom && finalConfig.needAt === 1 && isMention) || isRoom && !finalConfig.needAt || !isRoom) {
             const keyword = finalConfig?.keywords.find((item) => msg.includes(item))
             if (keyword || !finalConfig?.keywords.length) {
-              msg = keyword ? msg.replace(keyword, '') : msg
+              if(!!finalConfig?.replaceKeyword) {
+                msg = keyword ? msg.replace(keyword, ''): msg
+              }
+
               if (finalConfig.limitNum > 0 && finalConfig.limitNum <= finalConfig.usedNum) {
                 return [{ type: 1, content: finalConfig.rechargeTip || '' }]
               }
